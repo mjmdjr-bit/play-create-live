@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PLAY. CREATE. LIVE. — Creator's Voice</title>
+
     <style>
         :root {
             --bg: #0b0c10;
@@ -36,6 +37,7 @@
             overflow-x: hidden;
         }
 
+        /* BACKGROUND PARTICLES */
         #particles {
             position: fixed;
             inset: 0;
@@ -56,12 +58,14 @@
             mix-blend-mode: overlay
         }
 
+        /* HEADER */
         header {
-            padding: 32px 24px 10px;
+            padding: 40px 24px 10px;
             text-align: center;
-            position: relative
+            position: relative;
         }
 
+        /* Editボタン */
         .edit-link {
             position: absolute;
             right: 26px;
@@ -77,17 +81,17 @@
             gap: 6px;
             align-items: center;
             backdrop-filter: blur(14px);
-        }
-
-        .edit-link span {
-            font-size: 14px
+            z-index: 10;
+            pointer-events: auto;
+            transition: .15s;
         }
 
         .edit-link:hover {
-            box-shadow: 0 10px 24px rgba(0, 0, 0, .3);
-            transform: translateY(-1px)
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
         }
 
+        /* TITLE */
         .title {
             font-weight: 900;
             letter-spacing: .08em;
@@ -101,7 +105,7 @@
             margin-top: 6px;
             font-weight: 300;
             letter-spacing: .14em;
-            color: var(--muted)
+            color: var(--muted);
         }
 
         .jpcopy {
@@ -114,20 +118,20 @@
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             font-size: 15.5px;
-            line-height: 1.85
+            line-height: 1.85;
         }
 
         @keyframes float {
             0% {
-                transform: translateY(0)
+                transform: translateY(0);
             }
 
             50% {
-                transform: translateY(-6px)
+                transform: translateY(-6px);
             }
 
             100% {
-                transform: translateY(0)
+                transform: translateY(0);
             }
         }
 
@@ -146,40 +150,26 @@
         .container {
             max-width: 1120px;
             margin: 0 auto;
-            padding: 0 20px 60px
+            padding: 0 20px 60px;
         }
 
+        /* CREATOR GRID */
         .grid {
-            margin-top: 10px;
+            margin-top: 14px;
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 18px;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width:1024px) {
             .grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width:768px) {
             .grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            header {
-                padding-top: 48px
-            }
-
-            .edit-link {
-                top: 14px;
-                right: 16px
-            }
-        }
-
-        @media (max-width: 480px) {
-            .grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -248,7 +238,7 @@
             text-overflow: ellipsis;
         }
 
-        /* Detail modal */
+        /* DETAIL MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -284,7 +274,7 @@
         .modal-title-block {
             display: flex;
             gap: 12px;
-            align-items: center
+            align-items: center;
         }
 
         .avatar {
@@ -293,7 +283,7 @@
             border-radius: 50%;
             overflow: hidden;
             border: 1px solid #ffffff44;
-            background: radial-gradient(circle at 30% 0%, #fff4, transparent 60%), #1a2132;
+            background: #1a2132;
         }
 
         .avatar img {
@@ -312,13 +302,13 @@
             color: var(--muted)
         }
 
-        .murl>a {
+        .murl a {
             font-size: 11px;
             color: #9ac8ff;
             text-decoration: none;
         }
 
-        .murl>a:hover {
+        .murl a:hover {
             text-decoration: underline;
         }
 
@@ -337,7 +327,7 @@
             gap: 18px;
         }
 
-        @media (max-width: 780px) {
+        @media(max-width:780px) {
             .modal-body {
                 grid-template-columns: 1fr;
             }
@@ -350,6 +340,7 @@
             border: 1px solid var(--border);
         }
 
+        /* Play Video ボタン */
         .play-button {
             margin-top: 8px;
             display: inline-flex;
@@ -373,36 +364,29 @@
             0%,
             100% {
                 box-shadow: 0 0 18px #ffb45788, 0 0 40px #ec489988;
-                transform: translateY(0);
             }
 
             50% {
                 box-shadow: 0 0 26px #ffb457dd, 0 0 60px #ec4899dd;
-                transform: translateY(-1px);
             }
         }
 
-        .play-button span.icon {
+        .play-button .icon {
             width: 22px;
             height: 22px;
             border-radius: 50%;
-            background: #111111ee;
+            background: #111;
             display: grid;
             place-items: center;
             color: #fff;
             font-size: 11px;
         }
 
-        .meta-panel {
-            font-size: 13px;
-            color: var(--muted);
-        }
-
         .meta-label {
             font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .08em;
             color: #cfd6e6;
+            letter-spacing: .08em;
+            text-transform: uppercase;
             margin-bottom: 4px;
         }
 
@@ -411,7 +395,12 @@
             color: #e3e7f3;
         }
 
-        /* Full video overlay */
+        .meta-panel {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* FULLSCREEN VIDEO */
         .video-overlay {
             position: fixed;
             inset: 0;
@@ -431,8 +420,8 @@
             border-radius: 18px;
             overflow: hidden;
             background: #000;
-            box-shadow: 0 26px 80px rgba(0, 0, 0, .85);
             position: relative;
+            box-shadow: 0 26px 80px rgba(0, 0, 0, .85);
         }
 
         .video-shell video {
@@ -459,17 +448,21 @@
             text-align: center;
             color: #b8c2d4;
             font-size: 12px;
-            opacity: .8
+            opacity: .8;
         }
     </style>
 </head>
 
 <body>
+    <!-- BACKGROUND -->
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
+    <!-- HEADER -->
     <header>
+        <!-- ★ 右上の Edit ボタン（確実に動く） -->
         <a href="edit.html" class="edit-link"><span>✏️</span> Edit</a>
+
         <div class="title">PLAY. CREATE. LIVE.</div>
         <div class="subtitle">Creeds of the Playful Creators.</div>
         <div class="jpcopy">
@@ -479,35 +472,39 @@
         </div>
     </header>
 
+    <!-- CREATOR LIST -->
     <main class="container">
         <section>
             <div id="grid" class="grid"></div>
         </section>
     </main>
 
-    <!-- Detail Modal -->
+    <!-- DETAIL MODAL -->
     <div id="detailOverlay" class="modal-overlay">
         <div class="modal">
             <div class="modal-head">
                 <div class="modal-title-block">
                     <div class="avatar" id="detailAvatar"></div>
                     <div>
-                        <div class="mtitle" id="detailName">Creator Name</div>
+                        <div class="mtitle" id="detailName">Creator</div>
                         <div class="msub" id="detailCompany">Company</div>
                         <div class="murl" id="detailUrl"></div>
                     </div>
                 </div>
                 <button class="close" id="detailClose">×</button>
             </div>
+
             <div class="modal-body">
                 <div class="main-video-panel">
-                    <div class="meta-label">MAIN VIDEO</div>
-                    <div class="meta-text" id="detailDesc">メイン動画</div>
+                    <div class="meta-label">Main Video</div>
+                    <div class="meta-text" id="detailDesc">—</div>
+
                     <button class="play-button" id="playMain">
                         <span class="icon">▶</span>
                         <span>Play Video</span>
                     </button>
                 </div>
+
                 <div class="meta-panel">
                     <div class="meta-label">ABOUT</div>
                     <div class="meta-text" id="detailAbout">—</div>
@@ -516,7 +513,7 @@
         </div>
     </div>
 
-    <!-- Fullscreen video -->
+    <!-- FULLSCREEN VIDEO -->
     <div id="videoOverlay" class="video-overlay">
         <div class="video-shell">
             <button class="video-close" id="videoClose">Close</button>
@@ -526,12 +523,15 @@
 
     <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
 
+
+    <!-- SCRIPT -->
     <script>
-        // particles
+        /* PARTICLES ANIMATION */
         (function () {
             const c = document.getElementById('particles');
             const ctx = c.getContext('2d');
             let W, H, dpr = Math.max(1, window.devicePixelRatio || 1);
+
             function resize() {
                 W = c.width = innerWidth * dpr;
                 H = c.height = innerHeight * dpr;
@@ -539,24 +539,32 @@
                 c.style.height = innerHeight + 'px';
             }
             addEventListener('resize', resize); resize();
+
             const N = 80, parts = [];
             for (let i = 0; i < N; i++) parts.push({
-                x: Math.random() * W, y: Math.random() * H,
+                x: Math.random() * W,
+                y: Math.random() * H,
                 r: Math.random() * 3 * dpr + 1 * dpr,
                 a: Math.random() * Math.PI * 2,
                 v: 0.15 + Math.random() * 0.35,
                 o: 0.25 + Math.random() * 0.55
             });
+
             function tick() {
                 ctx.clearRect(0, 0, W, H);
                 for (const p of parts) {
                     p.a += (Math.random() - 0.5) * 0.02;
-                    p.x += Math.cos(p.a) * p.v; p.y += Math.sin(p.a) * p.v * 0.8;
-                    if (p.x < -50) p.x = W + 50; if (p.x > W + 50) p.x = -50; if (p.y < -50) p.y = H + 50; if (p.y > H + 50) p.y = -50;
-                    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
-                    grad.addColorStop(0, 'rgba(255,180,87,' + (0.28 * p.o) + ')');
-                    grad.addColorStop(1, 'rgba(255,108,0,0)');
-                    ctx.fillStyle = grad;
+                    p.x += Math.cos(p.a) * p.v;
+                    p.y += Math.sin(p.a) * p.v * 0.8;
+                    if (p.x < -50) p.x = W + 50;
+                    if (p.x > W + 50) p.x = -50;
+                    if (p.y < -50) p.y = H + 50;
+                    if (p.y > H + 50) p.y = -50;
+
+                    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+                    g.addColorStop(0, 'rgba(255,180,87,' + (0.28 * p.o) + ')');
+                    g.addColorStop(1, 'rgba(255,108,0,0)');
+                    ctx.fillStyle = g;
                     ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2); ctx.fill();
                 }
                 requestAnimationFrame(tick);
@@ -564,7 +572,8 @@
             tick();
         })();
 
-        // IndexedDB
+
+        /* IndexedDB */
         const DB_NAME = 'creatorsVoiceDB';
         const STORE = 'creators';
         let db;
@@ -572,119 +581,11 @@
         function openDB() {
             return new Promise((resolve, reject) => {
                 const req = indexedDB.open(DB_NAME, 1);
-                req.onupgradeneeded = (e) => {
+                req.onupgradeneeded = e => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE)) {
                         const os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
                         os.createIndex('createdAt', 'createdAt', { unique: false });
                     }
                 };
-                req.onsuccess = () => { db = req.result; resolve(db); };
-                req.onerror = () => reject(req.error);
-            });
-        }
-        function getAll() {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE, 'readonly');
-                const req = tx.objectStore(STORE).getAll();
-                req.onsuccess = () => resolve(req.result.slice());
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        function $(s) { return document.querySelector(s); }
-        function el(tag, props = {}, ...children) { const n = Object.assign(document.createElement(tag), props); for (const c of children) n.append(c); return n; }
-
-        let currentEntry = null;
-
-        async function renderGrid() {
-            const list = await getAll();
-            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            const grid = $('#grid');
-            grid.innerHTML = '';
-            if (!list.length) {
-                grid.style.gridTemplateColumns = '1fr';
-                grid.append(el('div', { style: 'padding:36px 18px;border-radius:22px;background:rgba(0,0,0,0.45);border:1px solid #ffffff22;text-align:center;color:#b8c2d4;font-size:14px;' },
-                    'まだクリエイターが登録されていません。右上の [Edit] から追加してください。'
-                ));
-                return;
-            }
-            grid.removeAttribute('style');
-            for (const item of list) {
-                const card = el('div', { className: 'card' });
-                const tw = el('div', { className: 'thumb-wrap' });
-                if (item.thumb) {
-                    tw.append(el('img', { className: 'thumb', src: item.thumb, alt: item.name || 'thumbnail' }));
-                } else {
-                    tw.append(el('div', { className: 'thumb-fallback' }));
-                }
-                const body = el('div', { className: 'card-body' },
-                    el('div', { className: 'creator-name' }, item.name || '—'),
-                    el('div', { className: 'creator-company' }, item.company || '')
-                );
-                card.append(tw, body);
-                card.addEventListener('click', () => openDetail(item));
-                grid.append(card);
-            }
-        }
-
-        function openDetail(item) {
-            currentEntry = item;
-            const avatar = $('#detailAvatar');
-            avatar.innerHTML = '';
-            if (item.profileThumb) {
-                avatar.append(el('img', { src: item.profileThumb, alt: item.name || 'avatar' }));
-            }
-            $('#detailName').textContent = item.name || 'Creator';
-            $('#detailCompany').textContent = item.company || '';
-            const u = $('#detailUrl');
-            u.innerHTML = '';
-            if (item.url) {
-                const a = document.createElement('a');
-                a.href = item.url;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                a.textContent = item.url;
-                u.append(a);
-            }
-            $('#detailDesc').textContent = item.videoTitle || 'Main video';
-            $('#detailAbout').textContent = item.summary || '—';
-            $('#detailOverlay').classList.add('show');
-        }
-
-        function closeDetail() {
-            $('#detailOverlay').classList.remove('show');
-        }
-
-        function openVideo() {
-            if (!currentEntry || !currentEntry.mainVideo) return;
-            const v = $('#mainVideo');
-            const url = URL.createObjectURL(currentEntry.mainVideo);
-            v.src = url;
-            v.currentTime = 0;
-            v.play().catch(() => { });
-            $('#videoOverlay').classList.add('show');
-            v.onended = () => { URL.revokeObjectURL(url); };
-        }
-        function closeVideo() {
-            const v = $('#mainVideo');
-            try { v.pause(); URL.revokeObjectURL(v.src); } catch { }
-            v.removeAttribute('src'); v.load();
-            $('#videoOverlay').classList.remove('show');
-        }
-
-        (async function () {
-            await openDB();
-            $('#detailClose').addEventListener('click', closeDetail);
-            $('#detailOverlay').addEventListener('click', (e) => { if (e.target.id === 'detailOverlay') closeDetail(); });
-            $('#playMain').addEventListener('click', openVideo);
-            $('#videoClose').addEventListener('click', closeVideo);
-            $('#videoOverlay').addEventListener('click', (e) => { if (e.target.id === 'videoOverlay') closeVideo(); });
-            window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeVideo(); closeDetail(); } });
-
-            renderGrid();
-        })();
-    </script>
-</body>
-
-</html>
+                req.ons
