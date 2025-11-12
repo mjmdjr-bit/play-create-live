@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PLAY. CREATE. LIVE. — Edit Creators</title>
+    <style>
+        :root {
+            --bg: #05060a;
+            --card: #11131aee;
+            --border: #ffffff20;
+            --text: #eaeef6;
+            --muted: #9aa3b2;
+            --accent: #ffb457;
+            --accent2: #ff8c37;
+            --danger: #ff6b6b;
+            --radius: 20px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at 0% 0%, #1f2937, #020617 60%);
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-weight: 700;
+            letter-spacing: .08em;
+            font-size: 14px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            font-size: 12px;
+            color: #cbd5f5;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #ffffff12, #ffffff03);
+        }
+
+        .back-link:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .35);
+        }
+
+        .lockstate {
+            font-size: 12px;
+            color: #ffd9b8;
+            margin-left: 8px;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass {
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, #ffffff0f, #ffffff03);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 16px 18px 18px;
+        }
+
+        h2 {
+            font-size: 13px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            margin: 0 0 8px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .dropzone {
+            position: relative;
+            border: 1px dashed #ffb45777;
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            transition: .2s border-color, .2s background;
+            background: linear-gradient(180deg, #ffb45715, transparent);
+            margin-bottom: 10px;
+        }
+
+        .dropzone.dragover {
+            border-color: #ffb457cc;
+            background: linear-gradient(180deg, #ffb45722, transparent)
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            font-size: 11px;
+            color: #c8d0dc;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            margin-top: 4px;
+            padding: 9px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #020617cc;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border .2s, box-shadow .2s;
+        }
+
+        textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #ffb457aa;
+            box-shadow: 0 0 0 3px #ffb45730;
+        }
+
+        .btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            appearance: none;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #ffffff22, #ffffff08);
+            color: var(--text);
+            padding: 8px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            border: none;
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .btn.danger {
+            border-color: #ff6b6b77;
+            background: linear-gradient(135deg, #ef444477, #b91c1c55);
+            color: #fee2e2;
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        thead {
+            background: #020617cc;
+        }
+
+        th,
+        td {
+            padding: 6px 6px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        th {
+            text-align: left;
+            font-weight: 500;
+            color: #cbd5f5;
+        }
+
+        tr:hover td {
+            background: #0b1220;
+        }
+
+        .badge-lock {
+            font-size: 11px;
+            color: #facc15;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <span class="title">PLAY. CREATE. LIVE. — EDIT</span>
+            <span class="lockstate" id="lockState">🔒 Locked</span>
+        </div>
+        <a href="index.html" class="back-link">← Back to TOP</a>
+    </header>
+
+    <main class="container">
+        <!-- left: form -->
+        <section class="glass">
+            <h2>CREATOR FORM</h2>
+            <p class="hint">動画とプロフィールを登録します。保存はブラウザ内（IndexedDB）にのみ行われます。</p>
+
+            <div class="dropzone" id="videoDrop">
+                <input id="videoInput" type="file" accept="video/*"
+                    style="position:absolute;inset:0;opacity:0;cursor:pointer" />
+                <div style="pointer-events:none">
+                    <div style="font-size:32px">⬆</div>
+                    <div style="font-size:13px;margin-top:2px;">ここにメイン動画をドロップ</div>
+                    <div class="hint">MP4 / MOV ・ 16:9推奨 ・ 500MB未満</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="name">氏名（Creator Name）</label>
+                    <input id="name" type="text" placeholder="例：Daijiro Majima">
+                </div>
+                <div>
+                    <label for="company">会社名（Company）</label>
+                    <input id="company" type="text" placeholder="例：TOPPAN Inc.">
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="url">URL</label>
+                    <input id="url" type="text" placeholder="https://example.com">
+                </div>
+                <div>
+                    <label for="videoTitle">動画タイトル（任意）</label>
+                    <input id="videoTitle" type="text" placeholder="例：Space-CX Showreel">
+                </div>
+            </div>
+
+            <div style="margin-top:10px;">
+                <label for="summary">概要 / コメント</label>
+                <textarea id="summary" placeholder="この動画やクリエイターについての簡単な説明"></textarea>
+            </div>
+
+            <div style="margin-top:10px;">
+                <label>プロフィール画像（任意）</label>
+                <div class="btns" style="margin-top:6px;">
+                    <label class="btn" style="position:relative;overflow:hidden;">
+                        画像を選択
+                        <input id="profileInput" type="file" accept="image/*"
+                            style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+                    </label>
+                    <span class="hint" id="profileHint">未選択</span>
+                </div>
+            </div>
+
+            <div class="btns">
+                <button class="btn primary" id="saveBtn" disabled>保存 / 追加</button>
+                <button class="btn" id="clearBtn" disabled>入力クリア</button>
+            </div>
+            <p class="hint">※ 保存・編集・削除にはロック解除（パスワード）が必要です。</p>
+        </section>
+
+        <!-- right: list & auth -->
+        <section class="glass">
+            <h2>CREATOR LIST</h2>
+            <p class="hint">登録済みのクリエイター一覧。クリックで簡易編集ができます。 <span class="badge-lock">（ロック中は読み取り専用）</span></p>
+
+            <div class="btns">
+                <button class="btn" id="authBtn">管理 / ロック解除</button>
+                <button class="btn" id="exportBtn" disabled>エクスポート（JSON）</button>
+                <label class="btn" style="position:relative;overflow:hidden;">
+                    インポート（JSON）
+                    <input id="importInput" type="file" accept="application/json"
+                        style="position:absolute;inset:0;opacity:0;cursor:pointer;" disabled>
+                </label>
+                <button class="btn danger" id="deleteAll" disabled>全削除</button>
+            </div>
+
+            <table id="listTable">
+                <thead>
+                    <tr>
+                        <th style="width:30px;">ID</th>
+                        <th>氏名</th>
+                        <th>会社名</th>
+                        <th>URL</th>
+                        <th style="width:70px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    <tr>
+                        <td colspan="5" style="text-align:center;padding:16px 0;color:#9ca3af;">まだ登録がありません。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- simple auth dialog (prompt ベース) -->
+    <script>
+        // IndexedDB
+        const DB_NAME = 'creatorsVoiceDB';
+        const STORE = 'creators';
+        let db;
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE)) {
+                        const os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+                        os.createIndex('createdAt', 'createdAt', { unique: false });
+                    }
+                };
+                req.onsuccess = () => { db = req.result; resolve(db); };
+                req.onerror = () => reject(req.error);
+            });
+        }
+        function addEntry(entry) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE, 'readwrite');
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+                tx.objectStore(STORE).add(entry);
+            });
+        }
+        function updateEntry(entry) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE, 'readwrite');
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+                tx.objectStore(STORE).put(entry);
+            });
+        }
+        function getAll() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE, 'readonly');
+                const req = tx.objectStore(STORE).getAll();
+                req.onsuccess = () => resolve(req.result.slice());
+                req.onerror = () => reject(req.error);
+            });
+        }
+        function deleteById(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE, 'readwrite');
+                tx.objectStore(STORE).delete(id);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+        function clearAll() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE, 'readwrite');
+                tx.objectStore(STORE).clear();
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        // helpers
+        function $(s) { return document.querySelector(s); }
+        function blobToBase64(blob) { return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(r.error); r.readAsDataURL(blob); }); }
+        async function fileToThumb(imageFile) {
+            return new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(imageFile);
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const size = 140;
+                    canvas.width = size; canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, size, size);
+                    const data = canvas.toDataURL('image/jpeg', 0.9);
+                    URL.revokeObjectURL(url);
+                    resolve(data);
+                };
+                img.onerror = e => { URL.revokeObjectURL(url); reject(e); };
+                img.src = url;
+            });
+        }
+
+        // auth
+        const HASH_KEY = 'cv_admin_hash';
+        let unlocked = false;
+        async function sha256(text) {
+            const enc = new TextEncoder().encode(text);
+            const buf = await crypto.subtle.digest('SHA-256', enc);
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        function setLockUI() {
+            $('#lockState').textContent = unlocked ? '🔓 Unlocked' : '🔒 Locked';
+            $('#saveBtn').disabled = !unlocked;
+            $('#clearBtn').disabled = !unlocked;
+            $('#exportBtn').disabled = !unlocked;
+            $('#importInput').disabled = !unlocked;
+            $('#deleteAll').disabled = !unlocked;
+        }
+        async function handleAuth() {
+            const has = localStorage.getItem(HASH_KEY);
+            if (!has) {
+                const p = prompt('初回設定：管理用パスワードを入力してください（4文字以上）');
+                if (!p || p.length < 4) { alert('4文字以上を入力してください'); return; }
+                const p2 = prompt('確認のため、もう一度入力してください');
+                if (p !== p2) { alert('一致しませんでした'); return; }
+                const h = await sha256(p);
+                localStorage.setItem(HASH_KEY, h);
+                unlocked = true; setLockUI(); alert('パスワードを設定し、ロック解除しました。');
+            } else {
+                const p = prompt('管理パスワードを入力してください');
+                if (!p) { return; }
+                const h = await sha256(p);
+                if (h === has) { unlocked = true; setLockUI(); } else { alert('パスワードが違います'); }
+            }
+        }
+
+        // state
+        let currentVideoFile = null;
+        let currentProfileFile = null;
+
+        function bindDnD() {
+            const dz = $('#videoDrop'); const input = $('#videoInput');
+            const setDrag = on => dz.classList.toggle('dragover', !!on);
+            ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); }));
+            ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(false); }));
+            dz.addEventListener('drop', (e) => {
+                if (!unlocked) { alert('ロック解除が必要です'); return; }
+                const f = e.dataTransfer.files?.[0]; if (f && f.type.startsWith('video/')) { currentVideoFile = f; dz.querySelector('.hint').textContent = `選択中: ${f.name}`; }
+            });
+            input.addEventListener('change', (e) => {
+                if (!unlocked) { alert('ロック解除が必要です'); input.value = ''; return; }
+                const f = e.target.files?.[0]; if (f && f.type.startsWith('video/')) { currentVideoFile = f; dz.querySelector('.hint').textContent = `選択中: ${f.name}`; }
+            });
+        }
+
+        async function renderList() {
+            const list = await getAll();
+            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            const tbody = $('#tbody');
+            tbody.innerHTML = '';
+            if (!list.length) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 5; td.style.textAlign = 'center'; td.style.padding = '16px 0'; td.style.color = '#9ca3af';
+                td.textContent = 'まだ登録がありません。';
+                tr.append(td); tbody.append(tr); return;
+            }
+            for (const it of list) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${it.id}</td>
+          <td>${it.name || ''}</td>
+          <td>${it.company || ''}</td>
+          <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.url || ''}</td>
+          <td><button class="btn" data-edit="${it.id}" style="padding:4px 8px;font-size:11px;">編集</button></td>
+        `;
+                tbody.append(tr);
+            }
+            tbody.addEventListener('click', async (e) => {
+                const idStr = e.target.getAttribute('data-edit');
+                if (!idStr) return;
+                const id = Number(idStr);
+                const list = await getAll();
+                const it = list.find(x => x.id === id);
+                if (!it) return;
+                if (!unlocked) { alert('ロック解除後に編集できます'); return; }
+                // fill form for quick edit
+                $('#name').value = it.name || '';
+                $('#company').value = it.company || '';
+                $('#url').value = it.url || '';
+                $('#videoTitle').value = it.videoTitle || '';
+                $('#summary').value = it.summary || '';
+                currentVideoFile = null; // 動画はそのまま
+                currentProfileFile = null;
+                $('#profileHint').textContent = '（既存画像あり or 未設定）';
+                // 保存は「上書き」として扱う
+                $('#saveBtn').onclick = () => saveEntry(it.id, it);
+            }, { once: true });
+        }
+
+        async function saveEntry(idOverride = null, existing = null) {
+            if (!unlocked) { alert('ロック解除が必要です'); return; }
+            const name = $('#name').value.trim();
+            const company = $('#company').value.trim();
+            const url = $('#url').value.trim();
+            const videoTitle = $('#videoTitle').value.trim();
+            const summary = $('#summary').value.trim();
+            if (!name) { alert('氏名を入力してください'); return; }
+
+            let mainVideoBlob = existing?.mainVideo || null;
+            if (currentVideoFile) {
+                mainVideoBlob = await currentVideoFile.arrayBuffer().then(buf => new Blob([buf], { type: currentVideoFile.type }));
+            }
+            if (!mainVideoBlob) { alert('メイン動画を選択してください'); return; }
+
+            let profileThumb = existing?.profileThumb || null;
+            if (currentProfileFile) {
+                profileThumb = await fileToThumb(currentProfileFile);
+            }
+
+            const entry = {
+                id: idOverride ?? undefined,
+                name, company, url, videoTitle, summary,
+                mainVideo: mainVideoBlob,
+                profileThumb,
+                createdAt: existing?.createdAt || Date.now()
+            };
+
+            if (idOverride) {
+                await updateEntry(entry);
+            } else {
+                await addEntry(entry);
+            }
+
+            clearForm();
+            renderList();
+            alert(idOverride ? '更新しました' : '保存しました');
+            // 保存後はデフォルトの saveBtn 動作に戻す
+            $('#saveBtn').onclick = handleSaveClick;
+        }
+
+        function clearForm() {
+            $('#name').value = '';
+            $('#company').value = '';
+            $('#url').value = '';
+            $('#videoTitle').value = '';
+            $('#summary').value = '';
+            currentVideoFile = null;
+            currentProfileFile = null;
+            $('#videoInput').value = '';
+            $('#profileInput').value = '';
+            $('#videoDrop').querySelector('.hint').textContent = 'MP4 / MOV ・ 16:9推奨 ・ 500MB未満';
+            $('#profileHint').textContent = '未選択';
+        }
+
+        async function exportJSON() {
+            if (!unlocked) { alert('ロック解除が必要です'); return; }
+            const list = await getAll();
+            const payload = await Promise.all(list.map(async it => {
+                const videoB64 = await blobToBase64(it.mainVideo);
+                return {
+                    id: it.id,
+                    name: it.name,
+                    company: it.company,
+                    url: it.url,
+                    videoTitle: it.videoTitle,
+                    summary: it.summary,
+                    profileThumb: it.profileThumb,
+                    createdAt: it.createdAt,
+                    videoB64,
+                    mime: it.mainVideo.type
+                };
+            }));
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+            a.download = `creators-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function importJSONFile(file) {
+            if (!unlocked) { alert('ロック解除が必要です'); return; }
+            const text = await file.text();
+            const arr = JSON.parse(text);
+            for (const it of arr) {
+                const videoBlob = await (await fetch(it.videoB64)).blob();
+                await addEntry({
+                    id: it.id,
+                    name: it.name,
+                    company: it.company,
+                    url: it.url,
+                    videoTitle: it.videoTitle,
+                    summary: it.summary,
+                    profileThumb: it.profileThumb,
+                    createdAt: it.createdAt || Date.now(),
+                    mainVideo: videoBlob
+                });
+            }
+            renderList();
+        }
+
+        async function handleSaveClick() {
+            await saveEntry();
+        }
+
+        (async function () {
+            await openDB();
+            bindDnD();
+            setLockUI();
+            renderList();
+
+            $('#authBtn').addEventListener('click', handleAuth);
+            $('#saveBtn').addEventListener('click', handleSaveClick);
+            $('#clearBtn').addEventListener('click', clearForm);
+
+            $('#profileInput').addEventListener('change', (e) => {
+                const f = e.target.files?.[0];
+                if (f) { currentProfileFile = f; $('#profileHint').textContent = `選択中: ${f.name}`; }
+            });
+
+            $('#exportBtn').addEventListener('click', exportJSON);
+            $('#importInput').addEventListener('change', (e) => {
+                const f = e.target.files?.[0]; if (f) importJSONFile(f); e.target.value = '';
+            });
+            $('#deleteAll').addEventListener('click', async () => {
+                if (!unlocked) { alert('ロック解除が必要です'); return; }
+                if (!confirm('すべてのクリエイターを削除します。よろしいですか？')) return;
+                await clearAll(); renderList();
+            });
+
+        })();
+    </script>
+</body>
+
+</html>
