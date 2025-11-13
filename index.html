@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 
 <head>
@@ -479,9 +479,9 @@
     <script>
         /* PARTICLE ANIMATION */
         (function () {
-            const c = document.getElementById('particles');
-            const ctx = c.getContext('2d');
-            let W, H, dpr = window.devicePixelRatio || 1;
+            var c = document.getElementById('particles');
+            var ctx = c.getContext('2d');
+            var W, H, dpr = window.devicePixelRatio || 1;
 
             function resize() {
                 W = c.width = innerWidth * dpr;
@@ -490,10 +490,10 @@
                 c.style.height = innerHeight + 'px';
             }
             resize();
-            addEventListener('resize', resize);
+            window.addEventListener('resize', resize);
 
-            const N = 70, parts = [];
-            for (let i = 0; i < N; i++) {
+            var N = 70, parts = [];
+            for (var i = 0; i < N; i++) {
                 parts.push({
                     x: Math.random() * W,
                     y: Math.random() * H,
@@ -505,7 +505,8 @@
 
             function draw() {
                 ctx.clearRect(0, 0, W, H);
-                for (const p of parts) {
+                for (var i = 0; i < parts.length; i++) {
+                    var p = parts[i];
                     p.x += Math.cos(p.a) * p.v;
                     p.y += Math.sin(p.a) * p.v;
                     p.a += (Math.random() - 0.5) * 0.02;
@@ -525,106 +526,99 @@
             draw();
         })();
 
-        /* IndexedDB */
-        const DB_NAME = 'creatorsVoiceDB';
-        const STORE = 'creators';
-        let db;
+        /* IndexedDB (read-only here) */
+        var DB_NAME = 'creatorsVoiceDB';
+        var STORE = 'creators';
+        var db;
 
         function openDB() {
-            return new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 2);   // ★ version 2
-                req.onupgradeneeded = e => {
-                    const db = e.target.result;
+            return new Promise(function (resolve, reject) {
+                var req = indexedDB.open(DB_NAME, 2);
+                req.onupgradeneeded = function (e) {
+                    var db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE)) {
-                        const os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+                        var os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
                         os.createIndex('createdAt', 'createdAt', { unique: false });
                     }
                 };
-                req.onsuccess = () => { db = req.result; resolve(db); };
-                req.onerror = () => reject(req.error);
+                req.onsuccess = function () { db = req.result; resolve(db); };
+                req.onerror = function () { reject(req.error); };
             });
         }
 
         function getAllCreators() {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE, 'readonly');
-                const req = tx.objectStore(STORE).getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE, 'readonly');
+                var req = tx.objectStore(STORE).getAll();
+                req.onsuccess = function () { resolve(req.result); };
+                req.onerror = function () { reject(req.error); };
             });
         }
 
         function $(s) { return document.querySelector(s); }
-        let currentCreator = null;
+        var currentCreator = null;
 
-        async function renderGrid() {
-            const list = await getAllCreators();
-            const grid = $('#grid');
-            grid.innerHTML = "";
-
-            if (!list || list.length === 0) {
-                // クリエイターがいないときはグリッドを非表示
-                grid.style.display = "none";
-                return;
-            }
-            grid.style.display = "grid";
-
-            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-            for (const c of list) {
-                const card = document.createElement('div');
-                card.className = 'card';
-
-                const tw = document.createElement('div');
-                tw.className = 'thumb-wrap';
-
-                if (c.profileThumb) {
-                    const img = document.createElement('img');
-                    img.src = c.profileThumb;
-                    img.alt = c.name || 'thumbnail';
-                    img.className = 'thumb';
-                    tw.appendChild(img);
-                } else if (c.thumb) {
-                    const img = document.createElement('img');
-                    img.src = c.thumb;
-                    img.alt = c.name || 'thumbnail';
-                    img.className = 'thumb';
-                    tw.appendChild(img);
-                } else {
-                    const fb = document.createElement('div');
-                    fb.className = 'thumb-fallback';
-                    tw.appendChild(fb);
+        function renderGrid() {
+            return getAllCreators().then(function (list) {
+                var grid = $('#grid');
+                grid.innerHTML = '';
+                if (!list || !list.length) {
+                    grid.style.display = 'none';
+                    return;
                 }
+                grid.style.display = 'grid';
+                list.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+                for (var i = 0; i < list.length; i++) {
+                    var c = list[i];
+                    var card = document.createElement('div');
+                    card.className = 'card';
 
-                const body = document.createElement('div');
-                body.className = 'card-body';
+                    var tw = document.createElement('div');
+                    tw.className = 'thumb-wrap';
 
-                const name = document.createElement('div');
-                name.className = 'creator-name';
-                name.textContent = c.name || '—';
+                    if (c.profileThumb) {
+                        var img = document.createElement('img');
+                        img.src = c.profileThumb;
+                        img.alt = c.name || 'thumbnail';
+                        img.className = 'thumb';
+                        tw.appendChild(img);
+                    } else {
+                        var fb = document.createElement('div');
+                        fb.className = 'thumb-fallback';
+                        tw.appendChild(fb);
+                    }
 
-                const comp = document.createElement('div');
-                comp.className = 'creator-company';
-                comp.textContent = c.company || '';
+                    var body = document.createElement('div');
+                    body.className = 'card-body';
 
-                body.appendChild(name);
-                body.appendChild(comp);
+                    var name = document.createElement('div');
+                    name.className = 'creator-name';
+                    name.textContent = c.name || '—';
 
-                card.appendChild(tw);
-                card.appendChild(body);
+                    var comp = document.createElement('div');
+                    comp.className = 'creator-company';
+                    comp.textContent = c.company || '';
 
-                card.addEventListener('click', () => openDetail(c));
+                    body.appendChild(name);
+                    body.appendChild(comp);
+                    card.appendChild(tw);
+                    card.appendChild(body);
 
-                grid.appendChild(card);
-            }
+                    (function (entry) {
+                        card.addEventListener('click', function () { openDetail(entry); });
+                    })(c);
+
+                    grid.appendChild(card);
+                }
+            });
         }
 
         function openDetail(c) {
             currentCreator = c;
-            const avatar = $('#detailAvatar');
+            var avatar = $('#detailAvatar');
             avatar.innerHTML = '';
             if (c.profileThumb) {
-                const img = document.createElement('img');
+                var img = document.createElement('img');
                 img.src = c.profileThumb;
                 img.alt = c.name || 'avatar';
                 avatar.appendChild(img);
@@ -632,10 +626,10 @@
 
             $('#detailName').textContent = c.name || 'Creator';
             $('#detailCompany').textContent = c.company || '';
-            const urlBox = $('#detailUrl');
+            var urlBox = $('#detailUrl');
             urlBox.innerHTML = '';
             if (c.url) {
-                const a = document.createElement('a');
+                var a = document.createElement('a');
                 a.href = c.url;
                 a.target = '_blank';
                 a.rel = 'noopener noreferrer';
@@ -654,39 +648,44 @@
 
         function openVideo() {
             if (!currentCreator || !currentCreator.mainVideo) return;
-            const v = $('#mainVideo');
-            const url = URL.createObjectURL(currentCreator.mainVideo);
+            var v = $('#mainVideo');
+            var url = URL.createObjectURL(currentCreator.mainVideo);
             v.src = url;
             v.currentTime = 0;
-            v.play().catch(() => { });
+            v.play().catch(function () { });
             $('#videoOverlay').classList.add('show');
-            v.onended = () => { URL.revokeObjectURL(url); };
+            v.onended = function () { URL.revokeObjectURL(url); };
         }
 
         function closeVideo() {
-            const v = $('#mainVideo');
-            try { v.pause(); URL.revokeObjectURL(v.src); } catch { }
+            var v = $('#mainVideo');
+            try { v.pause(); URL.revokeObjectURL(v.src); } catch (e) { }
             v.removeAttribute('src');
             v.load();
             $('#videoOverlay').classList.remove('show');
         }
 
-        (async function () {
-            await openDB();
-            await renderGrid();
+        (function init() {
+            openDB().then(function () {
+                return renderGrid();
+            }).then(function () {
+                $('#detailClose').addEventListener('click', closeDetail);
+                $('#detailOverlay').addEventListener('click', function (e) {
+                    if (e.target.id === 'detailOverlay') closeDetail();
+                });
 
-            $('#detailClose').addEventListener('click', closeDetail);
-            $('#detailOverlay').addEventListener('click', e => { if (e.target.id === 'detailOverlay') closeDetail(); });
+                $('#playMain').addEventListener('click', openVideo);
+                $('#videoClose').addEventListener('click', closeVideo);
+                $('#videoOverlay').addEventListener('click', function (e) {
+                    if (e.target.id === 'videoOverlay') closeVideo();
+                });
 
-            $('#playMain').addEventListener('click', openVideo);
-            $('#videoClose').addEventListener('click', closeVideo);
-            $('#videoOverlay').addEventListener('click', e => { if (e.target.id === 'videoOverlay') closeVideo(); });
-
-            window.addEventListener('keydown', e => {
-                if (e.key === 'Escape') {
-                    closeVideo();
-                    closeDetail();
-                }
+                window.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        closeVideo();
+                        closeDetail();
+                    }
+                });
             });
         })();
     </script>
