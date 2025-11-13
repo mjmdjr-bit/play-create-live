@@ -65,7 +65,6 @@
             position: relative;
         }
 
-        /* Editボタン */
         .edit-link {
             position: absolute;
             right: 26px;
@@ -146,7 +145,6 @@
             }
         }
 
-        /* GRID */
         .container {
             max-width: 1120px;
             margin: 0 auto;
@@ -236,7 +234,6 @@
             text-overflow: ellipsis;
         }
 
-        /* DETAIL MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -366,7 +363,6 @@
             }
         }
 
-        /* VIDEO FULLSCREEN */
         .video-overlay {
             position: fixed;
             inset: 0;
@@ -421,7 +417,6 @@
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
-    <!-- HEADER -->
     <header>
         <a href="edit.html" class="edit-link"><span>✏️</span> Edit</a>
 
@@ -434,7 +429,6 @@
         </div>
     </header>
 
-    <!-- LIST -->
     <main class="container">
         <div id="grid" class="grid"></div>
     </main>
@@ -531,14 +525,14 @@
             draw();
         })();
 
-        /* IndexedDB Setup */
+        /* IndexedDB */
         const DB_NAME = 'creatorsVoiceDB';
         const STORE = 'creators';
         let db;
 
         function openDB() {
             return new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 1);
+                const req = indexedDB.open(DB_NAME, 2);   // ★ version 2
                 req.onupgradeneeded = e => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE)) {
@@ -561,7 +555,6 @@
         }
 
         function $(s) { return document.querySelector(s); }
-
         let currentCreator = null;
 
         async function renderGrid() {
@@ -570,11 +563,10 @@
             grid.innerHTML = "";
 
             if (!list || list.length === 0) {
-                // クリエイターがいないときはグリッドごと非表示
+                // クリエイターがいないときはグリッドを非表示
                 grid.style.display = "none";
                 return;
             }
-
             grid.style.display = "grid";
 
             list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -589,6 +581,12 @@
                 if (c.profileThumb) {
                     const img = document.createElement('img');
                     img.src = c.profileThumb;
+                    img.alt = c.name || 'thumbnail';
+                    img.className = 'thumb';
+                    tw.appendChild(img);
+                } else if (c.thumb) {
+                    const img = document.createElement('img');
+                    img.src = c.thumb;
                     img.alt = c.name || 'thumbnail';
                     img.className = 'thumb';
                     tw.appendChild(img);

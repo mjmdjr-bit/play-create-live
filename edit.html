@@ -250,7 +250,7 @@
     </header>
 
     <main class="container">
-        <!-- 左：FORM -->
+        <!-- FORM -->
         <section class="glass">
             <h2>CREATOR FORM</h2>
             <p class="hint">動画とプロフィールを登録します。保存はブラウザ内（IndexedDB）にのみ行われます。</p>
@@ -311,7 +311,7 @@
             <p class="hint">※ 保存・編集・削除にはロック解除（パスワード）が必要です。</p>
         </section>
 
-        <!-- 右：LIST & AUTH -->
+        <!-- LIST & AUTH -->
         <section class="glass">
             <h2>CREATOR LIST</h2>
             <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存できます。 <span class="badge-lock">（ロック中は読み取り専用）</span></p>
@@ -347,14 +347,13 @@
     </main>
 
     <script>
-        /* ---- IndexedDB ---- */
         const DB_NAME = 'creatorsVoiceDB';
         const STORE = 'creators';
         let db;
 
         function openDB() {
             return new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 1);
+                const req = indexedDB.open(DB_NAME, 2);  // ★ version 2
                 req.onupgradeneeded = e => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE)) {
@@ -408,8 +407,8 @@
             });
         }
 
-        /* ---- Helpers ---- */
         function $(s) { return document.querySelector(s); }
+
         function fileToThumb(imageFile) {
             return new Promise((resolve, reject) => {
                 const url = URL.createObjectURL(imageFile);
@@ -428,6 +427,7 @@
                 img.src = url;
             });
         }
+
         function blobToBase64(blob) {
             return new Promise((resolve, reject) => {
                 const r = new FileReader();
@@ -437,7 +437,6 @@
             });
         }
 
-        /* ---- Auth ---- */
         const HASH_KEY = 'cv_admin_hash';
         let unlocked = false;
 
@@ -450,11 +449,10 @@
         function setLockUI() {
             $('#lockState').textContent = unlocked ? '🔓 Unlocked' : '🔒 Locked';
 
-            // 保存・クリアはロック中でも押せる（saveEntry内でチェック）
+            // 保存・クリアはロック中でも押せる（saveEntry側でチェック）
             $('#saveBtn').disabled = false;
             $('#clearBtn').disabled = false;
 
-            // JSONや全削除はロック依存
             $('#exportBtn').disabled = !unlocked;
             $('#importInput').disabled = !unlocked;
             $('#deleteAll').disabled = !unlocked;
@@ -469,23 +467,20 @@
                 if (p !== p2) { alert('一致しませんでした'); return; }
                 const h = await sha256(p);
                 localStorage.setItem(HASH_KEY, h);
-                unlocked = true;
-                setLockUI();
+                unlocked = true; setLockUI();
                 alert('パスワードを設定し、ロック解除しました。');
             } else {
                 const p = prompt('管理パスワードを入力してください');
                 if (!p) return;
                 const h = await sha256(p);
                 if (h === has) {
-                    unlocked = true;
-                    setLockUI();
+                    unlocked = true; setLockUI();
                 } else {
                     alert('パスワードが違います。');
                 }
             }
         }
 
-        /* ---- State ---- */
         let currentVideoFile = null;
         let currentProfileFile = null;
         let editingEntry = null;
@@ -493,8 +488,9 @@
         function bindDnD() {
             const dz = $('#videoDrop');
             const input = $('#videoInput');
-            const setDrag = on => dz.classList.toggle('dragover', !!on);
+            const hint = dz.querySelector('.hint');
 
+            const setDrag = on => dz.classList.toggle('dragover', !!on);
             ['dragenter', 'dragover'].forEach(ev => {
                 dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
             });
@@ -506,7 +502,8 @@
                 const f = e.dataTransfer.files?.[0];
                 if (f && f.type.startsWith('video/')) {
                     currentVideoFile = f;
-                    dz.querySelector('.hint').textContent = `選択中: ${f.name}`;
+                    hint.textContent = `動画読み込み中... (${f.name})`;
+                    setTimeout(() => { hint.textContent = `選択中: ${f.name}`; }, 500);
                 }
             });
 
@@ -514,7 +511,8 @@
                 const f = e.target.files?.[0];
                 if (f && f.type.startsWith('video/')) {
                     currentVideoFile = f;
-                    dz.querySelector('.hint').textContent = `選択中: ${f.name}`;
+                    hint.textContent = `動画読み込み中... (${f.name})`;
+                    setTimeout(() => { hint.textContent = `選択中: ${f.name}`; }, 500);
                 }
             });
         }
@@ -552,53 +550,67 @@
                 return;
             }
 
-            const name = $('#name').value.trim();
-            const company = $('#company').value.trim();
-            const url = $('#url').value.trim();
-            const videoTitle = $('#videoTitle').value.trim();
-            const summary = $('#summary').value.trim();
+            const saveBtn = $('#saveBtn');
+            const origText = saveBtn.textContent;
+            saveBtn.textContent = '保存中...';
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
 
-            if (!name) {
-                alert('氏名を入力してください。');
-                return;
+            try {
+                const name = $('#name').value.trim();
+                const company = $('#company').value.trim();
+                const url = $('#url').value.trim();
+                const videoTitle = $('#videoTitle').value.trim();
+                const summary = $('#summary').value.trim();
+
+                if (!name) {
+                    alert('氏名を入力してください。');
+                    return;
+                }
+
+                let mainVideoBlob = editingEntry?.mainVideo || null;
+                if (currentVideoFile) {
+                    mainVideoBlob = await currentVideoFile.arrayBuffer().then(
+                        buf => new Blob([buf], { type: currentVideoFile.type })
+                    );
+                }
+                if (!mainVideoBlob) {
+                    alert('メイン動画を選択してください。');
+                    return;
+                }
+
+                let profileThumb = editingEntry?.profileThumb || null;
+                if (currentProfileFile) {
+                    profileThumb = await fileToThumb(currentProfileFile);
+                }
+
+                const entry = {
+                    id: editingEntry?.id,
+                    name,
+                    company,
+                    url,
+                    videoTitle,
+                    summary,
+                    profileThumb,
+                    mainVideo: mainVideoBlob,
+                    createdAt: editingEntry?.createdAt || Date.now()
+                };
+
+                if (editingEntry) {
+                    await updateEntry(entry);
+                } else {
+                    delete entry.id;
+                    await addEntry(entry);
+                }
+
+                clearForm();
+                await renderList();
+                flashSaveButton(editingEntry ? '更新しました' : '保存しました');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.style.opacity = '1';
+                saveBtn.textContent = origText;
             }
-
-            let mainVideoBlob = editingEntry?.mainVideo || null;
-            if (currentVideoFile) {
-                mainVideoBlob = await currentVideoFile.arrayBuffer().then(buf => new Blob([buf], { type: currentVideoFile.type }));
-            }
-            if (!mainVideoBlob) {
-                alert('メイン動画を選択してください。');
-                return;
-            }
-
-            let profileThumb = editingEntry?.profileThumb || null;
-            if (currentProfileFile) {
-                profileThumb = await fileToThumb(currentProfileFile);
-            }
-
-            const entry = {
-                id: editingEntry?.id,
-                name,
-                company,
-                url,
-                videoTitle,
-                summary,
-                profileThumb,
-                mainVideo: mainVideoBlob,
-                createdAt: editingEntry?.createdAt || Date.now()
-            };
-
-            if (editingEntry) {
-                await updateEntry(entry);
-            } else {
-                delete entry.id; // autoIncrement
-                await addEntry(entry);
-            }
-
-            clearForm();
-            await renderList();
-            flashSaveButton(editingEntry ? '更新しました' : '保存しました');
         }
 
         async function renderList() {
@@ -631,25 +643,24 @@
         `;
                 tbody.appendChild(tr);
             }
+        }
 
-            tbody.addEventListener('click', async e => {
-                const id = e.target.getAttribute('data-id');
-                if (!id) return;
-                const all = await getAll();
-                const it = all.find(x => String(x.id) === String(id));
-                if (!it) return;
+        async function handleRowClick(e) {
+            const id = e.target.getAttribute('data-id');
+            if (!id) return;
+            const all = await getAll();
+            const it = all.find(x => String(x.id) === String(id));
+            if (!it) return;
 
-                // フォームに読み込み
-                $('#name').value = it.name || '';
-                $('#company').value = it.company || '';
-                $('#url').value = it.url || '';
-                $('#videoTitle').value = it.videoTitle || '';
-                $('#summary').value = it.summary || '';
-                $('#profileHint').textContent = it.profileThumb ? '既存画像あり' : '未選択';
-                currentVideoFile = null;
-                currentProfileFile = null;
-                editingEntry = it;
-            }, { once: true }); // 一度だけバインドし直す
+            $('#name').value = it.name || '';
+            $('#company').value = it.company || '';
+            $('#url').value = it.url || '';
+            $('#videoTitle').value = it.videoTitle || '';
+            $('#summary').value = it.summary || '';
+            $('#profileHint').textContent = it.profileThumb ? '既存画像あり' : '未選択';
+            currentVideoFile = null;
+            currentProfileFile = null;
+            editingEntry = it;
         }
 
         async function exportJSON() {
@@ -704,7 +715,6 @@
             await renderList();
         }
 
-        /* ---- INIT ---- */
         (async function () {
             await openDB();
             bindDnD();
@@ -719,7 +729,9 @@
                 const f = e.target.files?.[0];
                 if (f) {
                     currentProfileFile = f;
-                    $('#profileHint').textContent = `選択中: ${f.name}`;
+                    const hint = $('#profileHint');
+                    hint.textContent = `画像読み込み中... (${f.name})`;
+                    setTimeout(() => { hint.textContent = `選択中: ${f.name}`; }, 500);
                 }
             });
 
@@ -739,6 +751,8 @@
                 await clearAll();
                 await renderList();
             });
+
+            $('#tbody').addEventListener('click', handleRowClick);
         })();
     </script>
 </body>
