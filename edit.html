@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PLAY. CREATE. LIVE. — Edit Creators</title>
+
     <style>
         :root {
             --bg: #05060a;
@@ -20,12 +21,12 @@
         }
 
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         html,
         body {
-            height: 100%
+            height: 100%;
         }
 
         body {
@@ -49,6 +50,12 @@
             font-size: 14px;
         }
 
+        .lockstate {
+            font-size: 12px;
+            color: #ffd9b8;
+            margin-left: 8px;
+        }
+
         .back-link {
             text-decoration: none;
             font-size: 12px;
@@ -63,12 +70,6 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, .35);
         }
 
-        .lockstate {
-            font-size: 12px;
-            color: #ffd9b8;
-            margin-left: 8px;
-        }
-
         .container {
             max-width: 1120px;
             margin: 0 auto;
@@ -78,7 +79,7 @@
             gap: 20px;
         }
 
-        @media (max-width: 900px) {
+        @media(max-width:900px) {
             .container {
                 grid-template-columns: 1fr;
             }
@@ -118,7 +119,7 @@
 
         .dropzone.dragover {
             border-color: #ffb457cc;
-            background: linear-gradient(180deg, #ffb45722, transparent)
+            background: linear-gradient(180deg, #ffb45722, transparent);
         }
 
         .row {
@@ -128,7 +129,7 @@
             margin-top: 10px;
         }
 
-        @media (max-width: 640px) {
+        @media(max-width:640px) {
             .row {
                 grid-template-columns: 1fr;
             }
@@ -249,14 +250,14 @@
     </header>
 
     <main class="container">
-        <!-- left: form -->
+        <!-- 左：FORM -->
         <section class="glass">
             <h2>CREATOR FORM</h2>
             <p class="hint">動画とプロフィールを登録します。保存はブラウザ内（IndexedDB）にのみ行われます。</p>
 
             <div class="dropzone" id="videoDrop">
                 <input id="videoInput" type="file" accept="video/*"
-                    style="position:absolute;inset:0;opacity:0;cursor:pointer" />
+                    style="position:absolute;inset:0;opacity:0;cursor:pointer;">
                 <div style="pointer-events:none">
                     <div style="font-size:32px">⬆</div>
                     <div style="font-size:13px;margin-top:2px;">ここにメイン動画をドロップ</div>
@@ -304,16 +305,16 @@
             </div>
 
             <div class="btns">
-                <button class="btn primary" id="saveBtn" disabled>保存 / 追加</button>
-                <button class="btn" id="clearBtn" disabled>入力クリア</button>
+                <button class="btn primary" id="saveBtn">保存 / 追加</button>
+                <button class="btn" id="clearBtn">入力クリア</button>
             </div>
             <p class="hint">※ 保存・編集・削除にはロック解除（パスワード）が必要です。</p>
         </section>
 
-        <!-- right: list & auth -->
+        <!-- 右：LIST & AUTH -->
         <section class="glass">
             <h2>CREATOR LIST</h2>
-            <p class="hint">登録済みのクリエイター一覧。クリックで簡易編集ができます。 <span class="badge-lock">（ロック中は読み取り専用）</span></p>
+            <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存できます。 <span class="badge-lock">（ロック中は読み取り専用）</span></p>
 
             <div class="btns">
                 <button class="btn" id="authBtn">管理 / ロック解除</button>
@@ -326,10 +327,10 @@
                 <button class="btn danger" id="deleteAll" disabled>全削除</button>
             </div>
 
-            <table id="listTable">
+            <table>
                 <thead>
                     <tr>
-                        <th style="width:30px;">ID</th>
+                        <th style="width:40px;">ID</th>
                         <th>氏名</th>
                         <th>会社名</th>
                         <th>URL</th>
@@ -345,9 +346,8 @@
         </section>
     </main>
 
-    <!-- simple auth dialog (prompt ベース) -->
     <script>
-        // IndexedDB
+        /* ---- IndexedDB ---- */
         const DB_NAME = 'creatorsVoiceDB';
         const STORE = 'creators';
         let db;
@@ -355,7 +355,7 @@
         function openDB() {
             return new Promise((resolve, reject) => {
                 const req = indexedDB.open(DB_NAME, 1);
-                req.onupgradeneeded = (e) => {
+                req.onupgradeneeded = e => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE)) {
                         const os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
@@ -366,6 +366,7 @@
                 req.onerror = () => reject(req.error);
             });
         }
+
         function addEntry(entry) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction(STORE, 'readwrite');
@@ -386,7 +387,7 @@
             return new Promise((resolve, reject) => {
                 const tx = db.transaction(STORE, 'readonly');
                 const req = tx.objectStore(STORE).getAll();
-                req.onsuccess = () => resolve(req.result.slice());
+                req.onsuccess = () => resolve(req.result);
                 req.onerror = () => reject(req.error);
             });
         }
@@ -407,16 +408,15 @@
             });
         }
 
-        // helpers
+        /* ---- Helpers ---- */
         function $(s) { return document.querySelector(s); }
-        function blobToBase64(blob) { return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(r.error); r.readAsDataURL(blob); }); }
-        async function fileToThumb(imageFile) {
+        function fileToThumb(imageFile) {
             return new Promise((resolve, reject) => {
                 const url = URL.createObjectURL(imageFile);
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const size = 140;
+                    const size = 200;
                     canvas.width = size; canvas.height = size;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, size, size);
@@ -428,23 +428,38 @@
                 img.src = url;
             });
         }
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const r = new FileReader();
+                r.onload = () => resolve(r.result);
+                r.onerror = () => reject(r.error);
+                r.readAsDataURL(blob);
+            });
+        }
 
-        // auth
+        /* ---- Auth ---- */
         const HASH_KEY = 'cv_admin_hash';
         let unlocked = false;
+
         async function sha256(text) {
             const enc = new TextEncoder().encode(text);
             const buf = await crypto.subtle.digest('SHA-256', enc);
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
+
         function setLockUI() {
             $('#lockState').textContent = unlocked ? '🔓 Unlocked' : '🔒 Locked';
-            $('#saveBtn').disabled = !unlocked;
-            $('#clearBtn').disabled = !unlocked;
+
+            // 保存・クリアはロック中でも押せる（saveEntry内でチェック）
+            $('#saveBtn').disabled = false;
+            $('#clearBtn').disabled = false;
+
+            // JSONや全削除はロック依存
             $('#exportBtn').disabled = !unlocked;
             $('#importInput').disabled = !unlocked;
             $('#deleteAll').disabled = !unlocked;
         }
+
         async function handleAuth() {
             const has = localStorage.getItem(HASH_KEY);
             if (!has) {
@@ -454,118 +469,54 @@
                 if (p !== p2) { alert('一致しませんでした'); return; }
                 const h = await sha256(p);
                 localStorage.setItem(HASH_KEY, h);
-                unlocked = true; setLockUI(); alert('パスワードを設定し、ロック解除しました。');
+                unlocked = true;
+                setLockUI();
+                alert('パスワードを設定し、ロック解除しました。');
             } else {
                 const p = prompt('管理パスワードを入力してください');
-                if (!p) { return; }
+                if (!p) return;
                 const h = await sha256(p);
-                if (h === has) { unlocked = true; setLockUI(); } else { alert('パスワードが違います'); }
+                if (h === has) {
+                    unlocked = true;
+                    setLockUI();
+                } else {
+                    alert('パスワードが違います。');
+                }
             }
         }
 
-        // state
+        /* ---- State ---- */
         let currentVideoFile = null;
         let currentProfileFile = null;
+        let editingEntry = null;
 
         function bindDnD() {
-            const dz = $('#videoDrop'); const input = $('#videoInput');
+            const dz = $('#videoDrop');
+            const input = $('#videoInput');
             const setDrag = on => dz.classList.toggle('dragover', !!on);
-            ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); }));
-            ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(false); }));
-            dz.addEventListener('drop', (e) => {
-                if (!unlocked) { alert('ロック解除が必要です'); return; }
-                const f = e.dataTransfer.files?.[0]; if (f && f.type.startsWith('video/')) { currentVideoFile = f; dz.querySelector('.hint').textContent = `選択中: ${f.name}`; }
+
+            ['dragenter', 'dragover'].forEach(ev => {
+                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
             });
-            input.addEventListener('change', (e) => {
-                if (!unlocked) { alert('ロック解除が必要です'); input.value = ''; return; }
-                const f = e.target.files?.[0]; if (f && f.type.startsWith('video/')) { currentVideoFile = f; dz.querySelector('.hint').textContent = `選択中: ${f.name}`; }
+            ['dragleave', 'drop'].forEach(ev => {
+                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(false); });
             });
-        }
 
-        async function renderList() {
-            const list = await getAll();
-            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            const tbody = $('#tbody');
-            tbody.innerHTML = '';
-            if (!list.length) {
-                const tr = document.createElement('tr');
-                const td = document.createElement('td');
-                td.colSpan = 5; td.style.textAlign = 'center'; td.style.padding = '16px 0'; td.style.color = '#9ca3af';
-                td.textContent = 'まだ登録がありません。';
-                tr.append(td); tbody.append(tr); return;
-            }
-            for (const it of list) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-          <td>${it.id}</td>
-          <td>${it.name || ''}</td>
-          <td>${it.company || ''}</td>
-          <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.url || ''}</td>
-          <td><button class="btn" data-edit="${it.id}" style="padding:4px 8px;font-size:11px;">編集</button></td>
-        `;
-                tbody.append(tr);
-            }
-            tbody.addEventListener('click', async (e) => {
-                const idStr = e.target.getAttribute('data-edit');
-                if (!idStr) return;
-                const id = Number(idStr);
-                const list = await getAll();
-                const it = list.find(x => x.id === id);
-                if (!it) return;
-                if (!unlocked) { alert('ロック解除後に編集できます'); return; }
-                // fill form for quick edit
-                $('#name').value = it.name || '';
-                $('#company').value = it.company || '';
-                $('#url').value = it.url || '';
-                $('#videoTitle').value = it.videoTitle || '';
-                $('#summary').value = it.summary || '';
-                currentVideoFile = null; // 動画はそのまま
-                currentProfileFile = null;
-                $('#profileHint').textContent = '（既存画像あり or 未設定）';
-                // 保存は「上書き」として扱う
-                $('#saveBtn').onclick = () => saveEntry(it.id, it);
-            }, { once: true });
-        }
+            dz.addEventListener('drop', e => {
+                const f = e.dataTransfer.files?.[0];
+                if (f && f.type.startsWith('video/')) {
+                    currentVideoFile = f;
+                    dz.querySelector('.hint').textContent = `選択中: ${f.name}`;
+                }
+            });
 
-        async function saveEntry(idOverride = null, existing = null) {
-            if (!unlocked) { alert('ロック解除が必要です'); return; }
-            const name = $('#name').value.trim();
-            const company = $('#company').value.trim();
-            const url = $('#url').value.trim();
-            const videoTitle = $('#videoTitle').value.trim();
-            const summary = $('#summary').value.trim();
-            if (!name) { alert('氏名を入力してください'); return; }
-
-            let mainVideoBlob = existing?.mainVideo || null;
-            if (currentVideoFile) {
-                mainVideoBlob = await currentVideoFile.arrayBuffer().then(buf => new Blob([buf], { type: currentVideoFile.type }));
-            }
-            if (!mainVideoBlob) { alert('メイン動画を選択してください'); return; }
-
-            let profileThumb = existing?.profileThumb || null;
-            if (currentProfileFile) {
-                profileThumb = await fileToThumb(currentProfileFile);
-            }
-
-            const entry = {
-                id: idOverride ?? undefined,
-                name, company, url, videoTitle, summary,
-                mainVideo: mainVideoBlob,
-                profileThumb,
-                createdAt: existing?.createdAt || Date.now()
-            };
-
-            if (idOverride) {
-                await updateEntry(entry);
-            } else {
-                await addEntry(entry);
-            }
-
-            clearForm();
-            renderList();
-            alert(idOverride ? '更新しました' : '保存しました');
-            // 保存後はデフォルトの saveBtn 動作に戻す
-            $('#saveBtn').onclick = handleSaveClick;
+            input.addEventListener('change', e => {
+                const f = e.target.files?.[0];
+                if (f && f.type.startsWith('video/')) {
+                    currentVideoFile = f;
+                    dz.querySelector('.hint').textContent = `選択中: ${f.name}`;
+                }
+            });
         }
 
         function clearForm() {
@@ -574,16 +525,138 @@
             $('#url').value = '';
             $('#videoTitle').value = '';
             $('#summary').value = '';
-            currentVideoFile = null;
-            currentProfileFile = null;
             $('#videoInput').value = '';
             $('#profileInput').value = '';
             $('#videoDrop').querySelector('.hint').textContent = 'MP4 / MOV ・ 16:9推奨 ・ 500MB未満';
             $('#profileHint').textContent = '未選択';
+            currentVideoFile = null;
+            currentProfileFile = null;
+            editingEntry = null;
+        }
+
+        function flashSaveButton(message) {
+            const btn = $('#saveBtn');
+            const origText = btn.textContent;
+            const origBg = btn.style.backgroundImage;
+            btn.textContent = message || 'Saved!';
+            btn.style.backgroundImage = 'linear-gradient(135deg,#22c55e,#16a34a)';
+            setTimeout(() => {
+                btn.textContent = origText;
+                btn.style.backgroundImage = origBg || '';
+            }, 900);
+        }
+
+        async function saveEntry() {
+            if (!unlocked) {
+                alert('保存するには「管理 / ロック解除」からパスワードを入力してください。');
+                return;
+            }
+
+            const name = $('#name').value.trim();
+            const company = $('#company').value.trim();
+            const url = $('#url').value.trim();
+            const videoTitle = $('#videoTitle').value.trim();
+            const summary = $('#summary').value.trim();
+
+            if (!name) {
+                alert('氏名を入力してください。');
+                return;
+            }
+
+            let mainVideoBlob = editingEntry?.mainVideo || null;
+            if (currentVideoFile) {
+                mainVideoBlob = await currentVideoFile.arrayBuffer().then(buf => new Blob([buf], { type: currentVideoFile.type }));
+            }
+            if (!mainVideoBlob) {
+                alert('メイン動画を選択してください。');
+                return;
+            }
+
+            let profileThumb = editingEntry?.profileThumb || null;
+            if (currentProfileFile) {
+                profileThumb = await fileToThumb(currentProfileFile);
+            }
+
+            const entry = {
+                id: editingEntry?.id,
+                name,
+                company,
+                url,
+                videoTitle,
+                summary,
+                profileThumb,
+                mainVideo: mainVideoBlob,
+                createdAt: editingEntry?.createdAt || Date.now()
+            };
+
+            if (editingEntry) {
+                await updateEntry(entry);
+            } else {
+                delete entry.id; // autoIncrement
+                await addEntry(entry);
+            }
+
+            clearForm();
+            await renderList();
+            flashSaveButton(editingEntry ? '更新しました' : '保存しました');
+        }
+
+        async function renderList() {
+            const list = await getAll();
+            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            const tbody = $('#tbody');
+            tbody.innerHTML = '';
+
+            if (!list.length) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 5;
+                td.style.textAlign = 'center';
+                td.style.padding = '16px 0';
+                td.style.color = '#9ca3af';
+                td.textContent = 'まだ登録がありません。';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+
+            for (const it of list) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${it.id}</td>
+          <td>${it.name || ''}</td>
+          <td>${it.company || ''}</td>
+          <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.url || ''}</td>
+          <td><button class="btn" data-id="${it.id}" style="padding:4px 8px;font-size:11px;">編集</button></td>
+        `;
+                tbody.appendChild(tr);
+            }
+
+            tbody.addEventListener('click', async e => {
+                const id = e.target.getAttribute('data-id');
+                if (!id) return;
+                const all = await getAll();
+                const it = all.find(x => String(x.id) === String(id));
+                if (!it) return;
+
+                // フォームに読み込み
+                $('#name').value = it.name || '';
+                $('#company').value = it.company || '';
+                $('#url').value = it.url || '';
+                $('#videoTitle').value = it.videoTitle || '';
+                $('#summary').value = it.summary || '';
+                $('#profileHint').textContent = it.profileThumb ? '既存画像あり' : '未選択';
+                currentVideoFile = null;
+                currentProfileFile = null;
+                editingEntry = it;
+            }, { once: true }); // 一度だけバインドし直す
         }
 
         async function exportJSON() {
-            if (!unlocked) { alert('ロック解除が必要です'); return; }
+            if (!unlocked) {
+                alert('エクスポートするにはロック解除が必要です。');
+                return;
+            }
             const list = await getAll();
             const payload = await Promise.all(list.map(async it => {
                 const videoB64 = await blobToBase64(it.mainVideo);
@@ -608,7 +681,10 @@
         }
 
         async function importJSONFile(file) {
-            if (!unlocked) { alert('ロック解除が必要です'); return; }
+            if (!unlocked) {
+                alert('インポートするにはロック解除が必要です。');
+                return;
+            }
             const text = await file.text();
             const arr = JSON.parse(text);
             for (const it of arr) {
@@ -625,38 +701,44 @@
                     mainVideo: videoBlob
                 });
             }
-            renderList();
+            await renderList();
         }
 
-        async function handleSaveClick() {
-            await saveEntry();
-        }
-
+        /* ---- INIT ---- */
         (async function () {
             await openDB();
             bindDnD();
             setLockUI();
-            renderList();
+            await renderList();
 
             $('#authBtn').addEventListener('click', handleAuth);
-            $('#saveBtn').addEventListener('click', handleSaveClick);
+            $('#saveBtn').addEventListener('click', saveEntry);
             $('#clearBtn').addEventListener('click', clearForm);
 
-            $('#profileInput').addEventListener('change', (e) => {
+            $('#profileInput').addEventListener('change', e => {
                 const f = e.target.files?.[0];
-                if (f) { currentProfileFile = f; $('#profileHint').textContent = `選択中: ${f.name}`; }
+                if (f) {
+                    currentProfileFile = f;
+                    $('#profileHint').textContent = `選択中: ${f.name}`;
+                }
             });
 
             $('#exportBtn').addEventListener('click', exportJSON);
-            $('#importInput').addEventListener('change', (e) => {
-                const f = e.target.files?.[0]; if (f) importJSONFile(f); e.target.value = '';
-            });
-            $('#deleteAll').addEventListener('click', async () => {
-                if (!unlocked) { alert('ロック解除が必要です'); return; }
-                if (!confirm('すべてのクリエイターを削除します。よろしいですか？')) return;
-                await clearAll(); renderList();
+            $('#importInput').addEventListener('change', e => {
+                const f = e.target.files?.[0];
+                if (f) importJSONFile(f);
+                e.target.value = '';
             });
 
+            $('#deleteAll').addEventListener('click', async () => {
+                if (!unlocked) {
+                    alert('削除するにはロック解除が必要です。');
+                    return;
+                }
+                if (!confirm('すべてのクリエイターを削除します。よろしいですか？')) return;
+                await clearAll();
+                await renderList();
+            });
         })();
     </script>
 </body>

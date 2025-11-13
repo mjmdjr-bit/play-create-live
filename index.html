@@ -91,7 +91,6 @@
             box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
         }
 
-        /* TITLE */
         .title {
             font-weight: 900;
             letter-spacing: .08em;
@@ -209,7 +208,9 @@
         .thumb-fallback {
             position: absolute;
             inset: 0;
-            background: #2b3248;
+            background: radial-gradient(circle at 0% 0%, #ffb45755, transparent 55%),
+                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
+                #101322;
         }
 
         .card-body {
@@ -309,7 +310,18 @@
             padding: 16px;
         }
 
-        /* PLAY VIDEO BUTTON */
+        .meta-label {
+            font-size: 11px;
+            color: #cfd6e6;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .meta-text {
+            font-size: 13px;
+            color: #dde3f6;
+        }
+
         .play-button {
             margin-top: 12px;
             padding: 12px 22px;
@@ -352,18 +364,6 @@
                 transform: scale(1);
                 box-shadow: 0 0 22px #ffb457aa;
             }
-        }
-
-        .meta-label {
-            font-size: 11px;
-            color: #cfd6e6;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-
-        .meta-text {
-            font-size: 13px;
-            color: #dde3f6;
         }
 
         /* VIDEO FULLSCREEN */
@@ -446,9 +446,9 @@
                 <div style="display:flex; gap:12px; align-items:center;">
                     <div class="avatar" id="detailAvatar"></div>
                     <div>
-                        <div class="mtitle" id="detailName">Creator</div>
-                        <div class="msub" id="detailCompany">Company</div>
-                        <div class="murl" id="detailUrl"></div>
+                        <div id="detailName" style="font-weight:700;font-size:18px;">Creator</div>
+                        <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
+                        <div id="detailUrl" style="font-size:11px;margin-top:3px;"></div>
                     </div>
                 </div>
                 <button class="close" id="detailClose">×</button>
@@ -481,7 +481,6 @@
     </div>
 
     <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
-
 
     <script>
         /* PARTICLE ANIMATION */
@@ -532,7 +531,6 @@
             draw();
         })();
 
-
         /* IndexedDB Setup */
         const DB_NAME = 'creatorsVoiceDB';
         const STORE = 'creators';
@@ -548,7 +546,7 @@
                         os.createIndex('createdAt', 'createdAt', { unique: false });
                     }
                 };
-                req.onsuccess = () => { db = req.result; resolve(db) };
+                req.onsuccess = () => { db = req.result; resolve(db); };
                 req.onerror = () => reject(req.error);
             });
         }
@@ -562,37 +560,138 @@
             });
         }
 
-        /* UI HELPERS */
         function $(s) { return document.querySelector(s); }
-        function el(tag, props = {}, ...children) { const n = document.createElement(tag); Object.assign(n, props); children.forEach(c => n.append(c)); return n; }
 
-        let current = null;
+        let currentCreator = null;
 
         async function renderGrid() {
             const list = await getAllCreators();
             const grid = $('#grid');
-            grid.innerHTML = '';
+            grid.innerHTML = "";
 
-            if (list.length === 0) {
-                grid.style.gridTemplateColumns = '1fr';
-                grid.append(el('div', { style: "padding:36px;border-radius:16px;background:#1117;border:1px solid #ffffff22;text-align:center;color:#9aa3b2;" },
-                    'まだクリエイターが登録されていません。右上の [Edit] から追加してください。'
-                ));
+            if (!list || list.length === 0) {
+                // クリエイターがいないときはグリッドごと非表示
+                grid.style.display = "none";
                 return;
             }
 
-            grid.removeAttribute('style');
+            grid.style.display = "grid";
 
-            list.sort((a, b) => b.createdAt - a.createdAt);
+            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
             for (const c of list) {
-                const card = el('div', { className: 'card' });
-                const tw = el('div', { className: 'thumb-wrap' });
+                const card = document.createElement('div');
+                card.className = 'card';
 
-                if (c.thumb) {
-                    tw.append(el('img', { src: c.thumb, className: 'thumb' }));
+                const tw = document.createElement('div');
+                tw.className = 'thumb-wrap';
+
+                if (c.profileThumb) {
+                    const img = document.createElement('img');
+                    img.src = c.profileThumb;
+                    img.alt = c.name || 'thumbnail';
+                    img.className = 'thumb';
+                    tw.appendChild(img);
                 } else {
-                    tw.append(el('div', { className: 'thumb-fallback' }));
+                    const fb = document.createElement('div');
+                    fb.className = 'thumb-fallback';
+                    tw.appendChild(fb);
                 }
 
-                const body = el('div', { className: 'card-body' },
+                const body = document.createElement('div');
+                body.className = 'card-body';
+
+                const name = document.createElement('div');
+                name.className = 'creator-name';
+                name.textContent = c.name || '—';
+
+                const comp = document.createElement('div');
+                comp.className = 'creator-company';
+                comp.textContent = c.company || '';
+
+                body.appendChild(name);
+                body.appendChild(comp);
+
+                card.appendChild(tw);
+                card.appendChild(body);
+
+                card.addEventListener('click', () => openDetail(c));
+
+                grid.appendChild(card);
+            }
+        }
+
+        function openDetail(c) {
+            currentCreator = c;
+            const avatar = $('#detailAvatar');
+            avatar.innerHTML = '';
+            if (c.profileThumb) {
+                const img = document.createElement('img');
+                img.src = c.profileThumb;
+                img.alt = c.name || 'avatar';
+                avatar.appendChild(img);
+            }
+
+            $('#detailName').textContent = c.name || 'Creator';
+            $('#detailCompany').textContent = c.company || '';
+            const urlBox = $('#detailUrl');
+            urlBox.innerHTML = '';
+            if (c.url) {
+                const a = document.createElement('a');
+                a.href = c.url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = c.url;
+                urlBox.appendChild(a);
+            }
+            $('#detailDesc').textContent = c.videoTitle || 'Main video';
+            $('#detailAbout').textContent = c.summary || '—';
+
+            $('#detailOverlay').classList.add('show');
+        }
+
+        function closeDetail() {
+            $('#detailOverlay').classList.remove('show');
+        }
+
+        function openVideo() {
+            if (!currentCreator || !currentCreator.mainVideo) return;
+            const v = $('#mainVideo');
+            const url = URL.createObjectURL(currentCreator.mainVideo);
+            v.src = url;
+            v.currentTime = 0;
+            v.play().catch(() => { });
+            $('#videoOverlay').classList.add('show');
+            v.onended = () => { URL.revokeObjectURL(url); };
+        }
+
+        function closeVideo() {
+            const v = $('#mainVideo');
+            try { v.pause(); URL.revokeObjectURL(v.src); } catch { }
+            v.removeAttribute('src');
+            v.load();
+            $('#videoOverlay').classList.remove('show');
+        }
+
+        (async function () {
+            await openDB();
+            await renderGrid();
+
+            $('#detailClose').addEventListener('click', closeDetail);
+            $('#detailOverlay').addEventListener('click', e => { if (e.target.id === 'detailOverlay') closeDetail(); });
+
+            $('#playMain').addEventListener('click', openVideo);
+            $('#videoClose').addEventListener('click', closeVideo);
+            $('#videoOverlay').addEventListener('click', e => { if (e.target.id === 'videoOverlay') closeVideo(); });
+
+            window.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    closeVideo();
+                    closeDetail();
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>
