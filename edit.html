@@ -347,172 +347,188 @@
     </main>
 
     <script>
-        const DB_NAME = 'creatorsVoiceDB';
-        const STORE = 'creators';
-        let db;
+        var DB_NAME = 'creatorsVoiceDB';
+        var STORE = 'creators';
+        var db;
 
         function openDB() {
-            return new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 2);  // ★ version 2
-                req.onupgradeneeded = e => {
-                    const db = e.target.result;
+            return new Promise(function (resolve, reject) {
+                var req = indexedDB.open(DB_NAME, 2);
+                req.onupgradeneeded = function (e) {
+                    var db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE)) {
-                        const os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+                        var os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
                         os.createIndex('createdAt', 'createdAt', { unique: false });
                     }
                 };
-                req.onsuccess = () => { db = req.result; resolve(db); };
-                req.onerror = () => reject(req.error);
+                req.onsuccess = function () { db = req.result; resolve(db); };
+                req.onerror = function () { reject(req.error); };
             });
         }
 
         function addEntry(entry) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE, 'readwrite');
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE, 'readwrite');
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
                 tx.objectStore(STORE).add(entry);
             });
         }
         function updateEntry(entry) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE, 'readwrite');
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE, 'readwrite');
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
                 tx.objectStore(STORE).put(entry);
             });
         }
         function getAll() {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE, 'readonly');
-                const req = tx.objectStore(STORE).getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE, 'readonly');
+                var req = tx.objectStore(STORE).getAll();
+                req.onsuccess = function () { resolve(req.result); };
+                req.onerror = function () { reject(req.error); };
             });
         }
         function deleteById(id) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE, 'readwrite');
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE, 'readwrite');
                 tx.objectStore(STORE).delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
             });
         }
         function clearAll() {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE, 'readwrite');
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE, 'readwrite');
                 tx.objectStore(STORE).clear();
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
             });
         }
 
         function $(s) { return document.querySelector(s); }
 
         function fileToThumb(imageFile) {
-            return new Promise((resolve, reject) => {
-                const url = URL.createObjectURL(imageFile);
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const size = 200;
+            return new Promise(function (resolve, reject) {
+                var url = URL.createObjectURL(imageFile);
+                var img = new Image();
+                img.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    var size = 200;
                     canvas.width = size; canvas.height = size;
-                    const ctx = canvas.getContext('2d');
+                    var ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, size, size);
-                    const data = canvas.toDataURL('image/jpeg', 0.9);
+                    var data = canvas.toDataURL('image/jpeg', 0.9);
                     URL.revokeObjectURL(url);
                     resolve(data);
                 };
-                img.onerror = e => { URL.revokeObjectURL(url); reject(e); };
+                img.onerror = function (e) {
+                    URL.revokeObjectURL(url);
+                    reject(e);
+                };
                 img.src = url;
             });
         }
 
         function blobToBase64(blob) {
-            return new Promise((resolve, reject) => {
-                const r = new FileReader();
-                r.onload = () => resolve(r.result);
-                r.onerror = () => reject(r.error);
+            return new Promise(function (resolve, reject) {
+                var r = new FileReader();
+                r.onload = function () { resolve(r.result); };
+                r.onerror = function () { reject(r.error); };
                 r.readAsDataURL(blob);
             });
         }
 
-        const HASH_KEY = 'cv_admin_hash';
-        let unlocked = false;
+        var HASH_KEY = 'cv_admin_hash';
+        var unlocked = false;
 
-        async function sha256(text) {
-            const enc = new TextEncoder().encode(text);
-            const buf = await crypto.subtle.digest('SHA-256', enc);
-            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        function sha256(text) {
+            var enc = new TextEncoder().encode(text);
+            return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
+                return Array.from(new Uint8Array(buf)).map(function (b) {
+                    return b.toString(16).padStart(2, '0');
+                }).join('');
+            });
         }
 
         function setLockUI() {
             $('#lockState').textContent = unlocked ? '🔓 Unlocked' : '🔒 Locked';
-
-            // 保存・クリアはロック中でも押せる（saveEntry側でチェック）
             $('#saveBtn').disabled = false;
             $('#clearBtn').disabled = false;
-
             $('#exportBtn').disabled = !unlocked;
             $('#importInput').disabled = !unlocked;
             $('#deleteAll').disabled = !unlocked;
         }
 
-        async function handleAuth() {
-            const has = localStorage.getItem(HASH_KEY);
+        function handleAuth() {
+            var has = localStorage.getItem(HASH_KEY);
             if (!has) {
-                const p = prompt('初回設定：管理用パスワードを入力してください（4文字以上）');
+                var p = prompt('初回設定：管理用パスワードを入力してください（4文字以上）');
                 if (!p || p.length < 4) { alert('4文字以上を入力してください'); return; }
-                const p2 = prompt('確認のため、もう一度入力してください');
+                var p2 = prompt('確認のため、もう一度入力してください');
                 if (p !== p2) { alert('一致しませんでした'); return; }
-                const h = await sha256(p);
-                localStorage.setItem(HASH_KEY, h);
-                unlocked = true; setLockUI();
-                alert('パスワードを設定し、ロック解除しました。');
+                sha256(p).then(function (h) {
+                    localStorage.setItem(HASH_KEY, h);
+                    unlocked = true;
+                    setLockUI();
+                    alert('パスワードを設定し、ロック解除しました。');
+                });
             } else {
-                const p = prompt('管理パスワードを入力してください');
-                if (!p) return;
-                const h = await sha256(p);
-                if (h === has) {
-                    unlocked = true; setLockUI();
-                } else {
-                    alert('パスワードが違います。');
-                }
+                var p2 = prompt('管理パスワードを入力してください');
+                if (!p2) return;
+                sha256(p2).then(function (h2) {
+                    if (h2 === has) {
+                        unlocked = true;
+                        setLockUI();
+                    } else {
+                        alert('パスワードが違います。');
+                    }
+                });
             }
         }
 
-        let currentVideoFile = null;
-        let currentProfileFile = null;
-        let editingEntry = null;
+        var currentVideoFile = null;
+        var currentProfileFile = null;
+        var editingEntry = null;
 
         function bindDnD() {
-            const dz = $('#videoDrop');
-            const input = $('#videoInput');
-            const hint = dz.querySelector('.hint');
+            var dz = $('#videoDrop');
+            var input = $('#videoInput');
+            var hint = dz.querySelector('.hint');
 
-            const setDrag = on => dz.classList.toggle('dragover', !!on);
-            ['dragenter', 'dragover'].forEach(ev => {
-                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
+            function setDrag(on) {
+                dz.classList.toggle('dragover', !!on);
+            }
+
+            ['dragenter', 'dragover'].forEach(function (ev) {
+                dz.addEventListener(ev, function (e) {
+                    e.preventDefault(); e.stopPropagation(); setDrag(true);
+                });
             });
-            ['dragleave', 'drop'].forEach(ev => {
-                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(false); });
+            ['dragleave', 'drop'].forEach(function (ev) {
+                dz.addEventListener(ev, function (e) {
+                    e.preventDefault(); e.stopPropagation(); setDrag(false);
+                });
             });
 
-            dz.addEventListener('drop', e => {
-                const f = e.dataTransfer.files?.[0];
-                if (f && f.type.startsWith('video/')) {
+            dz.addEventListener('drop', function (e) {
+                var files = e.dataTransfer.files;
+                var f = files && files[0];
+                if (f && f.type.indexOf('video/') === 0) {
                     currentVideoFile = f;
-                    hint.textContent = `動画読み込み中... (${f.name})`;
-                    setTimeout(() => { hint.textContent = `選択中: ${f.name}`; }, 500);
+                    hint.textContent = '動画読み込み中... (' + f.name + ')';
+                    setTimeout(function () { hint.textContent = '選択中: ' + f.name; }, 500);
                 }
             });
 
-            input.addEventListener('change', e => {
-                const f = e.target.files?.[0];
-                if (f && f.type.startsWith('video/')) {
+            input.addEventListener('change', function (e) {
+                var files = e.target.files;
+                var f = files && files[0];
+                if (f && f.type.indexOf('video/') === 0) {
                     currentVideoFile = f;
-                    hint.textContent = `動画読み込み中... (${f.name})`;
-                    setTimeout(() => { hint.textContent = `選択中: ${f.name}`; }, 500);
+                    hint.textContent = '動画読み込み中... (' + f.name + ')';
+                    setTimeout(function () { hint.textContent = '選択中: ' + f.name; }, 500);
                 }
             });
         }
@@ -533,226 +549,250 @@
         }
 
         function flashSaveButton(message) {
-            const btn = $('#saveBtn');
-            const origText = btn.textContent;
-            const origBg = btn.style.backgroundImage;
+            var btn = $('#saveBtn');
+            var origText = btn.textContent;
+            var origBg = btn.style.backgroundImage;
             btn.textContent = message || 'Saved!';
             btn.style.backgroundImage = 'linear-gradient(135deg,#22c55e,#16a34a)';
-            setTimeout(() => {
+            setTimeout(function () {
                 btn.textContent = origText;
                 btn.style.backgroundImage = origBg || '';
             }, 900);
         }
 
-        async function saveEntry() {
+        function saveEntry() {
             if (!unlocked) {
                 alert('保存するには「管理 / ロック解除」からパスワードを入力してください。');
                 return;
             }
 
-            const saveBtn = $('#saveBtn');
-            const origText = saveBtn.textContent;
+            var saveBtn = $('#saveBtn');
+            var origText = saveBtn.textContent;
             saveBtn.textContent = '保存中...';
             saveBtn.disabled = true;
             saveBtn.style.opacity = '0.7';
 
-            try {
-                const name = $('#name').value.trim();
-                const company = $('#company').value.trim();
-                const url = $('#url').value.trim();
-                const videoTitle = $('#videoTitle').value.trim();
-                const summary = $('#summary').value.trim();
+            (async function () {
+                try {
+                    var name = $('#name').value.trim();
+                    var company = $('#company').value.trim();
+                    var url = $('#url').value.trim();
+                    var videoTitle = $('#videoTitle').value.trim();
+                    var summary = $('#summary').value.trim();
 
-                if (!name) {
-                    alert('氏名を入力してください。');
+                    if (!name) {
+                        alert('氏名を入力してください。');
+                        return;
+                    }
+
+                    var mainVideoBlob = null;
+                    if (editingEntry && editingEntry.mainVideo) {
+                        mainVideoBlob = editingEntry.mainVideo;
+                    }
+                    if (currentVideoFile) {
+                        var buf = await currentVideoFile.arrayBuffer();
+                        mainVideoBlob = new Blob([buf], { type: currentVideoFile.type });
+                    }
+                    if (!mainVideoBlob) {
+                        alert('メイン動画を選択してください。');
+                        return;
+                    }
+
+                    var profileThumb = null;
+                    if (editingEntry && editingEntry.profileThumb) {
+                        profileThumb = editingEntry.profileThumb;
+                    }
+                    if (currentProfileFile) {
+                        profileThumb = await fileToThumb(currentProfileFile);
+                    }
+
+                    var entry = {
+                        id: editingEntry ? editingEntry.id : undefined,
+                        name: name,
+                        company: company,
+                        url: url,
+                        videoTitle: videoTitle,
+                        summary: summary,
+                        profileThumb: profileThumb,
+                        mainVideo: mainVideoBlob,
+                        createdAt: editingEntry && editingEntry.createdAt ? editingEntry.createdAt : Date.now()
+                    };
+
+                    if (editingEntry) {
+                        await updateEntry(entry);
+                    } else {
+                        delete entry.id;
+                        await addEntry(entry);
+                    }
+
+                    clearForm();
+                    await renderList();
+                    flashSaveButton(editingEntry ? '更新しました' : '保存しました');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.style.opacity = '1';
+                    saveBtn.textContent = origText;
+                }
+            })();
+        }
+
+        function renderList() {
+            return getAll().then(function (list) {
+                list.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+                var tbody = $('#tbody');
+                tbody.innerHTML = '';
+
+                if (!list.length) {
+                    var tr = document.createElement('tr');
+                    var td = document.createElement('td');
+                    td.colSpan = 5;
+                    td.style.textAlign = 'center';
+                    td.style.padding = '16px 0';
+                    td.style.color = '#9ca3af';
+                    td.textContent = 'まだ登録がありません。';
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
                     return;
                 }
 
-                let mainVideoBlob = editingEntry?.mainVideo || null;
-                if (currentVideoFile) {
-                    mainVideoBlob = await currentVideoFile.arrayBuffer().then(
-                        buf => new Blob([buf], { type: currentVideoFile.type })
-                    );
+                for (var i = 0; i < list.length; i++) {
+                    var it = list[i];
+                    var tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td>' + it.id + '</td>' +
+                        '<td>' + (it.name || '') + '</td>' +
+                        '<td>' + (it.company || '') + '</td>' +
+                        '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.url || '') + '</td>' +
+                        '<td><button class="btn" data-id="' + it.id + '" style="padding:4px 8px;font-size:11px;">編集</button></td>';
+                    tbody.appendChild(tr);
                 }
-                if (!mainVideoBlob) {
-                    alert('メイン動画を選択してください。');
-                    return;
-                }
-
-                let profileThumb = editingEntry?.profileThumb || null;
-                if (currentProfileFile) {
-                    profileThumb = await fileToThumb(currentProfileFile);
-                }
-
-                const entry = {
-                    id: editingEntry?.id,
-                    name,
-                    company,
-                    url,
-                    videoTitle,
-                    summary,
-                    profileThumb,
-                    mainVideo: mainVideoBlob,
-                    createdAt: editingEntry?.createdAt || Date.now()
-                };
-
-                if (editingEntry) {
-                    await updateEntry(entry);
-                } else {
-                    delete entry.id;
-                    await addEntry(entry);
-                }
-
-                clearForm();
-                await renderList();
-                flashSaveButton(editingEntry ? '更新しました' : '保存しました');
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.style.opacity = '1';
-                saveBtn.textContent = origText;
-            }
+            });
         }
 
-        async function renderList() {
-            const list = await getAll();
-            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            const tbody = $('#tbody');
-            tbody.innerHTML = '';
-
-            if (!list.length) {
-                const tr = document.createElement('tr');
-                const td = document.createElement('td');
-                td.colSpan = 5;
-                td.style.textAlign = 'center';
-                td.style.padding = '16px 0';
-                td.style.color = '#9ca3af';
-                td.textContent = 'まだ登録がありません。';
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-                return;
-            }
-
-            for (const it of list) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-          <td>${it.id}</td>
-          <td>${it.name || ''}</td>
-          <td>${it.company || ''}</td>
-          <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.url || ''}</td>
-          <td><button class="btn" data-id="${it.id}" style="padding:4px 8px;font-size:11px;">編集</button></td>
-        `;
-                tbody.appendChild(tr);
-            }
-        }
-
-        async function handleRowClick(e) {
-            const id = e.target.getAttribute('data-id');
+        function handleRowClick(e) {
+            var id = e.target.getAttribute('data-id');
             if (!id) return;
-            const all = await getAll();
-            const it = all.find(x => String(x.id) === String(id));
-            if (!it) return;
-
-            $('#name').value = it.name || '';
-            $('#company').value = it.company || '';
-            $('#url').value = it.url || '';
-            $('#videoTitle').value = it.videoTitle || '';
-            $('#summary').value = it.summary || '';
-            $('#profileHint').textContent = it.profileThumb ? '既存画像あり' : '未選択';
-            currentVideoFile = null;
-            currentProfileFile = null;
-            editingEntry = it;
+            getAll().then(function (list) {
+                var it = null;
+                for (var i = 0; i < list.length; i++) {
+                    if (String(list[i].id) === String(id)) { it = list[i]; break; }
+                }
+                if (!it) return;
+                $('#name').value = it.name || '';
+                $('#company').value = it.company || '';
+                $('#url').value = it.url || '';
+                $('#videoTitle').value = it.videoTitle || '';
+                $('#summary').value = it.summary || '';
+                $('#profileHint').textContent = it.profileThumb ? '既存画像あり' : '未選択';
+                currentVideoFile = null;
+                currentProfileFile = null;
+                editingEntry = it;
+            });
         }
 
-        async function exportJSON() {
+        function exportJSON() {
             if (!unlocked) {
                 alert('エクスポートするにはロック解除が必要です。');
                 return;
             }
-            const list = await getAll();
-            const payload = await Promise.all(list.map(async it => {
-                const videoB64 = await blobToBase64(it.mainVideo);
-                return {
-                    id: it.id,
-                    name: it.name,
-                    company: it.company,
-                    url: it.url,
-                    videoTitle: it.videoTitle,
-                    summary: it.summary,
-                    profileThumb: it.profileThumb,
-                    createdAt: it.createdAt,
-                    videoB64,
-                    mime: it.mainVideo.type
-                };
-            }));
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-            a.download = `creators-${new Date().toISOString().slice(0, 10)}.json`;
-            a.click();
-            URL.revokeObjectURL(a.href);
+            getAll().then(function (list) {
+                return Promise.all(list.map(function (it) {
+                    return blobToBase64(it.mainVideo).then(function (videoB64) {
+                        return {
+                            id: it.id,
+                            name: it.name,
+                            company: it.company,
+                            url: it.url,
+                            videoTitle: it.videoTitle,
+                            summary: it.summary,
+                            profileThumb: it.profileThumb,
+                            createdAt: it.createdAt,
+                            videoB64: videoB64,
+                            mime: it.mainVideo.type
+                        };
+                    });
+                }));
+            }).then(function (payload) {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+                a.download = 'creators-' + new Date().toISOString().slice(0, 10) + '.json';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
         }
 
-        async function importJSONFile(file) {
+        function importJSONFile(file) {
             if (!unlocked) {
                 alert('インポートするにはロック解除が必要です。');
                 return;
             }
-            const text = await file.text();
-            const arr = JSON.parse(text);
-            for (const it of arr) {
-                const videoBlob = await (await fetch(it.videoB64)).blob();
-                await addEntry({
-                    id: it.id,
-                    name: it.name,
-                    company: it.company,
-                    url: it.url,
-                    videoTitle: it.videoTitle,
-                    summary: it.summary,
-                    profileThumb: it.profileThumb,
-                    createdAt: it.createdAt || Date.now(),
-                    mainVideo: videoBlob
-                });
-            }
-            await renderList();
+            file.text().then(function (text) {
+                var arr = JSON.parse(text);
+                (function loop(i) {
+                    if (i >= arr.length) {
+                        renderList();
+                        return;
+                    }
+                    var it = arr[i];
+                    fetch(it.videoB64).then(function (res) { return res.blob(); }).then(function (videoBlob) {
+                        return addEntry({
+                            id: it.id,
+                            name: it.name,
+                            company: it.company,
+                            url: it.url,
+                            videoTitle: it.videoTitle,
+                            summary: it.summary,
+                            profileThumb: it.profileThumb,
+                            createdAt: it.createdAt || Date.now(),
+                            mainVideo: videoBlob
+                        });
+                    }).then(function () {
+                        loop(i + 1);
+                    });
+                })(0);
+            });
         }
 
-        (async function () {
-            await openDB();
-            bindDnD();
-            setLockUI();
-            await renderList();
+        (function init() {
+            openDB().then(function () {
+                bindDnD();
+                setLockUI();
+                return renderList();
+            }).then(function () {
+                $('#authBtn').addEventListener('click', handleAuth);
+                $('#saveBtn').addEventListener('click', saveEntry);
+                $('#clearBtn').addEventListener('click', clearForm);
 
-            $('#authBtn').addEventListener('click', handleAuth);
-            $('#saveBtn').addEventListener('click', saveEntry);
-            $('#clearBtn').addEventListener('click', clearForm);
+                $('#profileInput').addEventListener('change', function (e) {
+                    var files = e.target.files;
+                    var f = files && files[0];
+                    if (f) {
+                        currentProfileFile = f;
+                        var hint = $('#profileHint');
+                        hint.textContent = '画像読み込み中... (' + f.name + ')';
+                        setTimeout(function () { hint.textContent = '選択中: ' + f.name; }, 500);
+                    }
+                });
 
-            $('#profileInput').addEventListener('change', e => {
-                const f = e.target.files?.[0];
-                if (f) {
-                    currentProfileFile = f;
-                    const hint = $('#profileHint');
-                    hint.textContent = `画像読み込み中... (${f.name})`;
-                    setTimeout(() => { hint.textContent = `選択中: ${f.name}`; }, 500);
-                }
+                $('#exportBtn').addEventListener('click', exportJSON);
+                $('#importInput').addEventListener('change', function (e) {
+                    var files = e.target.files;
+                    var f = files && files[0];
+                    if (f) importJSONFile(f);
+                    e.target.value = '';
+                });
+
+                $('#deleteAll').addEventListener('click', function () {
+                    if (!unlocked) {
+                        alert('削除するにはロック解除が必要です。');
+                        return;
+                    }
+                    if (!confirm('すべてのクリエイターを削除します。よろしいですか？')) return;
+                    clearAll().then(renderList);
+                });
+
+                $('#tbody').addEventListener('click', handleRowClick);
             });
-
-            $('#exportBtn').addEventListener('click', exportJSON);
-            $('#importInput').addEventListener('change', e => {
-                const f = e.target.files?.[0];
-                if (f) importJSONFile(f);
-                e.target.value = '';
-            });
-
-            $('#deleteAll').addEventListener('click', async () => {
-                if (!unlocked) {
-                    alert('削除するにはロック解除が必要です。');
-                    return;
-                }
-                if (!confirm('すべてのクリエイターを削除します。よろしいですか？')) return;
-                await clearAll();
-                await renderList();
-            });
-
-            $('#tbody').addEventListener('click', handleRowClick);
         })();
     </script>
 </body>
