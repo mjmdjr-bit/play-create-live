@@ -406,16 +406,16 @@
         <!-- LIST -->
         <section class="glass">
             <h2>CREATOR LIST</h2>
-            <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存ができます。（要管理者ログイン）</p>
+            <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存や削除ができます。（要管理者ログイン）</p>
 
             <table>
                 <thead>
                     <tr>
-                        <th style="width:40px;">ID</th>
+                        <th style="width:40px;">No</th>
                         <th>氏名</th>
                         <th>会社名</th>
                         <th>URL</th>
-                        <th style="width:70px;">操作</th>
+                        <th style="width:110px;">操作</th>
                     </tr>
                 </thead>
                 <tbody id="tbody">
@@ -430,10 +430,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-        // ★ あなたの firebaseConfig をそのまま貼り付け
         const firebaseConfig = {
             apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
             authDomain: "play-create-live.firebaseapp.com",
@@ -450,7 +449,7 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // ★ ここを「管理者として使うメールアドレス」に変更してください
+        // ★ここをあなたの管理者メールアドレスに変える
         const ADMIN_EMAIL = "mjmdjr@gmail.com";
 
         function $(s) { return document.querySelector(s); }
@@ -470,16 +469,11 @@
             const hint = dz.querySelector('.hint');
 
             function setDrag(on) { dz.classList.toggle('dragover', !!on); }
-
             ['dragenter', 'dragover'].forEach(ev => {
-                dz.addEventListener(ev, e => {
-                    e.preventDefault(); e.stopPropagation(); setDrag(true);
-                });
+                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
             });
             ['dragleave', 'drop'].forEach(ev => {
-                dz.addEventListener(ev, e => {
-                    e.preventDefault(); e.stopPropagation(); setDrag(false);
-                });
+                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(false); });
             });
 
             dz.addEventListener('drop', e => {
@@ -551,7 +545,6 @@
                 indicator.style.marginLeft = '8px';
                 indicator.textContent = '0%';
                 where.appendChild(indicator);
-
                 task.on('state_changed',
                     snap => {
                         const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
@@ -584,28 +577,34 @@
                 tbody.appendChild(tr);
                 return;
             }
+            let index = 1;
             snap.forEach(docSnap => {
                 const it = docSnap.data();
                 const tr = document.createElement('tr');
                 tr.innerHTML =
-                    '<td>' + docSnap.id + '</td>' +
+                    '<td>' + index + '</td>' +
                     '<td>' + (it.name || '') + '</td>' +
                     '<td>' + (it.company || '') + '</td>' +
                     '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.url || '') + '</td>' +
-                    '<td><button class="btn" data-id="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">編集</button></td>';
+                    '<td>' +
+                    '<button class="btn" data-edit="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">編集</button> ' +
+                    '<button class="btn danger" data-delete="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">削除</button>' +
+                    '</td>';
                 tbody.appendChild(tr);
+                index++;
             });
         }
 
-        function handleRowClick(e) {
-            const id = e.target.getAttribute('data-id');
-            if (!id) return;
-            const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
-            getDocs(q).then(snap => {
+        async function handleRowClick(e) {
+            const editId = e.target.getAttribute('data-edit');
+            const delId = e.target.getAttribute('data-delete');
+            if (editId) {
+                const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
                 snap.forEach(docSnap => {
-                    if (docSnap.id === id) {
+                    if (docSnap.id === editId) {
                         const it = docSnap.data();
-                        editingId = id;
+                        editingId = editId;
                         editingEntry = it;
                         $('#name').value = it.name || '';
                         $('#company').value = it.company || '';
@@ -615,7 +614,11 @@
                         $('#profileHint').textContent = it.profileImageUrl ? '既存画像あり' : '未選択';
                     }
                 });
-            });
+            } else if (delId) {
+                if (!confirm('このクリエイターを削除しますか？')) return;
+                await deleteDoc(doc(db, 'creators', delId));
+                await renderList();
+            }
         }
 
         function saveEntry() {
@@ -647,8 +650,8 @@
                         return;
                     }
 
-                    let videoUrl = editingEntry ? editingEntry.videoUrl : null;
-                    let profileUrl = editingEntry ? editingEntry.profileImageUrl : null;
+                    let videoUrl = editingEntry && editingEntry.videoUrl ? editingEntry.videoUrl : null;
+                    let profileUrl = editingEntry && editingEntry.profileImageUrl ? editingEntry.profileImageUrl : null;
 
                     const basePath = 'creators/' + Date.now() + '-' + Math.random().toString(36).slice(2);
 
@@ -673,6 +676,7 @@
                         summary,
                         profileImageUrl: profileUrl || null,
                         videoUrl: videoUrl || null,
+                        likes: editingEntry && typeof editingEntry.likes === "number" ? editingEntry.likes : 0,
                         createdAt: editingEntry && editingEntry.createdAt ? editingEntry.createdAt : Date.now()
                     };
 
@@ -699,29 +703,32 @@
         function setupLogin() {
             const overlay = $('#loginOverlay');
             const emailEl = $('#loginEmail');
-            const passEl = $('#loginPassword');
-            const btn = $('#loginButton');
-            const err = $('#loginError');
+            const passEl = $('\#loginPassword');
+            const btn = $('\#loginButton');
+            const err = $('\#loginError');
 
-            btn.addEventListener('click', () => {
+            const passInput = $('#loginPassword');
+            const loginBtn = $('#loginButton');
+
+            loginBtn.addEventListener('click', () => {
                 const email = emailEl.value.trim();
-                const pass = passEl.value;
+                const pass = passInput.value;
                 if (!email || !pass) {
                     err.textContent = 'メールアドレスとパスワードを入力してください。';
                     return;
                 }
                 err.textContent = '';
-                btn.disabled = true;
-                btn.textContent = 'ログイン中...';
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'ログイン中...';
                 signInWithEmailAndPassword(auth, email, pass)
-                    .then(() => {/* 状態は onAuthStateChanged で処理 */ })
+                    .then(() => {/* onAuthStateChangedで処理 */ })
                     .catch(e => {
                         console.error(e);
                         err.textContent = 'ログインに失敗しました。IDまたはパスワードを確認してください。';
                     })
                     .finally(() => {
-                        btn.disabled = false;
-                        btn.textContent = 'ログイン';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'ログイン';
                     });
             });
         }
@@ -737,7 +744,6 @@
                     setLockState('🔒 Locked');
                     return;
                 }
-                // 管理者チェック
                 if (user.email !== ADMIN_EMAIL) {
                     overlay.style.display = 'flex';
                     setLockState('🔒 Locked');
@@ -745,7 +751,6 @@
                     signOut(auth).then(() => { window.location.href = 'index.html'; });
                     return;
                 }
-                // 管理者OK
                 overlay.style.display = 'none';
                 setLockState('🔓 Unlocked');
                 renderList();
