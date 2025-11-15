@@ -269,14 +269,20 @@
             position: fixed;
             inset: 0;
             display: none;
-            place-items: center;
+            /* 初期状態は非表示 */
+            align-items: center;
+            /* 中央寄せに使う */
+            justify-content: center;
+            padding: 16px;
             background: rgba(0, 0, 0, 0.78);
             backdrop-filter: blur(18px);
             z-index: 1500;
+            overflow-y: auto;
+            /* 画面全体としてもスクロール可能 */
         }
 
         .modal-overlay.show {
-            display: grid;
+            display: flex;
         }
 
         .modal {
@@ -286,6 +292,11 @@
             border: 1px solid #ffffff22;
             box-shadow: 0 28px 80px rgba(0, 0, 0, 0.88);
             overflow: hidden;
+            max-height: 90vh;
+            /* 画面の9割まで */
+            display: flex;
+            flex-direction: column;
+            /* ヘッダー + 本文 */
         }
 
         .modal-head {
@@ -294,6 +305,8 @@
             align-items: center;
             padding: 16px 20px 10px;
             gap: 10px;
+            flex-shrink: 0;
+            /* スクロールしても潰れない */
         }
 
         .avatar {
@@ -325,6 +338,10 @@
             display: grid;
             grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
             gap: 18px;
+            flex: 1;
+            /* 本文エリアが残りの高さを使う */
+            overflow-y: auto;
+            /* 本文だけスクロール可能 */
         }
 
         @media(max-width:900px) {
@@ -334,6 +351,7 @@
 
             .modal-body {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
         }
 
@@ -348,6 +366,9 @@
             width: 100%;
             border-radius: 14px;
             background: #000;
+            max-height: 50vh;
+            /* 縦方向にでかくなりすぎないよう制限 */
+            object-fit: contain;
         }
 
         .meta-label {
