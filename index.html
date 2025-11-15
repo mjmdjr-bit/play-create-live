@@ -3,482 +3,764 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PLAY. CREATE. LIVE. – Creators</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PLAY. CREATE. LIVE. — Edit Creators</title>
 
     <style>
-        /* ---------------------------------------------------------
-       RESET / BASE
-    --------------------------------------------------------- */
-        *,
-        *::before,
-        *::after {
+        :root {
+            --bg: #05060a;
+            --card: #11131aee;
+            --border: #ffffff20;
+            --text: #eaeef6;
+            --muted: #9aa3b2;
+            --accent: #ffb457;
+            --accent2: #ff8c37;
+            --danger: #ff6b6b;
+            --radius: 20px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
+        }
+
+        * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
         }
 
         body {
-            font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background: #05070b;
-            color: #f6f6f6;
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at 0% 0%, #1f2937, #020617 60%);
             overflow-x: hidden;
         }
 
-        img {
-            display: block;
-            width: 100%;
-            height: auto;
+        header {
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        a {
-            color: inherit;
+        .title {
+            font-weight: 700;
+            letter-spacing: .08em;
+            font-size: 14px;
+        }
+
+        .lockstate {
+            font-size: 12px;
+            color: #ffd9b8;
+            margin-left: 8px;
+        }
+
+        .back-link {
             text-decoration: none;
+            font-size: 12px;
+            color: #cbd5f5;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #ffffff12, #ffffff03);
         }
 
+        .back-link:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .35);
+        }
 
-        /* ---------------------------------------------------------
-       CREATOR LIST
-    --------------------------------------------------------- */
-        .creator-list {
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
             display: grid;
-            gap: 36px;
-            padding: 60px 24px;
-            max-width: 1200px;
-            margin: auto;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+            gap: 20px;
         }
 
-        .creator-card {
+        @media(max-width:900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass {
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, #ffffff0f, #ffffff03);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 16px 18px 18px;
+        }
+
+        h2 {
+            font-size: 13px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            margin: 0 0 8px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .dropzone {
+            position: relative;
+            border: 1px dashed #ffb45777;
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            transition: .2s border-color, .2s background;
+            background: linear-gradient(180deg, #ffb45715, transparent);
+            margin-bottom: 10px;
+        }
+
+        .dropzone.dragover {
+            border-color: #ffb457cc;
+            background: linear-gradient(180deg, #ffb45722, transparent);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        @media(max-width:640px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            font-size: 11px;
+            color: #c8d0dc;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            margin-top: 4px;
+            padding: 9px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #020617cc;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border .2s, box-shadow .2s;
+        }
+
+        textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #ffb457aa;
+            box-shadow: 0 0 0 3px #ffb45730;
+        }
+
+        .btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            appearance: none;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #ffffff22, #ffffff08);
+            color: var(--text);
+            padding: 8px 14px;
+            font-size: 12px;
             cursor: pointer;
-            background: #0d1117;
-            border-radius: 18px;
-            overflow: hidden;
-            transition: transform .25s ease, opacity .25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .creator-card:hover {
-            transform: translateY(-4px);
-            opacity: .9;
-        }
-
-        .creator-card img {
-            height: 40vh;
-            object-fit: cover;
-        }
-
-        .creator-card-body {
-            padding: 22px;
-        }
-
-        .creator-card-title {
-            font-size: 1.35rem;
+        .btn.primary {
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            border: none;
+            color: #111827;
             font-weight: 600;
         }
 
-        .creator-card-role {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            margin-top: 4px;
+        .btn.danger {
+            border-color: #ff6b6b77;
+            background: linear-gradient(135deg, #ef444477, #b91c1c55);
+            color: #fee2e2;
         }
 
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
 
-        /* ---------------------------------------------------------
-       MODAL OVERLAY
-    --------------------------------------------------------- */
-        .creator-modal {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        thead {
+            background: #020617cc;
+        }
+
+        th,
+        td {
+            padding: 6px 6px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        th {
+            text-align: left;
+            font-weight: 500;
+            color: #cbd5f5;
+        }
+
+        tr:hover td {
+            background: #0b1220;
+        }
+
+        .badge-lock {
+            font-size: 11px;
+            color: #facc15;
+        }
+
+        /* LOGIN OVERLAY */
+        .login-backdrop {
             position: fixed;
             inset: 0;
-            z-index: 999;
-            background: rgba(0, 0, 0, .65);
-            display: none;
+            background: rgba(0, 0, 0, .85);
+            backdrop-filter: blur(14px);
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
-            backdrop-filter: blur(16px);
-            animation: fadeIn .35s ease forwards;
+            z-index: 2000;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        .login-card {
+            width: min(360px, 90vw);
+            border-radius: 20px;
+            background: #0b1120ee;
+            border: 1px solid #ffffff22;
+            padding: 20px 22px 22px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .8);
         }
 
-        .creator-modal.show {
-            display: flex;
+        .login-card h1 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
         }
 
+        .login-card p {
+            margin: 0 0 14px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
 
-        /* ---------------------------------------------------------
-       MODAL INNER
-    --------------------------------------------------------- */
-        .creator-modal-inner {
-            background: #05070b;
+        .login-card label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #cbd5f5;
+            margin-top: 10px;
+        }
+
+        .login-card input {
             width: 100%;
-            max-width: 960px;
-            max-height: 90vh;
-            border-radius: 22px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: row;
-            position: relative;
-            animation: modalPop .42s cubic-bezier(.25, .46, .45, .94) forwards;
-        }
-
-        @keyframes modalPop {
-            from {
-                opacity: 0;
-                transform: scale(.92);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-
-        /* IMAGE AREA */
-        .creator-modal-media {
-            flex: 0 0 50%;
-            max-width: 50%;
-            max-height: 90vh;
-        }
-
-        .creator-modal-media img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-
-        /* TEXT AREA */
-        .creator-modal-body {
-            flex: 1;
-            padding: 28px;
-            overflow-y: auto;
-        }
-
-        .creator-modal-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .creator-modal-role {
-            font-size: 0.95rem;
-            opacity: 0.75;
-            margin-bottom: 20px;
-        }
-
-        .creator-modal-description {
-            font-size: 1rem;
-            line-height: 1.75;
-            opacity: 0.92;
-            white-space: pre-wrap;
-        }
-
-
-        /* CLOSE BUTTON */
-        .creator-modal-close {
-            position: absolute;
-            top: 18px;
-            right: 20px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #fff;
-            background: none;
-            border: none;
+            margin-top: 4px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: #e5e7eb;
+            font-size: 13px;
             outline: none;
-            opacity: .8;
-            transition: .2s;
         }
 
-        .creator-modal-close:hover {
-            opacity: 1;
-            transform: scale(1.12);
+        .login-card input:focus {
+            border-color: #ffb457aa;
+            box-shadow: 0 0 0 2px #ffb45733;
         }
 
-
-        /* ---------------------------------------------------------
-       SWIPE NAVIGATION
-    --------------------------------------------------------- */
-        .nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2.4rem;
+        .login-card button {
+            margin-top: 14px;
+            width: 100%;
+            padding: 9px 0;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            color: #111827;
+            font-weight: 600;
             cursor: pointer;
-            opacity: .4;
-            transition: .2s;
-            user-select: none;
         }
 
-        .nav-arrow:hover {
-            opacity: 1;
-            transform: translateY(-50%) scale(1.15);
-        }
-
-        .nav-prev {
-            left: 12px;
-        }
-
-        .nav-next {
-            right: 12px;
-        }
-
-
-        /* ---------------------------------------------------------
-       MOBILE RESPONSIVE
-    --------------------------------------------------------- */
-        @media (max-width: 768px) {
-            .creator-modal-inner {
-                flex-direction: column;
-                max-height: 90vh;
-            }
-
-            .creator-modal-media {
-                flex: 0 0 auto;
-                max-height: 40vh;
-            }
-
-            .creator-modal-body {
-                padding: 18px 16px 26px;
-            }
-
-            .creator-modal-title {
-                font-size: 1.45rem;
-            }
-
-            .creator-modal-description {
-                font-size: 0.92rem;
-                line-height: 1.62;
-            }
+        .login-error {
+            font-size: 11px;
+            color: #fecaca;
+            margin-top: 8px;
         }
     </style>
 </head>
 
-
 <body>
-
-    <!-- ---------------------------------------------------------
-       CREATOR LIST
-  --------------------------------------------------------- -->
-    <div class="creator-list" id="creatorList"></div>
-
-
-    <!-- ---------------------------------------------------------
-       MODAL
-  --------------------------------------------------------- -->
-    <div class="creator-modal" id="creatorModal">
-        <div class="creator-modal-inner">
-
-            <span class="nav-arrow nav-prev" id="navPrev">‹</span>
-            <span class="nav-arrow nav-next" id="navNext">›</span>
-
-            <button class="creator-modal-close" id="modalClose">×</button>
-
-            <div class="creator-modal-media">
-                <img id="modalImage" src="" alt="">
-            </div>
-
-            <div class="creator-modal-body">
-                <div class="creator-modal-title" id="modalName"></div>
-                <div class="creator-modal-role" id="modalRole"></div>
-                <div class="creator-modal-description" id="modalDescription"></div>
-            </div>
-
+    <!-- LOGIN -->
+    <div id="loginOverlay" class="login-backdrop">
+        <div class="login-card">
+            <h1>EDIT PANEL</h1>
+            <p>登録・編集には管理者IDでのサインインが必要です。</p>
+            <label for="loginEmail">メールアドレス</label>
+            <input id="loginEmail" type="email" placeholder="admin@example.com" />
+            <label for="loginPassword">パスワード</label>
+            <input id="loginPassword" type="password" placeholder="password" />
+            <button id="loginButton">ログイン</button>
+            <div id="loginError" class="login-error"></div>
         </div>
     </div>
 
-
-
-    <!-- ---------------------------------------------------------
-       JS
-  --------------------------------------------------------- -->
-    <script>
-        /* ---------------------------------------------------------
-           CREATOR DATA
-        --------------------------------------------------------- */
-        const creators = [
-            {
-                name: "Kaede",
-                role: "Junior Explorer / 5-year-old House Head",
-                image: "assets/kaede.jpg",
-                desc: `「パパーこれかっこいいよねー」
-四つ打ちのPulseとHeavyなBeatを本能で読み取り、
-まるでフロアの中心に立つように空気を変える小さなHouse Head。
-
-音を“聴く”のではなく、音と“会話”しながら進化する少年。
-人は言う──「無限の可能性を秘めた器」と。
-
-All eyes are on his next move.`
-            },
-
-            {
-                name: "Daijiro Majima",
-                role: "TOPPAN Inc. / The Master of the Unspoken Word",
-                image: "assets/majima.jpg",
-                desc: `言葉を超えて本質を捉える“静かな洞察”を武器に、
-空間デザイン、CX、AI、Marketing DXを自在に横断し、
-経営のビジョンを“体験”として可視化する表現者。
-
-抽象を把握し、価値構造を再構築し、
-Space × Digital × Story を一つの世界線へ統合する稀有な存在。
-
-He speaks through silence.  
-He designs through vision.`
-            },
-
-            {
-                name: "Yujiro Iwasaki",
-                role: "Design Maestro / hotchpotch",
-                image: "assets/yujiro.jpg",
-                desc: `人々が「Design Maestro」と呼ぶ理由は、
-彼の創る空間が“美しい”を超えて、
-A state of mind のような静謐さと精度を宿すからだ。
-
-He curates emotions.
-光、温度、動線、物語──
-それらすべてを繊細に統合し、人がそこにいる理由を美しく成立させる。
-
-限界は存在しない。
-あるのは進化と深化、そして静かな革新。`
-            },
-
-            {
-                name: "Koichi Nakamura",
-                role: "Kona & UDA / The Architect of Wit",
-                image: "assets/nakamura.jpg",
-                desc: `When in doubt, make it a laugh.
-迷ったら笑いに変える──それが彼の“建築哲学”。
-
-建築 × 暮らし × 感情を横断し、
-人の心をほどくような“Wit”を空間に宿す表現者。
-
-Wit is not an accessory.  
-It is architecture.`
-            },
-
-            {
-                name: "Masahiro Kuwamoto",
-                role: "GEOBRAIN / Challenge. Never Quit.",
-                image: "assets/kuwamoto.jpg",
-                desc: `モノづくり界の「リリー・フランキー」。
-そう呼ばれるのは、多才さだけではない。
-挑戦し続け、諦めず、価値を後世に残す“意志”を持つ職人だからだ。
-
-Craft is not technique.  
-It is resolve.`
-            },
-
-            {
-                name: "Kosuke Shimizu",
-                role: "papi-ca / Visual & Digital Creator",
-                image: "assets/shimizu.jpg",
-                desc: `情熱という言葉が最も自然に似合うクリエイター。
-美とユーモア、精密さと軽やかさ。
-その両方を自在に操る稀有な存在。
-
-Loving the grind.  
-Can-do attitude.`
-            },
-
-            {
-                name: "Sushi Creator Kimoto",
-                role: "神楽坂 鮨 きもと / The Realm of Sound",
-                image: "assets/kimoto.jpg",
-                desc: `Where sushi becomes music, and silence becomes art.
-
-珠玉の鮨をアートのように生み出す職人。
-味覚・温度・緊張感・余白──それらはまるで“音”のようだ。
-
-A crafted silence.  
-A quiet symphony.`
-            }
-        ];
-
-
-        /* ---------------------------------------------------------
-           BUILD LIST
-        --------------------------------------------------------- */
-        const listEl = document.getElementById("creatorList");
-        creators.forEach((c, i) => {
-            const el = document.createElement("div");
-            el.className = "creator-card";
-            el.innerHTML = `
-        <img src="${c.image}">
-        <div class="creator-card-body">
-          <div class="creator-card-title">${c.name}</div>
-          <div class="creator-card-role">${c.role}</div>
+    <header>
+        <div>
+            <span class="title">PLAY. CREATE. LIVE. — EDIT</span>
+            <span class="lockstate" id="lockState">🔒 Locked</span>
         </div>
-      `;
-            el.addEventListener("click", () => openModal(i));
-            listEl.appendChild(el);
-        });
+        <a href="index.html" class="back-link">← Back to TOP</a>
+    </header>
 
+    <main class="container">
+        <!-- FORM -->
+        <section class="glass">
+            <h2>CREATOR FORM</h2>
+            <p class="hint">動画とプロフィールを登録します。保存はFirebaseに行われ、どの端末からでも閲覧できます。（編集は管理者のみ）</p>
 
-        /* ---------------------------------------------------------
-           MODAL LOGIC
-        --------------------------------------------------------- */
-        const modal = document.getElementById("creatorModal");
-        const modalImg = document.getElementById("modalImage");
-        const modalName = document.getElementById("modalName");
-        const modalRole = document.getElementById("modalRole");
-        const modalDesc = document.getElementById("modalDescription");
+            <div class="dropzone" id="videoDrop">
+                <input id="videoInput" type="file" accept="video/*"
+                    style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+                <div style="pointer-events:none">
+                    <div style="font-size:32px">⬆</div>
+                    <div style="font-size:13px;margin-top:2px;">ここにメイン動画をドロップ</div>
+                    <div class="hint">MP4 / MOV ・ 16:9推奨 ・ 500MB未満</div>
+                </div>
+            </div>
 
-        let currentIndex = 0;
+            <div class="row">
+                <div>
+                    <label for="name">氏名（Creator Name）</label>
+                    <input id="name" type="text" placeholder="例：Daijiro Majima">
+                </div>
+                <div>
+                    <label for="company">会社名（Company）</label>
+                    <input id="company" type="text" placeholder="例：TOPPAN Inc.">
+                </div>
+            </div>
 
-        function openModal(index) {
-            currentIndex = index;
+            <div class="row">
+                <div>
+                    <label for="url">URL</label>
+                    <input id="url" type="text" placeholder="https://example.com">
+                </div>
+                <div>
+                    <label for="videoTitle">動画タイトル（任意）</label>
+                    <input id="videoTitle" type="text" placeholder="例：Space-CX Showreel">
+                </div>
+            </div>
 
-            const c = creators[index];
-            modalImg.src = c.image;
-            modalName.textContent = c.name;
-            modalRole.textContent = c.role;
-            modalDesc.textContent = c.desc;
+            <div style="margin-top:10px;">
+                <label for="summary">概要 / コメント</label>
+                <textarea id="summary" placeholder="この動画やクリエイターについての簡単な説明"></textarea>
+            </div>
 
-            modal.classList.add("show");
-        }
+            <div style="margin-top:10px;">
+                <label>プロフィール画像（任意）</label>
+                <div class="btns" style="margin-top:6px;">
+                    <label class="btn" style="position:relative;overflow:hidden;">
+                        画像を選択
+                        <input id="profileInput" type="file" accept="image/*"
+                            style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+                    </label>
+                    <span class="hint" id="profileHint">未選択</span>
+                </div>
+            </div>
 
-        function closeModal() {
-            modal.classList.remove("show");
-        }
+            <div class="btns">
+                <button class="btn primary" id="saveBtn">保存 / 追加</button>
+                <button class="btn" id="clearBtn">入力クリア</button>
+            </div>
+            <p class="hint">※ 編集・削除は管理者のみ。全削除はFirebaseコンソールから行ってください。</p>
+        </section>
 
-        document.getElementById("modalClose").onclick = closeModal;
+        <!-- LIST -->
+        <section class="glass">
+            <h2>CREATOR LIST</h2>
+            <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存や削除ができます。（要管理者ログイン）</p>
 
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:40px;">No</th>
+                        <th>氏名</th>
+                        <th>会社名</th>
+                        <th>URL</th>
+                        <th style="width:110px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    <tr>
+                        <td colspan="5" style="text-align:center;padding:16px 0;color:#9ca3af;">まだ登録がありません。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
 
-        /* ---------------------------------------------------------
-           SWIPE / NAVIGATION
-        --------------------------------------------------------- */
-        document.getElementById("navNext").onclick = () => {
-            currentIndex = (currentIndex + 1) % creators.length;
-            openModal(currentIndex);
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
+            authDomain: "play-create-live.firebaseapp.com",
+            databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
+            projectId: "play-create-live",
+            storageBucket: "play-create-live.firebasestorage.app",
+            messagingSenderId: "143889321354",
+            appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
+            measurementId: "G-ZFHF93QQCJ"
         };
 
-        document.getElementById("navPrev").onclick = () => {
-            currentIndex = (currentIndex - 1 + creators.length) % creators.length;
-            openModal(currentIndex);
-        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
 
+        // ★ここをあなたの管理者メールアドレスに変える
+        const ADMIN_EMAIL = "mjmdjr@gmail.com";
 
-        /* ---------------------------------------------------------
-           TOUCH SWIPE (for mobile)
-        --------------------------------------------------------- */
-        let startX = 0;
-        modal.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-        modal.addEventListener("touchend", e => {
-            let dx = e.changedTouches[0].clientX - startX;
-            if (dx > 60) document.getElementById("navPrev").click();
-            if (dx < -60) document.getElementById("navNext").click();
-        });
+        function $(s) { return document.querySelector(s); }
 
+        let currentVideoFile = null;
+        let currentProfileFile = null;
+        let editingId = null;
+        let editingEntry = null;
+
+        function setLockState(text) {
+            $('#lockState').textContent = text;
+        }
+
+        function bindDnD() {
+            const dz = $('#videoDrop');
+            const input = $('#videoInput');
+            const hint = dz.querySelector('.hint');
+
+            function setDrag(on) { dz.classList.toggle('dragover', !!on); }
+            ['dragenter', 'dragover'].forEach(ev => {
+                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
+            });
+            ['dragleave', 'drop'].forEach(ev => {
+                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(false); });
+            });
+
+            dz.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                const f = files && files[0];
+                if (f && f.type.indexOf('video/') === 0) {
+                    currentVideoFile = f;
+                    hint.textContent = '動画読み込み中... (' + f.name + ')';
+                    setTimeout(() => { hint.textContent = '選択中: ' + f.name; }, 500);
+                }
+            });
+
+            input.addEventListener('change', e => {
+                const files = e.target.files;
+                const f = files && files[0];
+                if (f && f.type.indexOf('video/') === 0) {
+                    currentVideoFile = f;
+                    hint.textContent = '動画読み込み中... (' + f.name + ')';
+                    setTimeout(() => { hint.textContent = '選択中: ' + f.name; }, 500);
+                }
+            });
+
+            $('#profileInput').addEventListener('change', e => {
+                const files = e.target.files;
+                const f = files && files[0];
+                if (f) {
+                    currentProfileFile = f;
+                    const ph = $('#profileHint');
+                    ph.textContent = '画像読み込み中... (' + f.name + ')';
+                    setTimeout(() => { ph.textContent = '選択中: ' + f.name; }, 500);
+                }
+            });
+        }
+
+        function clearForm() {
+            $('#name').value = '';
+            $('#company').value = '';
+            $('#url').value = '';
+            $('#videoTitle').value = '';
+            $('#summary').value = '';
+            $('#videoInput').value = '';
+            $('#profileInput').value = '';
+            $('#videoDrop').querySelector('.hint').textContent = 'MP4 / MOV ・ 16:9推奨 ・ 500MB未満';
+            $('#profileHint').textContent = '未選択';
+            currentVideoFile = null;
+            currentProfileFile = null;
+            editingId = null;
+            editingEntry = null;
+        }
+
+        function flashSaveButton(message) {
+            const btn = $('#saveBtn');
+            const origText = btn.textContent;
+            const origBg = btn.style.backgroundImage;
+            btn.textContent = message || 'Saved!';
+            btn.style.backgroundImage = 'linear-gradient(135deg,#22c55e,#16a34a)';
+            setTimeout(() => {
+                btn.textContent = origText;
+                btn.style.backgroundImage = origBg || '';
+            }, 900);
+        }
+
+        function uploadWithProgress(file, path, where) {
+            return new Promise((resolve, reject) => {
+                const storageRef = ref(storage, path);
+                const task = uploadBytesResumable(storageRef, file);
+                const indicator = document.createElement('span');
+                indicator.style.fontSize = '11px';
+                indicator.style.marginLeft = '8px';
+                indicator.textContent = '0%';
+                where.appendChild(indicator);
+                task.on('state_changed',
+                    snap => {
+                        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+                        indicator.textContent = pct + '%';
+                    },
+                    err => { console.error(err); reject(err); },
+                    async () => {
+                        const url = await getDownloadURL(task.snapshot.ref);
+                        indicator.textContent = '100%';
+                        resolve(url);
+                    }
+                );
+            });
+        }
+
+        async function renderList() {
+            const tbody = $('#tbody');
+            tbody.innerHTML = '';
+            const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
+            const snap = await getDocs(q);
+            if (snap.empty) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 5;
+                td.style.textAlign = 'center';
+                td.style.padding = '16px 0';
+                td.style.color = '#9ca3af';
+                td.textContent = 'まだ登録がありません。';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+            let index = 1;
+            snap.forEach(docSnap => {
+                const it = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + index + '</td>' +
+                    '<td>' + (it.name || '') + '</td>' +
+                    '<td>' + (it.company || '') + '</td>' +
+                    '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.url || '') + '</td>' +
+                    '<td>' +
+                    '<button class="btn" data-edit="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">編集</button> ' +
+                    '<button class="btn danger" data-delete="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">削除</button>' +
+                    '</td>';
+                tbody.appendChild(tr);
+                index++;
+            });
+        }
+
+        async function handleRowClick(e) {
+            const editId = e.target.getAttribute('data-edit');
+            const delId = e.target.getAttribute('data-delete');
+            if (editId) {
+                const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
+                snap.forEach(docSnap => {
+                    if (docSnap.id === editId) {
+                        const it = docSnap.data();
+                        editingId = editId;
+                        editingEntry = it;
+                        $('#name').value = it.name || '';
+                        $('#company').value = it.company || '';
+                        $('#url').value = it.url || '';
+                        $('#videoTitle').value = it.videoTitle || '';
+                        $('#summary').value = it.summary || '';
+                        $('#profileHint').textContent = it.profileImageUrl ? '既存画像あり' : '未選択';
+                    }
+                });
+            } else if (delId) {
+                if (!confirm('このクリエイターを削除しますか？')) return;
+                await deleteDoc(doc(db, 'creators', delId));
+                await renderList();
+            }
+        }
+
+        function saveEntry() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('保存にはログインが必要です。');
+                return;
+            }
+            if (user.email !== ADMIN_EMAIL) {
+                alert('編集権限がありません（管理者のみ）。');
+                return;
+            }
+
+            const saveBtn = $('#saveBtn');
+            const origText = saveBtn.textContent;
+            saveBtn.textContent = '保存中...';
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
+
+            (async function () {
+                try {
+                    const name = $('#name').value.trim();
+                    const company = $('#company').value.trim();
+                    const url = $('#url').value.trim();
+                    const videoTitle = $('#videoTitle').value.trim();
+                    const summary = $('#summary').value.trim();
+                    if (!name) {
+                        alert('氏名を入力してください。');
+                        return;
+                    }
+
+                    let videoUrl = editingEntry && editingEntry.videoUrl ? editingEntry.videoUrl : null;
+                    let profileUrl = editingEntry && editingEntry.profileImageUrl ? editingEntry.profileImageUrl : null;
+
+                    const basePath = 'creators/' + Date.now() + '-' + Math.random().toString(36).slice(2);
+
+                    if (currentVideoFile) {
+                        const dz = $('#videoDrop');
+                        videoUrl = await uploadWithProgress(currentVideoFile, basePath + '/video', dz);
+                    } else if (!editingEntry) {
+                        alert('メイン動画を選択してください。');
+                        return;
+                    }
+
+                    if (currentProfileFile) {
+                        const ph = $('#profileHint');
+                        profileUrl = await uploadWithProgress(currentProfileFile, basePath + '/profile', ph);
+                    }
+
+                    const payload = {
+                        name,
+                        company,
+                        url,
+                        videoTitle,
+                        summary,
+                        profileImageUrl: profileUrl || null,
+                        videoUrl: videoUrl || null,
+                        likes: editingEntry && typeof editingEntry.likes === "number" ? editingEntry.likes : 0,
+                        createdAt: editingEntry && editingEntry.createdAt ? editingEntry.createdAt : Date.now()
+                    };
+
+                    if (editingId) {
+                        await updateDoc(doc(db, 'creators', editingId), payload);
+                    } else {
+                        await addDoc(collection(db, 'creators'), payload);
+                    }
+
+                    clearForm();
+                    await renderList();
+                    flashSaveButton(editingId ? '更新しました' : '保存しました');
+                } catch (e) {
+                    console.error(e);
+                    alert('保存中にエラーが発生しました');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.style.opacity = '1';
+                    saveBtn.textContent = origText;
+                }
+            })();
+        }
+
+        function setupLogin() {
+            const overlay = $('#loginOverlay');
+            const emailEl = $('#loginEmail');
+            const passEl = $('\#loginPassword');
+            const btn = $('\#loginButton');
+            const err = $('\#loginError');
+
+            const passInput = $('#loginPassword');
+            const loginBtn = $('#loginButton');
+
+            loginBtn.addEventListener('click', () => {
+                const email = emailEl.value.trim();
+                const pass = passInput.value;
+                if (!email || !pass) {
+                    err.textContent = 'メールアドレスとパスワードを入力してください。';
+                    return;
+                }
+                err.textContent = '';
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'ログイン中...';
+                signInWithEmailAndPassword(auth, email, pass)
+                    .then(() => {/* onAuthStateChangedで処理 */ })
+                    .catch(e => {
+                        console.error(e);
+                        err.textContent = 'ログインに失敗しました。IDまたはパスワードを確認してください。';
+                    })
+                    .finally(() => {
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'ログイン';
+                    });
+            });
+        }
+
+        (function init() {
+            bindDnD();
+            setupLogin();
+
+            onAuthStateChanged(auth, user => {
+                const overlay = $('#loginOverlay');
+                if (!user) {
+                    overlay.style.display = 'flex';
+                    setLockState('🔒 Locked');
+                    return;
+                }
+                if (user.email !== ADMIN_EMAIL) {
+                    overlay.style.display = 'flex';
+                    setLockState('🔒 Locked');
+                    alert('この編集画面は管理者専用です。TOPへ戻ります。');
+                    signOut(auth).then(() => { window.location.href = 'index.html'; });
+                    return;
+                }
+                overlay.style.display = 'none';
+                setLockState('🔓 Unlocked');
+                renderList();
+            });
+
+            $('#saveBtn').addEventListener('click', saveEntry);
+            $('#clearBtn').addEventListener('click', clearForm);
+            $('#tbody').addEventListener('click', handleRowClick);
+        })();
     </script>
-
 </body>
 
 </html>
