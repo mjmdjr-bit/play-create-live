@@ -237,10 +237,102 @@
             font-size: 11px;
             color: #facc15;
         }
+
+        /* LOGIN OVERLAY */
+        .login-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-card {
+            width: min(360px, 90vw);
+            border-radius: 20px;
+            background: #0b1120ee;
+            border: 1px solid #ffffff22;
+            padding: 20px 22px 22px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .8);
+        }
+
+        .login-card h1 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        .login-card p {
+            margin: 0 0 14px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .login-card label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #cbd5f5;
+            margin-top: 10px;
+        }
+
+        .login-card input {
+            width: 100%;
+            margin-top: 4px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: #e5e7eb;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .login-card input:focus {
+            border-color: #ffb457aa;
+            box-shadow: 0 0 0 2px #ffb45733;
+        }
+
+        .login-card button {
+            margin-top: 14px;
+            width: 100%;
+            padding: 9px 0;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            color: #111827;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-error {
+            font-size: 11px;
+            color: #fecaca;
+            margin-top: 8px;
+        }
     </style>
 </head>
 
 <body>
+    <!-- LOGIN -->
+    <div id="loginOverlay" class="login-backdrop">
+        <div class="login-card">
+            <h1>EDIT PANEL</h1>
+            <p>登録・編集には管理者IDでのサインインが必要です。</p>
+            <label for="loginEmail">メールアドレス</label>
+            <input id="loginEmail" type="email" placeholder="admin@example.com" />
+            <label for="loginPassword">パスワード</label>
+            <input id="loginPassword" type="password" placeholder="password" />
+            <button id="loginButton">ログイン</button>
+            <div id="loginError" class="login-error"></div>
+        </div>
+    </div>
+
     <header>
         <div>
             <span class="title">PLAY. CREATE. LIVE. — EDIT</span>
@@ -253,7 +345,7 @@
         <!-- FORM -->
         <section class="glass">
             <h2>CREATOR FORM</h2>
-            <p class="hint">動画とプロフィールを登録します。保存はブラウザ内（IndexedDB）にのみ行われます。</p>
+            <p class="hint">動画とプロフィールを登録します。保存はFirebaseに行われ、どの端末からでも閲覧できます。（編集は管理者のみ）</p>
 
             <div class="dropzone" id="videoDrop">
                 <input id="videoInput" type="file" accept="video/*"
@@ -308,24 +400,13 @@
                 <button class="btn primary" id="saveBtn">保存 / 追加</button>
                 <button class="btn" id="clearBtn">入力クリア</button>
             </div>
-            <p class="hint">※ 保存・編集・削除にはロック解除（パスワード）が必要です。</p>
+            <p class="hint">※ 編集・削除は管理者のみ。全削除はFirebaseコンソールから行ってください。</p>
         </section>
 
-        <!-- LIST & AUTH -->
+        <!-- LIST -->
         <section class="glass">
             <h2>CREATOR LIST</h2>
-            <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存できます。 <span class="badge-lock">（ロック中は読み取り専用）</span></p>
-
-            <div class="btns">
-                <button class="btn" id="authBtn">管理 / ロック解除</button>
-                <button class="btn" id="exportBtn" disabled>エクスポート（JSON）</button>
-                <label class="btn" style="position:relative;overflow:hidden;">
-                    インポート（JSON）
-                    <input id="importInput" type="file" accept="application/json"
-                        style="position:absolute;inset:0;opacity:0;cursor:pointer;" disabled>
-                </label>
-                <button class="btn danger" id="deleteAll" disabled>全削除</button>
-            </div>
+            <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存ができます。（要管理者ログイン）</p>
 
             <table>
                 <thead>
@@ -346,189 +427,89 @@
         </section>
     </main>
 
-    <script>
-        var DB_NAME = 'creatorsVoiceDB';
-        var STORE = 'creators';
-        var db;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-        function openDB() {
-            return new Promise(function (resolve, reject) {
-                var req = indexedDB.open(DB_NAME, 2);
-                req.onupgradeneeded = function (e) {
-                    var db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE)) {
-                        var os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
-                        os.createIndex('createdAt', 'createdAt', { unique: false });
-                    }
-                };
-                req.onsuccess = function () { db = req.result; resolve(db); };
-                req.onerror = function () { reject(req.error); };
-            });
-        }
+        // ★ あなたの firebaseConfig をそのまま貼り付け
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
+            authDomain: "play-create-live.firebaseapp.com",
+            databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
+            projectId: "play-create-live",
+            storageBucket: "play-create-live.firebasestorage.app",
+            messagingSenderId: "143889321354",
+            appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
+            measurementId: "G-ZFHF93QQCJ"
+        };
 
-        function addEntry(entry) {
-            return new Promise(function (resolve, reject) {
-                var tx = db.transaction(STORE, 'readwrite');
-                tx.oncomplete = function () { resolve(); };
-                tx.onerror = function () { reject(tx.error); };
-                tx.objectStore(STORE).add(entry);
-            });
-        }
-        function updateEntry(entry) {
-            return new Promise(function (resolve, reject) {
-                var tx = db.transaction(STORE, 'readwrite');
-                tx.oncomplete = function () { resolve(); };
-                tx.onerror = function () { reject(tx.error); };
-                tx.objectStore(STORE).put(entry);
-            });
-        }
-        function getAll() {
-            return new Promise(function (resolve, reject) {
-                var tx = db.transaction(STORE, 'readonly');
-                var req = tx.objectStore(STORE).getAll();
-                req.onsuccess = function () { resolve(req.result); };
-                req.onerror = function () { reject(req.error); };
-            });
-        }
-        function deleteById(id) {
-            return new Promise(function (resolve, reject) {
-                var tx = db.transaction(STORE, 'readwrite');
-                tx.objectStore(STORE).delete(id);
-                tx.oncomplete = function () { resolve(); };
-                tx.onerror = function () { reject(tx.error); };
-            });
-        }
-        function clearAll() {
-            return new Promise(function (resolve, reject) {
-                var tx = db.transaction(STORE, 'readwrite');
-                tx.objectStore(STORE).clear();
-                tx.oncomplete = function () { resolve(); };
-                tx.onerror = function () { reject(tx.error); };
-            });
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // ★ ここを「管理者として使うメールアドレス」に変更してください
+        const ADMIN_EMAIL = "mjmdjr@gmail.com";
 
         function $(s) { return document.querySelector(s); }
 
-        function fileToThumb(imageFile) {
-            return new Promise(function (resolve, reject) {
-                var url = URL.createObjectURL(imageFile);
-                var img = new Image();
-                img.onload = function () {
-                    var canvas = document.createElement('canvas');
-                    var size = 200;
-                    canvas.width = size; canvas.height = size;
-                    var ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, size, size);
-                    var data = canvas.toDataURL('image/jpeg', 0.9);
-                    URL.revokeObjectURL(url);
-                    resolve(data);
-                };
-                img.onerror = function (e) {
-                    URL.revokeObjectURL(url);
-                    reject(e);
-                };
-                img.src = url;
-            });
+        let currentVideoFile = null;
+        let currentProfileFile = null;
+        let editingId = null;
+        let editingEntry = null;
+
+        function setLockState(text) {
+            $('#lockState').textContent = text;
         }
-
-        function blobToBase64(blob) {
-            return new Promise(function (resolve, reject) {
-                var r = new FileReader();
-                r.onload = function () { resolve(r.result); };
-                r.onerror = function () { reject(r.error); };
-                r.readAsDataURL(blob);
-            });
-        }
-
-        var HASH_KEY = 'cv_admin_hash';
-        var unlocked = false;
-
-        function sha256(text) {
-            var enc = new TextEncoder().encode(text);
-            return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
-                return Array.from(new Uint8Array(buf)).map(function (b) {
-                    return b.toString(16).padStart(2, '0');
-                }).join('');
-            });
-        }
-
-        function setLockUI() {
-            $('#lockState').textContent = unlocked ? '🔓 Unlocked' : '🔒 Locked';
-            $('#saveBtn').disabled = false;
-            $('#clearBtn').disabled = false;
-            $('#exportBtn').disabled = !unlocked;
-            $('#importInput').disabled = !unlocked;
-            $('#deleteAll').disabled = !unlocked;
-        }
-
-        function handleAuth() {
-            var has = localStorage.getItem(HASH_KEY);
-            if (!has) {
-                var p = prompt('初回設定：管理用パスワードを入力してください（4文字以上）');
-                if (!p || p.length < 4) { alert('4文字以上を入力してください'); return; }
-                var p2 = prompt('確認のため、もう一度入力してください');
-                if (p !== p2) { alert('一致しませんでした'); return; }
-                sha256(p).then(function (h) {
-                    localStorage.setItem(HASH_KEY, h);
-                    unlocked = true;
-                    setLockUI();
-                    alert('パスワードを設定し、ロック解除しました。');
-                });
-            } else {
-                var p2 = prompt('管理パスワードを入力してください');
-                if (!p2) return;
-                sha256(p2).then(function (h2) {
-                    if (h2 === has) {
-                        unlocked = true;
-                        setLockUI();
-                    } else {
-                        alert('パスワードが違います。');
-                    }
-                });
-            }
-        }
-
-        var currentVideoFile = null;
-        var currentProfileFile = null;
-        var editingEntry = null;
 
         function bindDnD() {
-            var dz = $('#videoDrop');
-            var input = $('#videoInput');
-            var hint = dz.querySelector('.hint');
+            const dz = $('#videoDrop');
+            const input = $('#videoInput');
+            const hint = dz.querySelector('.hint');
 
-            function setDrag(on) {
-                dz.classList.toggle('dragover', !!on);
-            }
+            function setDrag(on) { dz.classList.toggle('dragover', !!on); }
 
-            ['dragenter', 'dragover'].forEach(function (ev) {
-                dz.addEventListener(ev, function (e) {
+            ['dragenter', 'dragover'].forEach(ev => {
+                dz.addEventListener(ev, e => {
                     e.preventDefault(); e.stopPropagation(); setDrag(true);
                 });
             });
-            ['dragleave', 'drop'].forEach(function (ev) {
-                dz.addEventListener(ev, function (e) {
+            ['dragleave', 'drop'].forEach(ev => {
+                dz.addEventListener(ev, e => {
                     e.preventDefault(); e.stopPropagation(); setDrag(false);
                 });
             });
 
-            dz.addEventListener('drop', function (e) {
-                var files = e.dataTransfer.files;
-                var f = files && files[0];
+            dz.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                const f = files && files[0];
                 if (f && f.type.indexOf('video/') === 0) {
                     currentVideoFile = f;
                     hint.textContent = '動画読み込み中... (' + f.name + ')';
-                    setTimeout(function () { hint.textContent = '選択中: ' + f.name; }, 500);
+                    setTimeout(() => { hint.textContent = '選択中: ' + f.name; }, 500);
                 }
             });
 
-            input.addEventListener('change', function (e) {
-                var files = e.target.files;
-                var f = files && files[0];
+            input.addEventListener('change', e => {
+                const files = e.target.files;
+                const f = files && files[0];
                 if (f && f.type.indexOf('video/') === 0) {
                     currentVideoFile = f;
                     hint.textContent = '動画読み込み中... (' + f.name + ')';
-                    setTimeout(function () { hint.textContent = '選択中: ' + f.name; }, 500);
+                    setTimeout(() => { hint.textContent = '選択中: ' + f.name; }, 500);
+                }
+            });
+
+            $('#profileInput').addEventListener('change', e => {
+                const files = e.target.files;
+                const f = files && files[0];
+                if (f) {
+                    currentProfileFile = f;
+                    const ph = $('#profileHint');
+                    ph.textContent = '画像読み込み中... (' + f.name + ')';
+                    setTimeout(() => { ph.textContent = '選択中: ' + f.name; }, 500);
                 }
             });
         }
@@ -545,89 +526,168 @@
             $('#profileHint').textContent = '未選択';
             currentVideoFile = null;
             currentProfileFile = null;
+            editingId = null;
             editingEntry = null;
         }
 
         function flashSaveButton(message) {
-            var btn = $('#saveBtn');
-            var origText = btn.textContent;
-            var origBg = btn.style.backgroundImage;
+            const btn = $('#saveBtn');
+            const origText = btn.textContent;
+            const origBg = btn.style.backgroundImage;
             btn.textContent = message || 'Saved!';
             btn.style.backgroundImage = 'linear-gradient(135deg,#22c55e,#16a34a)';
-            setTimeout(function () {
+            setTimeout(() => {
                 btn.textContent = origText;
                 btn.style.backgroundImage = origBg || '';
             }, 900);
         }
 
+        function uploadWithProgress(file, path, where) {
+            return new Promise((resolve, reject) => {
+                const storageRef = ref(storage, path);
+                const task = uploadBytesResumable(storageRef, file);
+                const indicator = document.createElement('span');
+                indicator.style.fontSize = '11px';
+                indicator.style.marginLeft = '8px';
+                indicator.textContent = '0%';
+                where.appendChild(indicator);
+
+                task.on('state_changed',
+                    snap => {
+                        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+                        indicator.textContent = pct + '%';
+                    },
+                    err => { console.error(err); reject(err); },
+                    async () => {
+                        const url = await getDownloadURL(task.snapshot.ref);
+                        indicator.textContent = '100%';
+                        resolve(url);
+                    }
+                );
+            });
+        }
+
+        async function renderList() {
+            const tbody = $('#tbody');
+            tbody.innerHTML = '';
+            const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
+            const snap = await getDocs(q);
+            if (snap.empty) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 5;
+                td.style.textAlign = 'center';
+                td.style.padding = '16px 0';
+                td.style.color = '#9ca3af';
+                td.textContent = 'まだ登録がありません。';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+            snap.forEach(docSnap => {
+                const it = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + docSnap.id + '</td>' +
+                    '<td>' + (it.name || '') + '</td>' +
+                    '<td>' + (it.company || '') + '</td>' +
+                    '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.url || '') + '</td>' +
+                    '<td><button class="btn" data-id="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">編集</button></td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        function handleRowClick(e) {
+            const id = e.target.getAttribute('data-id');
+            if (!id) return;
+            const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
+            getDocs(q).then(snap => {
+                snap.forEach(docSnap => {
+                    if (docSnap.id === id) {
+                        const it = docSnap.data();
+                        editingId = id;
+                        editingEntry = it;
+                        $('#name').value = it.name || '';
+                        $('#company').value = it.company || '';
+                        $('#url').value = it.url || '';
+                        $('#videoTitle').value = it.videoTitle || '';
+                        $('#summary').value = it.summary || '';
+                        $('#profileHint').textContent = it.profileImageUrl ? '既存画像あり' : '未選択';
+                    }
+                });
+            });
+        }
+
         function saveEntry() {
-            if (!unlocked) {
-                alert('保存するには「管理 / ロック解除」からパスワードを入力してください。');
+            const user = auth.currentUser;
+            if (!user) {
+                alert('保存にはログインが必要です。');
+                return;
+            }
+            if (user.email !== ADMIN_EMAIL) {
+                alert('編集権限がありません（管理者のみ）。');
                 return;
             }
 
-            var saveBtn = $('#saveBtn');
-            var origText = saveBtn.textContent;
+            const saveBtn = $('#saveBtn');
+            const origText = saveBtn.textContent;
             saveBtn.textContent = '保存中...';
             saveBtn.disabled = true;
             saveBtn.style.opacity = '0.7';
 
             (async function () {
                 try {
-                    var name = $('#name').value.trim();
-                    var company = $('#company').value.trim();
-                    var url = $('#url').value.trim();
-                    var videoTitle = $('#videoTitle').value.trim();
-                    var summary = $('#summary').value.trim();
-
+                    const name = $('#name').value.trim();
+                    const company = $('#company').value.trim();
+                    const url = $('#url').value.trim();
+                    const videoTitle = $('#videoTitle').value.trim();
+                    const summary = $('#summary').value.trim();
                     if (!name) {
                         alert('氏名を入力してください。');
                         return;
                     }
 
-                    var mainVideoBlob = null;
-                    if (editingEntry && editingEntry.mainVideo) {
-                        mainVideoBlob = editingEntry.mainVideo;
-                    }
+                    let videoUrl = editingEntry ? editingEntry.videoUrl : null;
+                    let profileUrl = editingEntry ? editingEntry.profileImageUrl : null;
+
+                    const basePath = 'creators/' + Date.now() + '-' + Math.random().toString(36).slice(2);
+
                     if (currentVideoFile) {
-                        var buf = await currentVideoFile.arrayBuffer();
-                        mainVideoBlob = new Blob([buf], { type: currentVideoFile.type });
-                    }
-                    if (!mainVideoBlob) {
+                        const dz = $('#videoDrop');
+                        videoUrl = await uploadWithProgress(currentVideoFile, basePath + '/video', dz);
+                    } else if (!editingEntry) {
                         alert('メイン動画を選択してください。');
                         return;
                     }
 
-                    var profileThumb = null;
-                    if (editingEntry && editingEntry.profileThumb) {
-                        profileThumb = editingEntry.profileThumb;
-                    }
                     if (currentProfileFile) {
-                        profileThumb = await fileToThumb(currentProfileFile);
+                        const ph = $('#profileHint');
+                        profileUrl = await uploadWithProgress(currentProfileFile, basePath + '/profile', ph);
                     }
 
-                    var entry = {
-                        id: editingEntry ? editingEntry.id : undefined,
-                        name: name,
-                        company: company,
-                        url: url,
-                        videoTitle: videoTitle,
-                        summary: summary,
-                        profileThumb: profileThumb,
-                        mainVideo: mainVideoBlob,
+                    const payload = {
+                        name,
+                        company,
+                        url,
+                        videoTitle,
+                        summary,
+                        profileImageUrl: profileUrl || null,
+                        videoUrl: videoUrl || null,
                         createdAt: editingEntry && editingEntry.createdAt ? editingEntry.createdAt : Date.now()
                     };
 
-                    if (editingEntry) {
-                        await updateEntry(entry);
+                    if (editingId) {
+                        await updateDoc(doc(db, 'creators', editingId), payload);
                     } else {
-                        delete entry.id;
-                        await addEntry(entry);
+                        await addDoc(collection(db, 'creators'), payload);
                     }
 
                     clearForm();
                     await renderList();
-                    flashSaveButton(editingEntry ? '更新しました' : '保存しました');
+                    flashSaveButton(editingId ? '更新しました' : '保存しました');
+                } catch (e) {
+                    console.error(e);
+                    alert('保存中にエラーが発生しました');
                 } finally {
                     saveBtn.disabled = false;
                     saveBtn.style.opacity = '1';
@@ -636,163 +696,64 @@
             })();
         }
 
-        function renderList() {
-            return getAll().then(function (list) {
-                list.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
-                var tbody = $('#tbody');
-                tbody.innerHTML = '';
+        function setupLogin() {
+            const overlay = $('#loginOverlay');
+            const emailEl = $('#loginEmail');
+            const passEl = $('#loginPassword');
+            const btn = $('#loginButton');
+            const err = $('#loginError');
 
-                if (!list.length) {
-                    var tr = document.createElement('tr');
-                    var td = document.createElement('td');
-                    td.colSpan = 5;
-                    td.style.textAlign = 'center';
-                    td.style.padding = '16px 0';
-                    td.style.color = '#9ca3af';
-                    td.textContent = 'まだ登録がありません。';
-                    tr.appendChild(td);
-                    tbody.appendChild(tr);
+            btn.addEventListener('click', () => {
+                const email = emailEl.value.trim();
+                const pass = passEl.value;
+                if (!email || !pass) {
+                    err.textContent = 'メールアドレスとパスワードを入力してください。';
                     return;
                 }
-
-                for (var i = 0; i < list.length; i++) {
-                    var it = list[i];
-                    var tr = document.createElement('tr');
-                    tr.innerHTML =
-                        '<td>' + it.id + '</td>' +
-                        '<td>' + (it.name || '') + '</td>' +
-                        '<td>' + (it.company || '') + '</td>' +
-                        '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.url || '') + '</td>' +
-                        '<td><button class="btn" data-id="' + it.id + '" style="padding:4px 8px;font-size:11px;">編集</button></td>';
-                    tbody.appendChild(tr);
-                }
-            });
-        }
-
-        function handleRowClick(e) {
-            var id = e.target.getAttribute('data-id');
-            if (!id) return;
-            getAll().then(function (list) {
-                var it = null;
-                for (var i = 0; i < list.length; i++) {
-                    if (String(list[i].id) === String(id)) { it = list[i]; break; }
-                }
-                if (!it) return;
-                $('#name').value = it.name || '';
-                $('#company').value = it.company || '';
-                $('#url').value = it.url || '';
-                $('#videoTitle').value = it.videoTitle || '';
-                $('#summary').value = it.summary || '';
-                $('#profileHint').textContent = it.profileThumb ? '既存画像あり' : '未選択';
-                currentVideoFile = null;
-                currentProfileFile = null;
-                editingEntry = it;
-            });
-        }
-
-        function exportJSON() {
-            if (!unlocked) {
-                alert('エクスポートするにはロック解除が必要です。');
-                return;
-            }
-            getAll().then(function (list) {
-                return Promise.all(list.map(function (it) {
-                    return blobToBase64(it.mainVideo).then(function (videoB64) {
-                        return {
-                            id: it.id,
-                            name: it.name,
-                            company: it.company,
-                            url: it.url,
-                            videoTitle: it.videoTitle,
-                            summary: it.summary,
-                            profileThumb: it.profileThumb,
-                            createdAt: it.createdAt,
-                            videoB64: videoB64,
-                            mime: it.mainVideo.type
-                        };
+                err.textContent = '';
+                btn.disabled = true;
+                btn.textContent = 'ログイン中...';
+                signInWithEmailAndPassword(auth, email, pass)
+                    .then(() => {/* 状態は onAuthStateChanged で処理 */ })
+                    .catch(e => {
+                        console.error(e);
+                        err.textContent = 'ログインに失敗しました。IDまたはパスワードを確認してください。';
+                    })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.textContent = 'ログイン';
                     });
-                }));
-            }).then(function (payload) {
-                var a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-                a.download = 'creators-' + new Date().toISOString().slice(0, 10) + '.json';
-                a.click();
-                URL.revokeObjectURL(a.href);
-            });
-        }
-
-        function importJSONFile(file) {
-            if (!unlocked) {
-                alert('インポートするにはロック解除が必要です。');
-                return;
-            }
-            file.text().then(function (text) {
-                var arr = JSON.parse(text);
-                (function loop(i) {
-                    if (i >= arr.length) {
-                        renderList();
-                        return;
-                    }
-                    var it = arr[i];
-                    fetch(it.videoB64).then(function (res) { return res.blob(); }).then(function (videoBlob) {
-                        return addEntry({
-                            id: it.id,
-                            name: it.name,
-                            company: it.company,
-                            url: it.url,
-                            videoTitle: it.videoTitle,
-                            summary: it.summary,
-                            profileThumb: it.profileThumb,
-                            createdAt: it.createdAt || Date.now(),
-                            mainVideo: videoBlob
-                        });
-                    }).then(function () {
-                        loop(i + 1);
-                    });
-                })(0);
             });
         }
 
         (function init() {
-            openDB().then(function () {
-                bindDnD();
-                setLockUI();
-                return renderList();
-            }).then(function () {
-                $('#authBtn').addEventListener('click', handleAuth);
-                $('#saveBtn').addEventListener('click', saveEntry);
-                $('#clearBtn').addEventListener('click', clearForm);
+            bindDnD();
+            setupLogin();
 
-                $('#profileInput').addEventListener('change', function (e) {
-                    var files = e.target.files;
-                    var f = files && files[0];
-                    if (f) {
-                        currentProfileFile = f;
-                        var hint = $('#profileHint');
-                        hint.textContent = '画像読み込み中... (' + f.name + ')';
-                        setTimeout(function () { hint.textContent = '選択中: ' + f.name; }, 500);
-                    }
-                });
-
-                $('#exportBtn').addEventListener('click', exportJSON);
-                $('#importInput').addEventListener('change', function (e) {
-                    var files = e.target.files;
-                    var f = files && files[0];
-                    if (f) importJSONFile(f);
-                    e.target.value = '';
-                });
-
-                $('#deleteAll').addEventListener('click', function () {
-                    if (!unlocked) {
-                        alert('削除するにはロック解除が必要です。');
-                        return;
-                    }
-                    if (!confirm('すべてのクリエイターを削除します。よろしいですか？')) return;
-                    clearAll().then(renderList);
-                });
-
-                $('#tbody').addEventListener('click', handleRowClick);
+            onAuthStateChanged(auth, user => {
+                const overlay = $('#loginOverlay');
+                if (!user) {
+                    overlay.style.display = 'flex';
+                    setLockState('🔒 Locked');
+                    return;
+                }
+                // 管理者チェック
+                if (user.email !== ADMIN_EMAIL) {
+                    overlay.style.display = 'flex';
+                    setLockState('🔒 Locked');
+                    alert('この編集画面は管理者専用です。TOPへ戻ります。');
+                    signOut(auth).then(() => { window.location.href = 'index.html'; });
+                    return;
+                }
+                // 管理者OK
+                overlay.style.display = 'none';
+                setLockState('🔓 Unlocked');
+                renderList();
             });
+
+            $('#saveBtn').addEventListener('click', saveEntry);
+            $('#clearBtn').addEventListener('click', clearForm);
+            $('#tbody').addEventListener('click', handleRowClick);
         })();
     </script>
 </body>
