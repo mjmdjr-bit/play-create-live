@@ -7,9 +7,9 @@
     <title>PLAY. CREATE. LIVE.</title>
 
     <style>
-        /* ======================================================
-   GLOBAL RESET
-======================================================*/
+        /* ==============================
+       RESET / BASE
+    =============================== */
         *,
         *::before,
         *::after {
@@ -22,45 +22,44 @@
         body {
             width: 100%;
             height: 100%;
-            font-family: -apple-system, "SF Pro", "Helvetica Neue", Arial;
+            font-family: -apple-system, "SF Pro", "Helvetica Neue", Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
-            transition: background .4s ease, color .4s ease;
             overflow-x: hidden;
+            transition: background 0.4s ease, color 0.4s ease;
         }
 
-        /* ======================================================
-   LIGHT / DARK AUTODETECT
-======================================================*/
         :root {
             --bg: #05070b;
-            --card-bg: #0d1117;
-            --text: #f2f2f2;
-            --border: rgba(255, 255, 255, .08);
-            --glow: rgba(0, 255, 180, .45);
+            --card-bg: #0b1016;
+            --card-inner: #05070b;
+            --text: #f5f5f5;
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #00ffb4;
+            --glow: rgba(0, 255, 180, 0.35);
         }
 
         @media (prefers-color-scheme: light) {
             :root {
-                --bg: #fdfdfd;
+                --bg: #f5f7fb;
                 --card-bg: #ffffff;
-                --text: #111;
-                --border: rgba(0, 0, 0, .1);
-                --glow: rgba(0, 140, 255, .25);
+                --card-inner: #f9fafc;
+                --text: #111111;
+                --border: rgba(0, 0, 0, 0.08);
+                --accent: #008cff;
+                --glow: rgba(0, 140, 255, 0.25);
             }
         }
 
-        /* ======================================================
-   GLOBAL ANIMATIONS
-======================================================*/
+        /* フェードイン */
         .fade-in {
-            animation: fadeIn 1.3s ease both;
+            animation: fadeIn 1s ease both;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(8px);
             }
 
             to {
@@ -69,89 +68,97 @@
             }
         }
 
-        /* 音楽に合わせて発光する Glow */
+        /* やさしい Glow */
         @keyframes glowPulse {
             0% {
-                box-shadow: 0 0 0px var(--glow);
+                box-shadow: 0 0 0 var(--glow);
             }
 
             50% {
-                box-shadow: 0 0 24px var(--glow);
+                box-shadow: 0 0 22px var(--glow);
             }
 
             100% {
-                box-shadow: 0 0 0px var(--glow);
+                box-shadow: 0 0 0 var(--glow);
             }
         }
 
-        /* ======================================================
-   CREATOR LIST
-======================================================*/
+        /* ==============================
+       CREATOR LIST
+    =============================== */
         .creator-list {
-            display: grid;
-            gap: 36px;
-            padding: 64px 24px;
-            max-width: 1220px;
-            margin: auto;
+            max-width: 1200px;
+            margin: 64px auto;
+            padding: 0 20px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
         }
 
         .creator-card {
             cursor: pointer;
-            background: var(--card-bg);
-            border-radius: 22px;
-            overflow: hidden;
+            border-radius: 24px;
+            background: radial-gradient(circle at top left, rgba(0, 255, 180, 0.18), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(0, 180, 255, 0.12), transparent 55%),
+                var(--card-bg);
             border: 1px solid var(--border);
-            transition: transform .4s cubic-bezier(.22, .61, .36, 1),
-                box-shadow .4s ease;
+            padding: 3px;
+            transition:
+                transform 0.35s cubic-bezier(.22, .61, .36, 1),
+                box-shadow 0.35s ease,
+                background 0.35s ease;
             transform-style: preserve-3d;
         }
 
+        .creator-card-inner {
+            background: var(--card-inner);
+            border-radius: 20px;
+            padding: 18px 22px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .creator-card:hover {
-            transform: translateY(-6px) rotateX(6deg) rotateY(-6deg) scale(1.02);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, .35);
+            transform: translateY(-6px) rotateX(4deg) rotateY(-3deg) scale(1.01);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
         }
 
-        .creator-card img {
-            height: 42vh;
-            object-fit: cover;
+        .creator-name {
+            font-size: 1.4rem;
+            font-weight: 650;
         }
 
-        .creator-card-body {
-            padding: 24px;
-        }
-
-        .creator-card-title {
-            font-size: 1.45rem;
-            font-weight: 600;
-        }
-
-        .creator-card-role {
+        .creator-role {
             font-size: 0.9rem;
-            opacity: .7;
-            margin-top: 4px;
+            opacity: 0.75;
         }
 
-        /* ======================================================
-   MODAL
-======================================================*/
+        .creator-tagline {
+            margin-top: 6px;
+            font-size: 0.9rem;
+            opacity: 0.82;
+        }
+
+        /* ==============================
+       MODAL
+    =============================== */
         .creator-modal {
             position: fixed;
             inset: 0;
             z-index: 999;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(16px);
             display: none;
             align-items: center;
             justify-content: center;
             padding: 16px;
-            background: rgba(0, 0, 0, .55);
-            backdrop-filter: blur(16px);
         }
 
-        /* show状態 */
         .creator-modal.show {
             display: flex;
         }
 
-        /* Apple風スライド＋フェード */
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -177,7 +184,7 @@
         }
 
         .creator-modal-inner {
-            background: var(--bg);
+            background: var(--card-inner);
             border-radius: 22px;
             width: 100%;
             max-width: 960px;
@@ -185,12 +192,13 @@
             display: flex;
             overflow: hidden;
             position: relative;
-            animation: slideIn .45s cubic-bezier(.22, .61, .36, 1);
+            animation: slideIn 0.45s cubic-bezier(.22, .61, .36, 1);
         }
 
         .creator-modal-media {
             flex: 0 0 50%;
             max-width: 50%;
+            background: #000;
         }
 
         .creator-modal-media img {
@@ -199,61 +207,59 @@
             object-fit: cover;
         }
 
-        /* TEXT */
         .creator-modal-body {
             flex: 1;
-            padding: 28px;
+            padding: 26px 26px 26px;
             overflow-y: auto;
         }
 
         .creator-modal-title {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
+            font-size: 1.7rem;
             font-weight: 700;
+            margin-bottom: 6px;
         }
 
         .creator-modal-role {
-            font-size: 1rem;
-            opacity: .7;
-            margin-bottom: 22px;
+            font-size: 0.95rem;
+            opacity: 0.7;
+            margin-bottom: 18px;
         }
 
         .creator-modal-description {
-            font-size: 1rem;
+            font-size: 0.96rem;
             line-height: 1.75;
-            opacity: .92;
+            opacity: 0.95;
             white-space: pre-wrap;
         }
 
-        /* CLOSE BTN */
         .creator-modal-close {
             position: absolute;
             top: 14px;
-            right: 18px;
+            right: 16px;
             font-size: 1.6rem;
             background: none;
             border: none;
             color: var(--text);
             cursor: pointer;
-            opacity: .7;
-            transition: .25s;
+            opacity: 0.7;
+            transition: 0.25s;
         }
 
         .creator-modal-close:hover {
-            transform: scale(1.18);
             opacity: 1;
+            transform: scale(1.12);
         }
 
-        /* ARROWS */
         .nav-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 2.4rem;
+            font-size: 2.3rem;
+            color: var(--text);
             cursor: pointer;
+            opacity: 0.3;
+            transition: 0.25s;
             user-select: none;
-            opacity: .3;
-            transition: .25s;
         }
 
         .nav-arrow:hover {
@@ -269,37 +275,49 @@
             right: 12px;
         }
 
-        /* ---------------------------------------------------------
-   RESPONSIVE
----------------------------------------------------------*/
-        @media(max-width: 780px) {
+        /* ==============================
+       RESPONSIVE
+    =============================== */
+        @media (max-width: 768px) {
             .creator-modal-inner {
                 flex-direction: column;
             }
 
             .creator-modal-media {
                 max-height: 40vh;
+                flex: 0 0 auto;
+            }
+
+            .creator-modal-body {
+                padding: 18px 18px 22px;
+            }
+
+            .creator-modal-title {
+                font-size: 1.4rem;
+            }
+
+            .creator-modal-description {
+                font-size: 0.9rem;
+                line-height: 1.65;
             }
         }
     </style>
 </head>
 
-
 <body class="fade-in">
 
     <div class="creator-list" id="creatorList"></div>
 
-    <!-- Modal -->
+    <!-- MODAL -->
     <div class="creator-modal" id="creatorModal">
         <div class="creator-modal-inner" id="modalInner">
-
             <span class="nav-arrow nav-prev" id="navPrev">‹</span>
             <span class="nav-arrow nav-next" id="navNext">›</span>
 
             <button class="creator-modal-close" id="modalClose">×</button>
 
             <div class="creator-modal-media">
-                <img id="modalImage">
+                <img id="modalImage" alt="">
             </div>
 
             <div class="creator-modal-body">
@@ -307,193 +325,202 @@
                 <div id="modalRole" class="creator-modal-role"></div>
                 <div id="modalDescription" class="creator-modal-description"></div>
             </div>
-
         </div>
     </div>
 
-
-
     <script>
-        /* ======================================================
+        /* ==============================
            CREATOR DATA
-        ======================================================*/
+        =============================== */
         const creators = [
             {
                 name: "Kaede",
                 role: "Junior Explorer / 5-year-old House Head",
-                image: "assets/kaede.jpg",
+                tagline: "The 5-year-old House Head.",
+                image: "assets/kaede.jpg", // ←ここを実際のパスに
                 desc: `五歳とは思えない、Beatと会話する小さなHouse Head。
-四つ打ちのPulseを感じ取るたび、空気がわずかに揺れ、
-人々の視線が自然と彼へと吸い寄せられる。
+「パパーこの曲かっこいいよねー」と四つ打ちのPulseに身を委ね、
+HeavyなBeatに合わせて軽やかに踊る姿は、まるでフロアの主役。
 
-「無限の可能性を秘めた器」。
-
+人は彼を「無限の可能性を秘めた器」と呼ぶ。
 All eyes are on his next move.`
             },
-
             {
                 name: "Daijiro Majima",
                 role: "TOPPAN Inc. / The Master of the Unspoken Word",
+                tagline: "空間・CX・AI・DXを横断するプロデューサー。",
                 image: "assets/majima.jpg",
-                desc: `言葉より深く、視線ひとつで本質を見抜く。
-空間、CX、AI、Marketing DX。
-それらを分断ではなく、一つのExperienceとして束ねる希有なプロデューサー。
+                desc: `The Master of the Unspoken Word。
+言葉よりも深く、鋭い視線で本質を見抜く稀有なプロデューサー。
+
+空間デザイン、CX、AI、Marketing DXを自在に横断し、
+経営のビジョンを“体験”として可視化する。
+抽象的な経営課題を読み解き、価値構造を再整理し、
+Space × Digital × Story を統合した唯一無二の体験へと昇華する。
 
 He speaks through silence.
 He designs through vision.`
             },
-
             {
                 name: "Yujiro Iwasaki",
                 role: "hotchpotch / Design Maestro",
+                tagline: "空間に“状態”と“余白”を宿すデザインの名手。",
                 image: "assets/yujiro.jpg",
-                desc: `彼のつくる空間は“美しい”を超え、精神の状態そのもののよう。
-光、動線、温度、ストーリー。
-それら全てを繊細に編み込み、人がそこに“存在する理由”を美しく成立させる。
+                desc: `人々が“Design Maestro”と呼ぶのは、
+彼のつくる世界が単なるインテリアではなく、
+A state of mind のような静謐さと精度を帯びているからだ。
 
-限界はない。あるのは深化と進化、そして静謐な革新。`
+光、温度、動線、物語──
+それらすべてを繊細に統合し、
+人がそこにいる理由を美しく成立させる。
+
+限界は存在しない。
+あるのは進化と深化、そして静かな革新。`
             },
-
             {
                 name: "Koichi Nakamura",
                 role: "Kona & UDA / The Architect of Wit",
+                tagline: "When in doubt, make it a laugh.",
                 image: "assets/nakamura.jpg",
-                desc: `When in doubt, make it a laugh.
-迷ったときほど、彼の建築は軽やかに、美しく、人の心を解きほぐす。
+                desc: `迷ったときほど、笑いに変える。
+その哲学をArchitectとしての仕事に落とし込み、
+人の心をほどくような空間をつくり続ける男。
 
 Wit is not an accessory.
 It is architecture.`
             },
-
             {
                 name: "Masahiro Kuwamoto",
                 role: "GEOBRAIN / Challenge. Never Quit.",
+                tagline: "モノづくり界の「リリー・フランキー」。",
                 image: "assets/kuwamoto.jpg",
-                desc: `挑み続け、諦めず、価値ある“形”を未来へ残す男。
-Craft is not technique. It is resolve.
+                desc: `Challenge. Never Quit.
+挑戦し続け、諦めず、価値ある“カタチ”を後世に残す。
 
-静かな意志が、作品に温度を宿す。`
+モノづくり界の「リリー・フランキー」と呼ばれるこの漢は、
+多彩さ以上に、静かな執念とユーモアで世界を更新し続ける。`
             },
-
             {
                 name: "Kosuke Shimizu",
                 role: "papi-ca / Visual & Digital Creator",
+                tagline: "情熱とユーモアをまとうビジュアル＆デジタルクリエイター。",
                 image: "assets/shimizu.jpg",
-                desc: `情熱という言葉が自然と似合うクリエイター。
-美、ユーモア、精度、軽やかさ。
-そのすべてを自在に操る稀有な存在。
+                desc: `「情熱」という言葉が似合う漢。
+独自のセンスとユーモアで、オリジナリティ溢れる世界観を描き続ける。
 
-Loving the grind.
-Can-do attitude.`
+“Loving the grind”
+“Can-do attitude”
+この二つのCredoを胸に、
+Visual × Digital の領域で常に前進し続けている。`
             },
-
             {
                 name: "Sushi Creator Kimoto",
-                role: "神楽坂 鮨きもと / The Realm of Sound",
+                role: "神楽坂 鮨 きもと / The Realm of Sound",
+                tagline: "一貫の美を追求する鮨職人がひも解く「音の境地」。",
                 image: "assets/kimoto.jpg",
                 desc: `Where sushi becomes music, and silence becomes art.
 
-珠玉の一貫に宿るのは、味覚だけでなく
-温度・緊張・余白という“音”のような美。
+珠玉の鮨をアートのように生み出すSushi Creator。
+彼の鮨は“料理”ではない。
+A crafted silence. A quiet symphony.
 
-A crafted silence.
-A quiet symphony.`
-            },
+味わいの立ち上がりはイントロ、
+旨味の頂点はサビ、
+余韻は静かなフェードアウト。
+
+鮨と音楽の境界は、
+彼の中ではすでに存在しない。`
+            }
         ];
 
-
-        /* ======================================================
+        /* ==============================
            BUILD LIST
-        ======================================================*/
+        =============================== */
         const listEl = document.getElementById("creatorList");
 
-        creators.forEach((c, i) => {
+        creators.forEach((c, index) => {
             const card = document.createElement("div");
             card.className = "creator-card";
+
             card.innerHTML = `
-    <div class="glow"></div>
-    <img src="${c.image}">
-    <div class="creator-card-body">
-      <div class="creator-card-title">${c.name}</div>
-      <div class="creator-card-role">${c.role}</div>
-    </div>
-  `;
-            card.onclick = () => openModal(i);
+        <div class="creator-card-inner">
+          <div class="creator-name">${c.name}</div>
+          <div class="creator-role">${c.role}</div>
+          <div class="creator-tagline">${c.tagline || ""}</div>
+        </div>
+      `;
+
+            card.addEventListener("click", () => openModal(index));
             listEl.appendChild(card);
         });
 
+        /* やさしいGlowを全カードに */
+        function startGlow() {
+            document.querySelectorAll(".creator-card").forEach(card => {
+                card.style.animation = "glowPulse 3s ease-in-out infinite";
+            });
+        }
+        startGlow();
 
-        /* ======================================================
-           MODAL
-        ======================================================*/
+        /* ==============================
+           MODAL CONTROL
+        =============================== */
         const modal = document.getElementById("creatorModal");
+        const modalInner = document.getElementById("modalInner");
         const modalImg = document.getElementById("modalImage");
         const modalName = document.getElementById("modalName");
         const modalRole = document.getElementById("modalRole");
         const modalDesc = document.getElementById("modalDescription");
-        const modalInner = document.getElementById("modalInner");
 
         let currentIndex = 0;
 
         function openModal(i) {
             currentIndex = i;
-            modalImg.src = creators[i].image;
-            modalName.textContent = creators[i].name;
-            modalRole.textContent = creators[i].role;
-            modalDesc.textContent = creators[i].desc;
+            const c = creators[i];
 
-            modal.style.display = "flex";
-            modalInner.style.animation = "slideIn .45s cubic-bezier(.22,.61,.36,1)";
+            modalImg.src = c.image;       // ←ここが実ファイルに合っていればOK
+            modalName.textContent = c.name;
+            modalRole.textContent = c.role;
+            modalDesc.textContent = c.desc;
+
+            modal.classList.add("show");
+            modalInner.style.animation = "slideIn 0.45s cubic-bezier(.22,.61,.36,1)";
         }
 
         function closeModal() {
-            modalInner.style.animation = "slideOut .45s cubic-bezier(.22,.61,.36,1)";
-            setTimeout(() => modal.style.display = "none", 420);
+            modalInner.style.animation = "slideOut 0.35s cubic-bezier(.22,.61,.36,1)";
+            setTimeout(() => {
+                modal.classList.remove("show");
+            }, 330);
         }
 
-        document.getElementById("modalClose").onclick = closeModal;
+        document.getElementById("modalClose").addEventListener("click", closeModal);
 
+        // オーバーレイクリックで閉じる
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeModal();
+        });
 
-        /* ======================================================
-           ARROWS (left/right)
-        ======================================================*/
-        document.getElementById("navNext").onclick = () => {
+        // 左右ナビ
+        document.getElementById("navNext").addEventListener("click", () => {
             currentIndex = (currentIndex + 1) % creators.length;
             openModal(currentIndex);
-        };
-        document.getElementById("navPrev").onclick = () => {
+        });
+
+        document.getElementById("navPrev").addEventListener("click", () => {
             currentIndex = (currentIndex - 1 + creators.length) % creators.length;
             openModal(currentIndex);
-        };
+        });
 
-
-        /* ======================================================
-           TOUCH SWIPE (mobile)
-        ======================================================*/
+        // スワイプ
         let startX = 0;
         modal.addEventListener("touchstart", e => startX = e.touches[0].clientX);
         modal.addEventListener("touchend", e => {
-            let dx = e.changedTouches[0].clientX - startX;
+            const dx = e.changedTouches[0].clientX - startX;
             if (dx > 60) document.getElementById("navPrev").click();
             if (dx < -60) document.getElementById("navNext").click();
         });
-
-
-        /* ======================================================
-           音楽に連動してGlowアニメーション
-        ======================================================*/
-        function glowAnimation() {
-            document.querySelectorAll(".creator-card").forEach(card => {
-                card.style.animation = "glowPulse 2.6s infinite ease-in-out";
-            });
-        }
-        glowAnimation();
-
-        /* ======================================================
-           END
-        ======================================================*/
     </script>
-
 </body>
 
 </html>
