@@ -37,7 +37,6 @@
             overflow-x: hidden;
         }
 
-        /* BACKGROUND */
         #particles {
             position: fixed;
             inset: 0;
@@ -58,7 +57,6 @@
             mix-blend-mode: overlay;
         }
 
-        /* HEADER */
         header {
             padding: 40px 24px 10px;
             text-align: center;
@@ -151,8 +149,31 @@
             padding: 0 20px 60px;
         }
 
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+
+        .toolbar-label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .toolbar select {
+            background: #050816;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 10px;
+            font-size: 12px;
+            outline: none;
+        }
+
         .grid {
-            margin-top: 14px;
+            margin-top: 4px;
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 18px;
@@ -234,6 +255,86 @@
             text-overflow: ellipsis;
         }
 
+        /* LOGIN OVERLAY */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-card {
+            width: min(360px, 90vw);
+            border-radius: 20px;
+            background: rgba(8, 12, 24, 0.95);
+            border: 1px solid #ffffff22;
+            padding: 20px 22px 22px;
+            box-shadow: 0 26px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .login-card h1 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .login-card p {
+            font-size: 12px;
+            color: #9ca3b2;
+            margin: 0 0 14px;
+        }
+
+        .login-card label {
+            display: block;
+            font-size: 11px;
+            color: #cbd5f5;
+            margin-top: 10px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .login-card input {
+            width: 100%;
+            margin-top: 4px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .login-card input:focus {
+            border-color: #ffb457aa;
+            box-shadow: 0 0 0 3px #ffb45733;
+        }
+
+        .login-card button {
+            margin-top: 14px;
+            width: 100%;
+            padding: 9px 14px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            color: #111;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-error {
+            font-size: 11px;
+            color: #fecaca;
+            margin-top: 8px;
+            min-height: 16px;
+        }
+
+        /* DETAIL MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -241,7 +342,7 @@
             place-items: center;
             background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(16px);
-            z-index: 9999;
+            z-index: 1500;
         }
 
         .modal-overlay.show {
@@ -253,8 +354,21 @@
             background: #111622f2;
             border-radius: 22px;
             border: 1px solid #ffffff22;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, .65);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .8);
             overflow: hidden;
+            transition: width .2s ease;
+        }
+
+        .modal[data-size="small"] {
+            width: min(640px, 92vw);
+        }
+
+        .modal[data-size="medium"] {
+            width: min(880px, 95vw);
+        }
+
+        .modal[data-size="large"] {
+            width: min(1100px, 98vw);
         }
 
         .modal-head {
@@ -262,15 +376,17 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px 10px;
+            gap: 8px;
         }
 
         .avatar {
-            width: 50px;
-            height: 50px;
+            width: 54px;
+            height: 54px;
             border-radius: 50%;
             overflow: hidden;
             background: #222;
             border: 1px solid #ffffff33;
+            flex-shrink: 0;
         }
 
         .avatar img {
@@ -295,6 +411,10 @@
         }
 
         @media(max-width:768px) {
+            .modal {
+                width: 95vw !important;
+            }
+
             .modal-body {
                 grid-template-columns: 1fr;
             }
@@ -363,13 +483,37 @@
             }
         }
 
+        .modal-size {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            font-size: 11px;
+            color: #9ca3b2;
+        }
+
+        .size-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 3px 8px;
+            font-size: 10px;
+            background: #020617aa;
+            color: #cbd5f5;
+            cursor: pointer;
+        }
+
+        .size-btn.active {
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            color: #111827;
+            font-weight: 600;
+        }
+
         .video-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, .9);
             display: none;
             place-items: center;
-            z-index: 999999;
+            z-index: 2000;
         }
 
         .video-overlay.show {
@@ -417,6 +561,21 @@
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
+    <!-- LOGIN -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <h1>PLAY. CREATE. LIVE.</h1>
+            <p>このギャラリーを閲覧するには、IDとパスワードでサインインしてください。</p>
+            <label for="loginEmail">メールアドレス</label>
+            <input id="loginEmail" type="email" placeholder="you@example.com" />
+            <label for="loginPassword">パスワード</label>
+            <input id="loginPassword" type="password" placeholder="password" />
+            <button id="loginButton">ログイン</button>
+            <div id="loginError" class="login-error"></div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
     <header>
         <a href="edit.html" class="edit-link"><span>✏️</span> Edit</a>
 
@@ -430,12 +589,21 @@
     </header>
 
     <main class="container">
+        <div class="toolbar">
+            <span class="toolbar-label">並び順：</span>
+            <select id="sortSelect">
+                <option value="newest">新着順</option>
+                <option value="oldest">古い順</option>
+                <option value="name-asc">名前 A→Z</option>
+                <option value="name-desc">名前 Z→A</option>
+            </select>
+        </div>
         <div id="grid" class="grid"></div>
     </main>
 
     <!-- DETAIL POPUP -->
     <div id="detailOverlay" class="modal-overlay">
-        <div class="modal">
+        <div class="modal" data-size="medium" id="detailModal">
             <div class="modal-head">
                 <div style="display:flex; gap:12px; align-items:center;">
                     <div class="avatar" id="detailAvatar"></div>
@@ -444,6 +612,12 @@
                         <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
                         <div id="detailUrl" style="font-size:11px;margin-top:3px;"></div>
                     </div>
+                </div>
+                <div class="modal-size">
+                    <span>Size:</span>
+                    <button class="size-btn active" data-size="medium">M</button>
+                    <button class="size-btn" data-size="large">L</button>
+                    <button class="size-btn" data-size="small">S</button>
                 </div>
                 <button class="close" id="detailClose">×</button>
             </div>
@@ -476,216 +650,247 @@
 
     <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
 
-    <script>
-        /* PARTICLE ANIMATION */
-        (function () {
-            var c = document.getElementById('particles');
-            var ctx = c.getContext('2d');
-            var W, H, dpr = window.devicePixelRatio || 1;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-            function resize() {
-                W = c.width = innerWidth * dpr;
-                H = c.height = innerHeight * dpr;
-                c.style.width = innerWidth + 'px';
-                c.style.height = innerHeight + 'px';
+        // ★ あなたの firebaseConfig をそのまま貼り付け
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
+            authDomain: "play-create-live.firebaseapp.com",
+            databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
+            projectId: "play-create-live",
+            storageBucket: "play-create-live.firebasestorage.app",
+            messagingSenderId: "143889321354",
+            appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
+            measurementId: "G-ZFHF93QQCJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function $(s) { return document.querySelector(s); }
+
+        let currentCreator = null;
+        let currentSort = "newest";
+        let modalSize = "medium";
+
+        // パーティクルはCSSの上で定義済み：JSで描画済（上の即時関数）
+
+        function applyModalSize() {
+            const modal = $("#detailModal");
+            if (!modal) return;
+            modal.setAttribute("data-size", modalSize);
+            const btns = document.querySelectorAll(".size-btn");
+            btns.forEach(btn => {
+                if (btn.getAttribute("data-size") === modalSize) {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
+            });
+        }
+
+        async function renderGrid() {
+            const grid = $("#grid");
+            grid.innerHTML = "";
+
+            const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
+            const ss = await getDocs(q);
+            const list = [];
+            ss.forEach(docSnap => list.push(docSnap.data()));
+
+            if (!list.length) {
+                grid.style.display = 'none';
+                return;
             }
-            resize();
-            window.addEventListener('resize', resize);
-
-            var N = 70, parts = [];
-            for (var i = 0; i < N; i++) {
-                parts.push({
-                    x: Math.random() * W,
-                    y: Math.random() * H,
-                    r: Math.random() * 3 * dpr + 1,
-                    a: Math.random() * Math.PI * 2,
-                    v: 0.2 + Math.random() * 0.4
+            // 並び替え
+            if (currentSort === "newest") {
+                list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else if (currentSort === "oldest") {
+                list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+            } else if (currentSort === "name-asc") {
+                list.sort((a, b) => {
+                    const an = (a.name || "").toLowerCase();
+                    const bn = (b.name || "").toLowerCase();
+                    if (an < bn) return -1;
+                    if (an > bn) return 1;
+                    return 0;
+                });
+            } else if (currentSort === "name-desc") {
+                list.sort((a, b) => {
+                    const an = (a.name || "").toLowerCase();
+                    const bn = (b.name || "").toLowerCase();
+                    if (an > bn) return -1;
+                    if (an < bn) return 1;
+                    return 0;
                 });
             }
 
-            function draw() {
-                ctx.clearRect(0, 0, W, H);
-                for (var i = 0; i < parts.length; i++) {
-                    var p = parts[i];
-                    p.x += Math.cos(p.a) * p.v;
-                    p.y += Math.sin(p.a) * p.v;
-                    p.a += (Math.random() - 0.5) * 0.02;
+            grid.style.display = 'grid';
 
-                    if (p.x < 0) p.x = W;
-                    if (p.x > W) p.x = 0;
-                    if (p.y < 0) p.y = H;
-                    if (p.y > H) p.y = 0;
+            list.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'card';
 
-                    ctx.beginPath();
-                    ctx.fillStyle = "rgba(255,180,87,0.35)";
-                    ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
-                    ctx.fill();
+                const tw = document.createElement('div');
+                tw.className = 'thumb-wrap';
+                if (c.profileImageUrl) {
+                    const img = document.createElement('img');
+                    img.src = c.profileImageUrl;
+                    img.alt = c.name || 'thumbnail';
+                    img.className = 'thumb';
+                    tw.appendChild(img);
+                } else {
+                    const fb = document.createElement('div');
+                    fb.className = 'thumb-fallback';
+                    tw.appendChild(fb);
                 }
-                requestAnimationFrame(draw);
-            }
-            draw();
-        })();
 
-        /* IndexedDB (read-only here) */
-        var DB_NAME = 'creatorsVoiceDB';
-        var STORE = 'creators';
-        var db;
+                const body = document.createElement('div');
+                body.className = 'card-body';
 
-        function openDB() {
-            return new Promise(function (resolve, reject) {
-                var req = indexedDB.open(DB_NAME, 2);
-                req.onupgradeneeded = function (e) {
-                    var db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE)) {
-                        var os = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
-                        os.createIndex('createdAt', 'createdAt', { unique: false });
-                    }
-                };
-                req.onsuccess = function () { db = req.result; resolve(db); };
-                req.onerror = function () { reject(req.error); };
-            });
-        }
+                const nameEl = document.createElement('div');
+                nameEl.className = 'creator-name';
+                nameEl.textContent = c.name || '—';
 
-        function getAllCreators() {
-            return new Promise(function (resolve, reject) {
-                var tx = db.transaction(STORE, 'readonly');
-                var req = tx.objectStore(STORE).getAll();
-                req.onsuccess = function () { resolve(req.result); };
-                req.onerror = function () { reject(req.error); };
-            });
-        }
+                const comp = document.createElement('div');
+                comp.className = 'creator-company';
+                comp.textContent = c.company || '';
 
-        function $(s) { return document.querySelector(s); }
-        var currentCreator = null;
+                body.appendChild(nameEl);
+                body.appendChild(comp);
+                card.appendChild(tw);
+                card.appendChild(body);
 
-        function renderGrid() {
-            return getAllCreators().then(function (list) {
-                var grid = $('#grid');
-                grid.innerHTML = '';
-                if (!list || !list.length) {
-                    grid.style.display = 'none';
-                    return;
-                }
-                grid.style.display = 'grid';
-                list.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
-                for (var i = 0; i < list.length; i++) {
-                    var c = list[i];
-                    var card = document.createElement('div');
-                    card.className = 'card';
-
-                    var tw = document.createElement('div');
-                    tw.className = 'thumb-wrap';
-
-                    if (c.profileThumb) {
-                        var img = document.createElement('img');
-                        img.src = c.profileThumb;
-                        img.alt = c.name || 'thumbnail';
-                        img.className = 'thumb';
-                        tw.appendChild(img);
-                    } else {
-                        var fb = document.createElement('div');
-                        fb.className = 'thumb-fallback';
-                        tw.appendChild(fb);
-                    }
-
-                    var body = document.createElement('div');
-                    body.className = 'card-body';
-
-                    var name = document.createElement('div');
-                    name.className = 'creator-name';
-                    name.textContent = c.name || '—';
-
-                    var comp = document.createElement('div');
-                    comp.className = 'creator-company';
-                    comp.textContent = c.company || '';
-
-                    body.appendChild(name);
-                    body.appendChild(comp);
-                    card.appendChild(tw);
-                    card.appendChild(body);
-
-                    (function (entry) {
-                        card.addEventListener('click', function () { openDetail(entry); });
-                    })(c);
-
-                    grid.appendChild(card);
-                }
+                card.addEventListener('click', () => openDetail(c));
+                grid.appendChild(card);
             });
         }
 
         function openDetail(c) {
             currentCreator = c;
-            var avatar = $('#detailAvatar');
-            avatar.innerHTML = '';
-            if (c.profileThumb) {
-                var img = document.createElement('img');
-                img.src = c.profileThumb;
-                img.alt = c.name || 'avatar';
+            const avatar = $("#detailAvatar");
+            avatar.innerHTML = "";
+            if (c.profileImageUrl) {
+                const img = document.createElement('img');
+                img.src = c.profileImageUrl;
+                img.alt = c.name || "avatar";
                 avatar.appendChild(img);
             }
-
-            $('#detailName').textContent = c.name || 'Creator';
-            $('#detailCompany').textContent = c.company || '';
-            var urlBox = $('#detailUrl');
-            urlBox.innerHTML = '';
+            $("#detailName").textContent = c.name || "Creator";
+            $("#detailCompany").textContent = c.company || "";
+            const urlBox = $("#detailUrl");
+            urlBox.innerHTML = "";
             if (c.url) {
-                var a = document.createElement('a');
+                const a = document.createElement("a");
                 a.href = c.url;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
                 a.textContent = c.url;
                 urlBox.appendChild(a);
             }
-            $('#detailDesc').textContent = c.videoTitle || 'Main video';
-            $('#detailAbout').textContent = c.summary || '—';
+            $("#detailDesc").textContent = c.videoTitle || "Main video";
+            $("#detailAbout").textContent = c.summary || "—";
 
-            $('#detailOverlay').classList.add('show');
+            applyModalSize();
+            $("#detailOverlay").classList.add("show");
         }
 
         function closeDetail() {
-            $('#detailOverlay').classList.remove('show');
+            $("#detailOverlay").classList.remove("show");
         }
 
         function openVideo() {
-            if (!currentCreator || !currentCreator.mainVideo) return;
-            var v = $('#mainVideo');
-            var url = URL.createObjectURL(currentCreator.mainVideo);
-            v.src = url;
+            if (!currentCreator || !currentCreator.videoUrl) return;
+            const v = $("#mainVideo");
+            v.src = currentCreator.videoUrl;
             v.currentTime = 0;
-            v.play().catch(function () { });
-            $('#videoOverlay').classList.add('show');
-            v.onended = function () { URL.revokeObjectURL(url); };
+            v.play().catch(() => { });
+            $("#videoOverlay").classList.add("show");
         }
 
         function closeVideo() {
-            var v = $('#mainVideo');
-            try { v.pause(); URL.revokeObjectURL(v.src); } catch (e) { }
-            v.removeAttribute('src');
+            const v = $("#mainVideo");
+            try { v.pause(); } catch (e) { }
+            v.removeAttribute("src");
             v.load();
-            $('#videoOverlay').classList.remove('show');
+            $("#videoOverlay").classList.remove("show");
+        }
+
+        function setupLogin() {
+            const overlay = $("#loginOverlay");
+            const emailEl = $("#loginEmail");
+            const passEl = $("#loginPassword");
+            const btn = $("#loginButton");
+            const errBox = $("#loginError");
+
+            btn.addEventListener("click", async () => {
+                const email = emailEl.value.trim();
+                const pass = passEl.value;
+                errBox.textContent = "";
+                if (!email || !pass) {
+                    errBox.textContent = "メールアドレスとパスワードを入力してください。";
+                    return;
+                }
+                try {
+                    btn.disabled = true;
+                    btn.textContent = "ログイン中...";
+                    await signInWithEmailAndPassword(auth, email, pass);
+                    // onAuthStateChangedがハンドル
+                } catch (e) {
+                    console.error(e);
+                    errBox.textContent = "ログインに失敗しました。IDまたはパスワードを確認してください。";
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "ログイン";
+                }
+            });
         }
 
         (function init() {
-            openDB().then(function () {
-                return renderGrid();
-            }).then(function () {
-                $('#detailClose').addEventListener('click', closeDetail);
-                $('#detailOverlay').addEventListener('click', function (e) {
-                    if (e.target.id === 'detailOverlay') closeDetail();
-                });
+            setupLogin();
 
-                $('#playMain').addEventListener('click', openVideo);
-                $('#videoClose').addEventListener('click', closeVideo);
-                $('#videoOverlay').addEventListener('click', function (e) {
-                    if (e.target.id === 'videoOverlay') closeVideo();
-                });
+            onAuthStateChanged(auth, user => {
+                const overlay = $("#loginOverlay");
+                if (!user) {
+                    overlay.style.display = "flex";
+                    return;
+                }
+                overlay.style.display = "none";
+                renderGrid();
+            });
 
-                window.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape') {
-                        closeVideo();
-                        closeDetail();
-                    }
+            $("#detailClose").addEventListener("click", closeDetail);
+            $("#detailOverlay").addEventListener("click", e => {
+                if (e.target.id === "detailOverlay") closeDetail();
+            });
+
+            $("#playMain").addEventListener("click", openVideo);
+            $("#videoClose").addEventListener("click", closeVideo);
+            $("#videoOverlay").addEventListener("click", e => {
+                if (e.target.id === "videoOverlay") closeVideo();
+            });
+
+            $("#sortSelect").addEventListener("change", e => {
+                currentSort = e.target.value || "newest";
+                renderGrid();
+            });
+
+            document.querySelectorAll(".size-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    modalSize = btn.getAttribute("data-size") || "medium";
+                    applyModalSize();
                 });
+            });
+
+            window.addEventListener("keydown", e => {
+                if (e.key === "Escape") {
+                    closeVideo();
+                    closeDetail();
+                }
             });
         })();
     </script>
