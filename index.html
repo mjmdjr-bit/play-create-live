@@ -2,14 +2,14 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLAY. CREATE. LIVE.</title>
 
     <style>
         /* ==============================
-       RESET / BASE
-    =============================== */
+   RESET
+============================== */
         *,
         *::before,
         *::after {
@@ -22,137 +22,98 @@
         body {
             width: 100%;
             height: 100%;
-            font-family: -apple-system, "SF Pro", "Helvetica Neue", Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: #05060a;
+            color: #f5f5f5;
+            font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
             overflow-x: hidden;
-            transition: background 0.4s ease, color 0.4s ease;
-        }
-
-        :root {
-            --bg: #05070b;
-            --card-bg: #0b1016;
-            --card-inner: #05070b;
-            --text: #f5f5f5;
-            --border: rgba(255, 255, 255, 0.08);
-            --accent: #00ffb4;
-            --glow: rgba(0, 255, 180, 0.35);
-        }
-
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg: #f5f7fb;
-                --card-bg: #ffffff;
-                --card-inner: #f9fafc;
-                --text: #111111;
-                --border: rgba(0, 0, 0, 0.08);
-                --accent: #008cff;
-                --glow: rgba(0, 140, 255, 0.25);
-            }
-        }
-
-        /* フェードイン */
-        .fade-in {
-            animation: fadeIn 1s ease both;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* やさしい Glow */
-        @keyframes glowPulse {
-            0% {
-                box-shadow: 0 0 0 var(--glow);
-            }
-
-            50% {
-                box-shadow: 0 0 22px var(--glow);
-            }
-
-            100% {
-                box-shadow: 0 0 0 var(--glow);
-            }
         }
 
         /* ==============================
-       CREATOR LIST
-    =============================== */
-        .creator-list {
-            max-width: 1200px;
-            margin: 64px auto;
-            padding: 0 20px 80px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
+   背景パーティクル (橙)
+============================== */
+        #bgCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at top, #2c181e 0%, #05060a 60%);
         }
 
+        /* ==============================
+   グリッドレイアウト
+============================== */
+        .page {
+            max-width: 1200px;
+            padding: 80px 20px;
+            margin: auto;
+        }
+
+        .creator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 36px;
+        }
+
+        /* ==============================
+   正方形カード
+============================== */
         .creator-card {
             cursor: pointer;
-            border-radius: 24px;
-            background: radial-gradient(circle at top left, rgba(0, 255, 180, 0.18), transparent 55%),
-                radial-gradient(circle at bottom right, rgba(0, 180, 255, 0.12), transparent 55%),
-                var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 3px;
-            transition:
-                transform 0.35s cubic-bezier(.22, .61, .36, 1),
-                box-shadow 0.35s ease,
-                background 0.35s ease;
-            transform-style: preserve-3d;
-        }
-
-        .creator-card-inner {
-            background: var(--card-inner);
             border-radius: 20px;
-            padding: 18px 22px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            overflow: hidden;
+            background: #0b0f15;
+            border: 1px solid rgba(255, 255, 255, .06);
+            position: relative;
+            aspect-ratio: 1 / 1;
+            /* ← 正方形に戻す */
+            transition: transform .35s ease, box-shadow .35s ease;
         }
 
         .creator-card:hover {
-            transform: translateY(-6px) rotateX(4deg) rotateY(-3deg) scale(1.01);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+        }
+
+        /* サムネイル */
+        .creator-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* テキスト部分 */
+        .creator-info {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            padding: 14px 16px;
+            background: linear-gradient(0deg, rgba(0, 0, 0, .65), transparent);
         }
 
         .creator-name {
-            font-size: 1.4rem;
-            font-weight: 650;
+            font-weight: 700;
+            font-size: 1.15rem;
         }
 
         .creator-role {
-            font-size: 0.9rem;
-            opacity: 0.75;
-        }
-
-        .creator-tagline {
-            margin-top: 6px;
-            font-size: 0.9rem;
-            opacity: 0.82;
+            font-size: 0.83rem;
+            opacity: .8;
+            margin-top: 2px;
         }
 
         /* ==============================
-       MODAL
-    =============================== */
+   MODAL
+============================== */
         .creator-modal {
             position: fixed;
             inset: 0;
-            z-index: 999;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, .55);
             backdrop-filter: blur(16px);
             display: none;
             align-items: center;
             justify-content: center;
             padding: 16px;
+            z-index: 999;
         }
 
         .creator-modal.show {
@@ -184,20 +145,19 @@
         }
 
         .creator-modal-inner {
-            background: var(--card-inner);
+            background: #090c12;
             border-radius: 22px;
             width: 100%;
-            max-width: 960px;
+            max-width: 900px;
             max-height: 90vh;
-            display: flex;
             overflow: hidden;
-            position: relative;
-            animation: slideIn 0.45s cubic-bezier(.22, .61, .36, 1);
+            display: flex;
+            animation: slideIn .45s cubic-bezier(.22, .61, .36, 1);
         }
 
+        /* モーダル左（画像） */
         .creator-modal-media {
             flex: 0 0 50%;
-            max-width: 50%;
             background: #000;
         }
 
@@ -207,28 +167,29 @@
             object-fit: cover;
         }
 
+        /* モーダル右（文章） */
         .creator-modal-body {
             flex: 1;
-            padding: 26px 26px 26px;
+            padding: 28px;
             overflow-y: auto;
         }
 
         .creator-modal-title {
-            font-size: 1.7rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            margin-bottom: 6px;
         }
 
         .creator-modal-role {
-            font-size: 0.95rem;
-            opacity: 0.7;
-            margin-bottom: 18px;
+            margin-top: 6px;
+            font-size: .95rem;
+            opacity: .75;
         }
 
         .creator-modal-description {
-            font-size: 0.96rem;
-            line-height: 1.75;
-            opacity: 0.95;
+            margin-top: 20px;
+            font-size: .95rem;
+            line-height: 1.7;
+            opacity: .92;
             white-space: pre-wrap;
         }
 
@@ -239,66 +200,40 @@
             font-size: 1.6rem;
             background: none;
             border: none;
-            color: var(--text);
+            color: #fff;
             cursor: pointer;
-            opacity: 0.7;
-            transition: 0.25s;
-        }
-
-        .creator-modal-close:hover {
-            opacity: 1;
-            transform: scale(1.12);
+            opacity: .7;
         }
 
         .nav-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 2.3rem;
-            color: var(--text);
+            font-size: 2rem;
             cursor: pointer;
-            opacity: 0.3;
-            transition: 0.25s;
+            opacity: .3;
             user-select: none;
         }
 
         .nav-arrow:hover {
             opacity: 1;
-            transform: translateY(-50%) scale(1.15);
         }
 
         .nav-prev {
-            left: 12px;
+            left: 10px;
         }
 
         .nav-next {
-            right: 12px;
+            right: 10px;
         }
 
-        /* ==============================
-       RESPONSIVE
-    =============================== */
-        @media (max-width: 768px) {
+        @media(max-width:768px) {
             .creator-modal-inner {
                 flex-direction: column;
             }
 
             .creator-modal-media {
-                max-height: 40vh;
-                flex: 0 0 auto;
-            }
-
-            .creator-modal-body {
-                padding: 18px 18px 22px;
-            }
-
-            .creator-modal-title {
-                font-size: 1.4rem;
-            }
-
-            .creator-modal-description {
-                font-size: 0.9rem;
-                line-height: 1.65;
+                max-height: 45vh;
             }
         }
     </style>
@@ -306,20 +241,20 @@
 
 <body class="fade-in">
 
-    <div class="creator-list" id="creatorList"></div>
+    <canvas id="bgCanvas"></canvas>
 
-    <!-- MODAL -->
+    <div class="page">
+        <div class="creator-grid" id="creatorGrid"></div>
+    </div>
+
+    <!-- ===================== MODAL ===================== -->
     <div class="creator-modal" id="creatorModal">
         <div class="creator-modal-inner" id="modalInner">
+            <button id="modalClose" class="creator-modal-close">×</button>
             <span class="nav-arrow nav-prev" id="navPrev">‹</span>
             <span class="nav-arrow nav-next" id="navNext">›</span>
 
-            <button class="creator-modal-close" id="modalClose">×</button>
-
-            <div class="creator-modal-media">
-                <img id="modalImage" alt="">
-            </div>
-
+            <div class="creator-modal-media"><img id="modalImage"></div>
             <div class="creator-modal-body">
                 <div id="modalName" class="creator-modal-title"></div>
                 <div id="modalRole" class="creator-modal-role"></div>
@@ -329,142 +264,72 @@
     </div>
 
     <script>
-        /* ==============================
-           CREATOR DATA
-        =============================== */
+        /* ===================== データ（画像パス変更してね） ===================== */
         const creators = [
             {
                 name: "Kaede",
                 role: "Junior Explorer / 5-year-old House Head",
-                tagline: "The 5-year-old House Head.",
-                image: "assets/kaede.jpg", // ←ここを実際のパスに
-                desc: `五歳とは思えない、Beatと会話する小さなHouse Head。
-「パパーこの曲かっこいいよねー」と四つ打ちのPulseに身を委ね、
-HeavyなBeatに合わせて軽やかに踊る姿は、まるでフロアの主役。
-
-人は彼を「無限の可能性を秘めた器」と呼ぶ。
-All eyes are on his next move.`
+                image: "img/kaede.jpg",   // ← あなたの実フォルダに合わせて変更
+                desc: `五歳とは思えない、Beatと対話する小さなダンサー。
+「パパーこれかっこいいよねー」と四つ打ちのPulseに身を委ね、
+HeavyなBeatに合わせて軽やかに踊る姿はまるでフロアの主役。`
             },
             {
                 name: "Daijiro Majima",
                 role: "TOPPAN Inc. / The Master of the Unspoken Word",
-                tagline: "空間・CX・AI・DXを横断するプロデューサー。",
-                image: "assets/majima.jpg",
-                desc: `The Master of the Unspoken Word。
-言葉よりも深く、鋭い視線で本質を見抜く稀有なプロデューサー。
-
-空間デザイン、CX、AI、Marketing DXを自在に横断し、
-経営のビジョンを“体験”として可視化する。
-抽象的な経営課題を読み解き、価値構造を再整理し、
-Space × Digital × Story を統合した唯一無二の体験へと昇華する。
-
-He speaks through silence.
-He designs through vision.`
+                image: "img/majima.jpg",
+                desc: `言葉より深く、本質を見抜く“静かな洞察”を武器に…`
             },
             {
                 name: "Yujiro Iwasaki",
                 role: "hotchpotch / Design Maestro",
-                tagline: "空間に“状態”と“余白”を宿すデザインの名手。",
-                image: "assets/yujiro.jpg",
-                desc: `人々が“Design Maestro”と呼ぶのは、
-彼のつくる世界が単なるインテリアではなく、
-A state of mind のような静謐さと精度を帯びているからだ。
-
-光、温度、動線、物語──
-それらすべてを繊細に統合し、
-人がそこにいる理由を美しく成立させる。
-
-限界は存在しない。
-あるのは進化と深化、そして静かな革新。`
+                image: "img/yujiro.jpg",
+                desc: `空間に“状態”と“余白”を宿すデザインの名手。`
             },
             {
                 name: "Koichi Nakamura",
                 role: "Kona & UDA / The Architect of Wit",
-                tagline: "When in doubt, make it a laugh.",
-                image: "assets/nakamura.jpg",
-                desc: `迷ったときほど、笑いに変える。
-その哲学をArchitectとしての仕事に落とし込み、
-人の心をほどくような空間をつくり続ける男。
-
-Wit is not an accessory.
-It is architecture.`
+                image: "img/nakamura.jpg",
+                desc: `When in doubt, make it a laugh.`
             },
             {
                 name: "Masahiro Kuwamoto",
                 role: "GEOBRAIN / Challenge. Never Quit.",
-                tagline: "モノづくり界の「リリー・フランキー」。",
-                image: "assets/kuwamoto.jpg",
-                desc: `Challenge. Never Quit.
-挑戦し続け、諦めず、価値ある“カタチ”を後世に残す。
-
-モノづくり界の「リリー・フランキー」と呼ばれるこの漢は、
-多彩さ以上に、静かな執念とユーモアで世界を更新し続ける。`
+                image: "img/kuwamoto.jpg",
+                desc: `モノづくり界の「リリー・フランキー」。`
             },
             {
                 name: "Kosuke Shimizu",
                 role: "papi-ca / Visual & Digital Creator",
-                tagline: "情熱とユーモアをまとうビジュアル＆デジタルクリエイター。",
-                image: "assets/shimizu.jpg",
-                desc: `「情熱」という言葉が似合う漢。
-独自のセンスとユーモアで、オリジナリティ溢れる世界観を描き続ける。
-
-“Loving the grind”
-“Can-do attitude”
-この二つのCredoを胸に、
-Visual × Digital の領域で常に前進し続けている。`
+                image: "img/shimizu.jpg",
+                desc: `情熱とユーモアをまとうクリエイター。`
             },
             {
                 name: "Sushi Creator Kimoto",
                 role: "神楽坂 鮨 きもと / The Realm of Sound",
-                tagline: "一貫の美を追求する鮨職人がひも解く「音の境地」。",
-                image: "assets/kimoto.jpg",
-                desc: `Where sushi becomes music, and silence becomes art.
-
-珠玉の鮨をアートのように生み出すSushi Creator。
-彼の鮨は“料理”ではない。
-A crafted silence. A quiet symphony.
-
-味わいの立ち上がりはイントロ、
-旨味の頂点はサビ、
-余韻は静かなフェードアウト。
-
-鮨と音楽の境界は、
-彼の中ではすでに存在しない。`
+                image: "img/kimoto.jpg",
+                desc: `Where sushi becomes music, and silence becomes art.`
             }
         ];
 
-        /* ==============================
-           BUILD LIST
-        =============================== */
-        const listEl = document.getElementById("creatorList");
+        /* ===================== LIST BUILD ===================== */
+        const grid = document.getElementById("creatorGrid");
 
-        creators.forEach((c, index) => {
+        creators.forEach((c, i) => {
             const card = document.createElement("div");
             card.className = "creator-card";
-
             card.innerHTML = `
-        <div class="creator-card-inner">
-          <div class="creator-name">${c.name}</div>
-          <div class="creator-role">${c.role}</div>
-          <div class="creator-tagline">${c.tagline || ""}</div>
-        </div>
-      `;
-
-            card.addEventListener("click", () => openModal(index));
-            listEl.appendChild(card);
+    <img src="${c.image}" alt="">
+    <div class="creator-info">
+      <div class="creator-name">${c.name}</div>
+      <div class="creator-role">${c.role}</div>
+    </div>
+  `;
+            card.onclick = () => openModal(i);
+            grid.appendChild(card);
         });
 
-        /* やさしいGlowを全カードに */
-        function startGlow() {
-            document.querySelectorAll(".creator-card").forEach(card => {
-                card.style.animation = "glowPulse 3s ease-in-out infinite";
-            });
-        }
-        startGlow();
-
-        /* ==============================
-           MODAL CONTROL
-        =============================== */
+        /* ===================== MODAL ===================== */
         const modal = document.getElementById("creatorModal");
         const modalInner = document.getElementById("modalInner");
         const modalImg = document.getElementById("modalImage");
@@ -477,50 +342,78 @@ A crafted silence. A quiet symphony.
         function openModal(i) {
             currentIndex = i;
             const c = creators[i];
-
-            modalImg.src = c.image;       // ←ここが実ファイルに合っていればOK
+            modalImg.src = c.image;
             modalName.textContent = c.name;
             modalRole.textContent = c.role;
             modalDesc.textContent = c.desc;
 
             modal.classList.add("show");
-            modalInner.style.animation = "slideIn 0.45s cubic-bezier(.22,.61,.36,1)";
+            modalInner.style.animation = "slideIn .45s cubic-bezier(.22,.61,.36,1)";
         }
 
         function closeModal() {
-            modalInner.style.animation = "slideOut 0.35s cubic-bezier(.22,.61,.36,1)";
-            setTimeout(() => {
-                modal.classList.remove("show");
-            }, 330);
+            modalInner.style.animation = "slideOut .35s ease";
+            setTimeout(() => modal.classList.remove("show"), 320);
         }
 
-        document.getElementById("modalClose").addEventListener("click", closeModal);
+        document.getElementById("modalClose").onclick = closeModal;
+        modal.onclick = e => { if (e.target === modal) closeModal(); };
 
-        // オーバーレイクリックで閉じる
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        // 左右ナビ
-        document.getElementById("navNext").addEventListener("click", () => {
+        document.getElementById("navNext").onclick = () => {
             currentIndex = (currentIndex + 1) % creators.length;
             openModal(currentIndex);
-        });
+        };
 
-        document.getElementById("navPrev").addEventListener("click", () => {
+        document.getElementById("navPrev").onclick = () => {
             currentIndex = (currentIndex - 1 + creators.length) % creators.length;
             openModal(currentIndex);
-        });
+        };
 
-        // スワイプ
-        let startX = 0;
-        modal.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-        modal.addEventListener("touchend", e => {
-            const dx = e.changedTouches[0].clientX - startX;
-            if (dx > 60) document.getElementById("navPrev").click();
-            if (dx < -60) document.getElementById("navNext").click();
-        });
+        /* ===================== 背景パーティクル復活 ===================== */
+        const canvas = document.getElementById("bgCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let w, h, particles = [];
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.onresize = resize;
+        resize();
+
+        function init() {
+            particles = [];
+            for (let i = 0; i < 80; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: Math.random() * 3 + 1,
+                    vx: (Math.random() - .5) * 0.6,
+                    vy: (Math.random() - .5) * 0.6,
+                    a: Math.random() * 0.5 + 0.5
+                });
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, w, h);
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.fillStyle = `rgba(255,140,60,${p.a})`;
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > w) p.vx *= -1;
+                if (p.y < 0 || p.y > h) p.vy *= -1;
+            });
+            requestAnimationFrame(render);
+        }
+
+        init();
+        render();
     </script>
+
 </body>
 
 </html>
