@@ -3,844 +3,497 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PLAY. CREATE. LIVE. — Creator's Voice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PLAY. CREATE. LIVE.</title>
 
     <style>
-        :root {
-            --bg: #0b0c10;
-            --card: #11131aee;
-            --border: #ffffff20;
-            --text: #eaeef6;
-            --muted: #9aa3b2;
-            --accent: #ffb457;
-            --accent2: #ff8c37;
-            --danger: #ff6b6b;
-            --radius: 22px;
-            --shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
-            --glow: 0 0 22px #ffb457aa, 0 0 46px #ff8c37aa, 0 0 80px #ff6a00aa;
-        }
-
-        * {
+        /* ======================================================
+   GLOBAL RESET
+======================================================*/
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
         html,
         body {
+            width: 100%;
             height: 100%;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", sans-serif;
-            color: var(--text);
+            font-family: -apple-system, "SF Pro", "Helvetica Neue", Arial;
             background: var(--bg);
+            color: var(--text);
+            transition: background .4s ease, color .4s ease;
             overflow-x: hidden;
         }
 
-        #particles {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background:
-                radial-gradient(1200px 1200px at 10% 10%, #1b2540 0%, transparent 60%),
-                radial-gradient(1000px 900px at 90% 20%, #3b1a4b 0%, transparent 65%),
-                radial-gradient(900px 1000px at 50% 100%, #093a47 0%, transparent 55%),
-                var(--bg);
+        /* ======================================================
+   LIGHT / DARK AUTODETECT
+======================================================*/
+        :root {
+            --bg: #05070b;
+            --card-bg: #0d1117;
+            --text: #f2f2f2;
+            --border: rgba(255, 255, 255, .08);
+            --glow: rgba(0, 255, 180, .45);
         }
 
-        .grain {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            opacity: .09;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.6"/></svg>');
-            mix-blend-mode: overlay;
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #fdfdfd;
+                --card-bg: #ffffff;
+                --text: #111;
+                --border: rgba(0, 0, 0, .1);
+                --glow: rgba(0, 140, 255, .25);
+            }
         }
 
-        header {
-            padding: 40px 24px 10px;
-            text-align: center;
-            position: relative;
+        /* ======================================================
+   GLOBAL ANIMATIONS
+======================================================*/
+        .fade-in {
+            animation: fadeIn 1.3s ease both;
         }
 
-        .title {
-            font-weight: 900;
-            letter-spacing: .08em;
-            font-size: clamp(28px, 6vw, 64px);
-            text-transform: uppercase;
-            filter: drop-shadow(0 6px 26px rgba(0, 0, 0, .5));
-            animation: float 6.8s ease-in-out infinite, glow 2.6s ease-in-out infinite;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .subtitle {
-            margin-top: 6px;
-            font-weight: 300;
-            letter-spacing: .14em;
-            color: var(--muted);
-        }
-
-        .jpcopy {
-            max-width: 860px;
-            margin: 18px auto 28px;
-            padding: 16px 18px;
-            border-radius: var(--radius);
-            backdrop-filter: blur(14px);
-            background: var(--card);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            font-size: 15.5px;
-            line-height: 1.85;
-        }
-
-        @keyframes float {
+        /* 音楽に合わせて発光する Glow */
+        @keyframes glowPulse {
             0% {
-                transform: translateY(0);
+                box-shadow: 0 0 0px var(--glow);
             }
 
             50% {
-                transform: translateY(-6px);
+                box-shadow: 0 0 24px var(--glow);
             }
 
             100% {
-                transform: translateY(0);
+                box-shadow: 0 0 0px var(--glow);
             }
         }
 
-        @keyframes glow {
-
-            0%,
-            100% {
-                text-shadow: var(--glow);
-            }
-
-            50% {
-                text-shadow: 0 0 10px #ffb45755, 0 0 20px #ff8c3755;
-            }
-        }
-
-        .container {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-
-        .toolbar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 8px;
-        }
-
-        .toolbar-label {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .toolbar select {
-            background: #050816;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 6px 10px;
-            font-size: 12px;
-            outline: none;
-        }
-
-        .grid {
-            margin-top: 4px;
+        /* ======================================================
+   CREATOR LIST
+======================================================*/
+        .creator-list {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 18px;
+            gap: 36px;
+            padding: 64px 24px;
+            max-width: 1220px;
+            margin: auto;
         }
 
-        @media (max-width:1024px) {
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width:768px) {
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width:520px) {
-            .grid {
-                grid-template-columns: repeat(1, 1fr);
-            }
-        }
-
-        .card {
-            position: relative;
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            background: linear-gradient(145deg, #151926dd, #0b101bdd);
-            overflow: hidden;
+        .creator-card {
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            min-height: 170px;
-            transition: .18s;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
-            border-color: #ffb45788;
-        }
-
-        .thumb-wrap {
-            position: relative;
-            padding-top: 62%;
+            background: var(--card-bg);
+            border-radius: 22px;
             overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform .4s cubic-bezier(.22, .61, .36, 1),
+                box-shadow .4s ease;
+            transform-style: preserve-3d;
         }
 
-        .thumb {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+        .creator-card:hover {
+            transform: translateY(-6px) rotateX(6deg) rotateY(-6deg) scale(1.02);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .35);
+        }
+
+        .creator-card img {
+            height: 42vh;
             object-fit: cover;
         }
 
-        .thumb-fallback {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 0% 0%, #ffb45755, transparent 55%),
-                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
-                #101322;
+        .creator-card-body {
+            padding: 24px;
         }
 
-        .card-body {
-            padding: 10px 12px 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .creator-card-title {
+            font-size: 1.45rem;
+            font-weight: 600;
         }
 
-        .creator-name {
-            font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .creator-card-role {
+            font-size: 0.9rem;
+            opacity: .7;
+            margin-top: 4px;
         }
 
-        .creator-company {
-            font-size: 11px;
-            color: var(--muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-footer {
-            margin-top: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .like-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.35);
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .like-btn span.heart {
-            color: #fb7185;
-            font-size: 12px;
-        }
-
-        /* DETAIL MODAL（1.5倍サイズ & 動画埋め込み） */
-
-        .modal-overlay {
+        /* ======================================================
+   MODAL
+======================================================*/
+        .creator-modal {
             position: fixed;
             inset: 0;
+            z-index: 999;
             display: none;
-            place-items: center;
-            background: rgba(0, 0, 0, 0.78);
-            backdrop-filter: blur(18px);
-            z-index: 1500;
-        }
-
-        .modal-overlay.show {
-            display: grid;
-        }
-
-        .modal {
-            width: min(1100px, 96vw);
-            background: #111622f2;
-            border-radius: 24px;
-            border: 1px solid #ffffff22;
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.88);
-            overflow: hidden;
-        }
-
-        .modal-head {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 16px 20px 10px;
-            gap: 10px;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0, 0, 0, .55);
+            backdrop-filter: blur(16px);
         }
 
-        .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+        /* show状態 */
+        .creator-modal.show {
+            display: flex;
+        }
+
+        /* Apple風スライド＋フェード */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+        }
+
+        .creator-modal-inner {
+            background: var(--bg);
+            border-radius: 22px;
+            width: 100%;
+            max-width: 960px;
+            max-height: 90vh;
+            display: flex;
             overflow: hidden;
-            background: #222;
-            border: 1px solid #ffffff33;
-            flex-shrink: 0;
+            position: relative;
+            animation: slideIn .45s cubic-bezier(.22, .61, .36, 1);
         }
 
-        .avatar img {
+        .creator-modal-media {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .creator-modal-media img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .close {
-            background: transparent;
-            border: 0;
-            cursor: pointer;
-            font-size: 22px;
-            color: #fff;
+        /* TEXT */
+        .creator-modal-body {
+            flex: 1;
+            padding: 28px;
+            overflow-y: auto;
         }
 
-        .modal-body {
-            padding: 10px 20px 20px;
-            display: grid;
-            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-            gap: 18px;
+        .creator-modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
         }
 
-        @media(max-width:900px) {
-            .modal {
-                width: 95vw;
-            }
-
-            .modal-body {
-                grid-template-columns: 1fr;
-            }
+        .creator-modal-role {
+            font-size: 1rem;
+            opacity: .7;
+            margin-bottom: 22px;
         }
 
-        .video-panel {
-            background: #111827;
-            border-radius: 18px;
-            border: 1px solid #ffffff22;
-            padding: 12px 12px 14px;
-        }
-
-        .video-panel video {
-            width: 100%;
-            border-radius: 14px;
-            background: #000;
-        }
-
-        .meta-label {
-            font-size: 11px;
-            color: #cfd6e6;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-top: 8px;
-        }
-
-        .meta-text {
-            font-size: 13px;
-            color: #dde3f6;
-        }
-
-        .detail-about {
-            font-size: 13px;
-            color: #dde3f6;
-            line-height: 1.7;
+        .creator-modal-description {
+            font-size: 1rem;
+            line-height: 1.75;
+            opacity: .92;
             white-space: pre-wrap;
         }
 
-        /* EDIT ボタン（下センター） */
-        .edit-bottom-wrap {
-            margin-top: 32px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .edit-bottom-btn {
-            padding: 10px 18px;
-            border-radius: 999px;
+        /* CLOSE BTN */
+        .creator-modal-close {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            font-size: 1.6rem;
+            background: none;
             border: none;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .12em;
-            text-transform: uppercase;
+            color: var(--text);
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            opacity: .7;
+            transition: .25s;
         }
 
-        footer {
-            margin: 30px 0 18px;
-            text-align: center;
-            color: #b8c2d4;
-            font-size: 12px;
-            opacity: .8;
+        .creator-modal-close:hover {
+            transform: scale(1.18);
+            opacity: 1;
         }
 
-        /* EDIT用ログインモーダル */
-        .edit-login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .85);
-            backdrop-filter: blur(14px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .edit-login-card {
-            width: min(360px, 90vw);
-            border-radius: 20px;
-            background: #0b1120ee;
-            border: 1px solid #ffffff22;
-            padding: 20px 22px 22px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .8);
-        }
-
-        .edit-login-card h2 {
-            margin: 0 0 8px;
-            font-size: 16px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-
-        .edit-login-card p {
-            margin: 0 0 14px;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .edit-login-card label {
-            display: block;
-            font-size: 11px;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: #cbd5f5;
-            margin-top: 10px;
-        }
-
-        .edit-login-card input {
-            width: 100%;
-            margin-top: 4px;
-            padding: 9px 10px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: #020617;
-            color: #e5e7eb;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .edit-login-card input:focus {
-            border-color: #ffb457aa;
-            box-shadow: 0 0 0 2px #ffb45733;
-        }
-
-        .edit-login-card button {
-            margin-top: 14px;
-            width: 100%;
-            padding: 9px 0;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-weight: 600;
+        /* ARROWS */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.4rem;
             cursor: pointer;
+            user-select: none;
+            opacity: .3;
+            transition: .25s;
         }
 
-        .edit-login-error {
-            font-size: 11px;
-            color: #fecaca;
-            margin-top: 8px;
-            min-height: 16px;
+        .nav-arrow:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        .nav-prev {
+            left: 12px;
+        }
+
+        .nav-next {
+            right: 12px;
+        }
+
+        /* ---------------------------------------------------------
+   RESPONSIVE
+---------------------------------------------------------*/
+        @media(max-width: 780px) {
+            .creator-modal-inner {
+                flex-direction: column;
+            }
+
+            .creator-modal-media {
+                max-height: 40vh;
+            }
         }
     </style>
 </head>
 
-<body>
 
-    <canvas id="particles"></canvas>
-    <div class="grain"></div>
+<body class="fade-in">
 
-    <!-- DETAIL POPUP -->
-    <div id="detailOverlay" class="modal-overlay">
-        <div class="modal" id="detailModal">
-            <div class="modal-head">
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <div class="avatar" id="detailAvatar"></div>
-                    <div>
-                        <div id="detailName" style="font-weight:700;font-size:18px;">Creator</div>
-                        <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
-                        <div id="detailUrl" style="font-size:11px;margin-top:3px;"></div>
-                    </div>
-                </div>
-                <button class="close" id="detailClose">×</button>
+    <div class="creator-list" id="creatorList"></div>
+
+    <!-- Modal -->
+    <div class="creator-modal" id="creatorModal">
+        <div class="creator-modal-inner" id="modalInner">
+
+            <span class="nav-arrow nav-prev" id="navPrev">‹</span>
+            <span class="nav-arrow nav-next" id="navNext">›</span>
+
+            <button class="creator-modal-close" id="modalClose">×</button>
+
+            <div class="creator-modal-media">
+                <img id="modalImage">
             </div>
 
-            <div class="modal-body">
-                <div class="video-panel">
-                    <video id="detailVideo" controls playsinline></video>
-                    <div class="meta-label">Main Video</div>
-                    <div class="meta-text" id="detailDesc">—</div>
-                </div>
-
-                <div>
-                    <div class="meta-label">ABOUT</div>
-                    <div class="detail-about" id="detailAbout">—</div>
-                </div>
+            <div class="creator-modal-body">
+                <div id="modalName" class="creator-modal-title"></div>
+                <div id="modalRole" class="creator-modal-role"></div>
+                <div id="modalDescription" class="creator-modal-description"></div>
             </div>
+
         </div>
     </div>
 
-    <!-- EDIT ログイン用オーバーレイ -->
-    <div id="editLoginOverlay" class="edit-login-overlay">
-        <div class="edit-login-card">
-            <h2>EDIT LOGIN</h2>
-            <p>コンテンツを編集するには管理者IDでサインインしてください。</p>
-            <label for="editLoginEmail">メールアドレス</label>
-            <input id="editLoginEmail" type="email" placeholder="admin@example.com" />
-            <label for="editLoginPassword">パスワード</label>
-            <input id="editLoginPassword" type="password" placeholder="password" />
-            <button id="editLoginButton">ログインして編集へ</button>
-            <div id="editLoginError" class="edit-login-error"></div>
-        </div>
+
+
+    <script>
+        /* ======================================================
+           CREATOR DATA
+        ======================================================*/
+        const creators = [
+            {
+                name: "Kaede",
+                role: "Junior Explorer / 5-year-old House Head",
+                image: "assets/kaede.jpg",
+                desc: `五歳とは思えない、Beatと会話する小さなHouse Head。
+四つ打ちのPulseを感じ取るたび、空気がわずかに揺れ、
+人々の視線が自然と彼へと吸い寄せられる。
+
+「無限の可能性を秘めた器」。
+
+All eyes are on his next move.`
+            },
+
+            {
+                name: "Daijiro Majima",
+                role: "TOPPAN Inc. / The Master of the Unspoken Word",
+                image: "assets/majima.jpg",
+                desc: `言葉より深く、視線ひとつで本質を見抜く。
+空間、CX、AI、Marketing DX。
+それらを分断ではなく、一つのExperienceとして束ねる希有なプロデューサー。
+
+He speaks through silence.
+He designs through vision.`
+            },
+
+            {
+                name: "Yujiro Iwasaki",
+                role: "hotchpotch / Design Maestro",
+                image: "assets/yujiro.jpg",
+                desc: `彼のつくる空間は“美しい”を超え、精神の状態そのもののよう。
+光、動線、温度、ストーリー。
+それら全てを繊細に編み込み、人がそこに“存在する理由”を美しく成立させる。
+
+限界はない。あるのは深化と進化、そして静謐な革新。`
+            },
+
+            {
+                name: "Koichi Nakamura",
+                role: "Kona & UDA / The Architect of Wit",
+                image: "assets/nakamura.jpg",
+                desc: `When in doubt, make it a laugh.
+迷ったときほど、彼の建築は軽やかに、美しく、人の心を解きほぐす。
+
+Wit is not an accessory.
+It is architecture.`
+            },
+
+            {
+                name: "Masahiro Kuwamoto",
+                role: "GEOBRAIN / Challenge. Never Quit.",
+                image: "assets/kuwamoto.jpg",
+                desc: `挑み続け、諦めず、価値ある“形”を未来へ残す男。
+Craft is not technique. It is resolve.
+
+静かな意志が、作品に温度を宿す。`
+            },
+
+            {
+                name: "Kosuke Shimizu",
+                role: "papi-ca / Visual & Digital Creator",
+                image: "assets/shimizu.jpg",
+                desc: `情熱という言葉が自然と似合うクリエイター。
+美、ユーモア、精度、軽やかさ。
+そのすべてを自在に操る稀有な存在。
+
+Loving the grind.
+Can-do attitude.`
+            },
+
+            {
+                name: "Sushi Creator Kimoto",
+                role: "神楽坂 鮨きもと / The Realm of Sound",
+                image: "assets/kimoto.jpg",
+                desc: `Where sushi becomes music, and silence becomes art.
+
+珠玉の一貫に宿るのは、味覚だけでなく
+温度・緊張・余白という“音”のような美。
+
+A crafted silence.
+A quiet symphony.`
+            },
+        ];
+
+
+        /* ======================================================
+           BUILD LIST
+        ======================================================*/
+        const listEl = document.getElementById("creatorList");
+
+        creators.forEach((c, i) => {
+            const card = document.createElement("div");
+            card.className = "creator-card";
+            card.innerHTML = `
+    <div class="glow"></div>
+    <img src="${c.image}">
+    <div class="creator-card-body">
+      <div class="creator-card-title">${c.name}</div>
+      <div class="creator-card-role">${c.role}</div>
     </div>
+  `;
+            card.onclick = () => openModal(i);
+            listEl.appendChild(card);
+        });
 
-    <!-- HEADER -->
-    <header>
-        <div class="title">PLAY. CREATE. LIVE.</div>
-        <div class="subtitle">Creeds of the Playful Creators.</div>
-        <div class="jpcopy">
-            遊ぶように発想し、創るように生きる。<br>
-            枠にとらわれず、世界を面白がる者たちの信条。<br>
-            創造とは、日常を遊びに変えるチカラだ。
-        </div>
-    </header>
 
-    <main class="container">
-        <div class="toolbar">
-            <span class="toolbar-label">並び順：</span>
-            <select id="sortSelect">
-                <option value="newest">新着順</option>
-                <option value="oldest">古い順</option>
-                <option value="name-asc">名前 A→Z</option>
-                <option value="name-desc">名前 Z→A</option>
-            </select>
-        </div>
+        /* ======================================================
+           MODAL
+        ======================================================*/
+        const modal = document.getElementById("creatorModal");
+        const modalImg = document.getElementById("modalImage");
+        const modalName = document.getElementById("modalName");
+        const modalRole = document.getElementById("modalRole");
+        const modalDesc = document.getElementById("modalDescription");
+        const modalInner = document.getElementById("modalInner");
 
-        <div id="grid" class="grid"></div>
+        let currentIndex = 0;
 
-        <div class="edit-bottom-wrap">
-            <button id="openEditLogin" class="edit-bottom-btn">EDIT</button>
-        </div>
-    </main>
+        function openModal(i) {
+            currentIndex = i;
+            modalImg.src = creators[i].image;
+            modalName.textContent = creators[i].name;
+            modalRole.textContent = creators[i].role;
+            modalDesc.textContent = creators[i].desc;
 
-    <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
+            modal.style.display = "flex";
+            modalInner.style.animation = "slideIn .45s cubic-bezier(.22,.61,.36,1)";
+        }
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        function closeModal() {
+            modalInner.style.animation = "slideOut .45s cubic-bezier(.22,.61,.36,1)";
+            setTimeout(() => modal.style.display = "none", 420);
+        }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
-            authDomain: "play-create-live.firebaseapp.com",
-            databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
-            projectId: "play-create-live",
-            storageBucket: "play-create-live.firebasestorage.app",
-            messagingSenderId: "143889321354",
-            appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
-            measurementId: "G-ZFHF93QQCJ"
+        document.getElementById("modalClose").onclick = closeModal;
+
+
+        /* ======================================================
+           ARROWS (left/right)
+        ======================================================*/
+        document.getElementById("navNext").onclick = () => {
+            currentIndex = (currentIndex + 1) % creators.length;
+            openModal(currentIndex);
+        };
+        document.getElementById("navPrev").onclick = () => {
+            currentIndex = (currentIndex - 1 + creators.length) % creators.length;
+            openModal(currentIndex);
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        function $(s) { return document.querySelector(s); }
+        /* ======================================================
+           TOUCH SWIPE (mobile)
+        ======================================================*/
+        let startX = 0;
+        modal.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+        modal.addEventListener("touchend", e => {
+            let dx = e.changedTouches[0].clientX - startX;
+            if (dx > 60) document.getElementById("navPrev").click();
+            if (dx < -60) document.getElementById("navNext").click();
+        });
 
-        let currentSort = "newest";
-        let creators = [];
-        let currentCreator = null;
 
-        // パーティクル（濃いめ）
-        (function () {
-            const c = document.getElementById('particles');
-            const ctx = c.getContext('2d');
-            let W, H, dpr = window.devicePixelRatio || 1;
-            function resize() {
-                W = c.width = innerWidth * dpr;
-                H = c.height = innerHeight * dpr;
-                c.style.width = innerWidth + 'px';
-                c.style.height = innerHeight + 'px';
-            }
-            resize();
-            window.addEventListener('resize', resize);
-            const N = 90, parts = [];
-            for (let i = 0; i < N; i++) {
-                parts.push({
-                    x: Math.random() * W,
-                    y: Math.random() * H,
-                    r: Math.random() * 3 * dpr + 1,
-                    a: Math.random() * Math.PI * 2,
-                    v: 0.25 + Math.random() * 0.5
-                });
-            }
-            function draw() {
-                ctx.clearRect(0, 0, W, H);
-                for (const p of parts) {
-                    p.x += Math.cos(p.a) * p.v;
-                    p.y += Math.sin(p.a) * p.v;
-                    p.a += (Math.random() - 0.5) * 0.03;
-                    if (p.x < 0) p.x = W;
-                    if (p.x > W) p.x = 0;
-                    if (p.y < 0) p.y = H;
-                    if (p.y > H) p.y = 0;
-                    ctx.beginPath();
-                    ctx.fillStyle = "rgba(255,180,87,0.6)";
-                    ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                requestAnimationFrame(draw);
-            }
-            draw();
-        })();
-
-        async function loadCreators() {
-            const grid = $("#grid");
-            grid.innerHTML = "";
-            const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
-            const snap = await getDocs(q);
-            const list = [];
-            snap.forEach(docSnap => {
-                const d = docSnap.data();
-                list.push({
-                    id: docSnap.id,
-                    name: d.name || "",
-                    company: d.company || "",
-                    url: d.url || "",
-                    videoTitle: d.videoTitle || "",
-                    summary: d.summary || "",
-                    profileImageUrl: d.profileImageUrl || "",
-                    videoUrl: d.videoUrl || "",
-                    likes: typeof d.likes === "number" ? d.likes : 0,
-                    createdAt: d.createdAt || 0
-                });
-            });
-            creators = list;
-            renderGrid();
-        }
-
-        function sortCreators(list) {
-            const arr = list.slice();
-            if (currentSort === "newest") {
-                arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            } else if (currentSort === "oldest") {
-                arr.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-            } else if (currentSort === "name-asc") {
-                arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-            } else if (currentSort === "name-desc") {
-                arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-            }
-            return arr;
-        }
-
-        function renderGrid() {
-            const grid = $("#grid");
-            grid.innerHTML = "";
-            if (!creators.length) {
-                grid.style.display = "none";
-                return;
-            }
-            grid.style.display = "grid";
-            const list = sortCreators(creators);
-            list.forEach(c => {
-                const card = document.createElement("div");
-                card.className = "card";
-                const tw = document.createElement("div");
-                tw.className = "thumb-wrap";
-                if (c.profileImageUrl) {
-                    const img = document.createElement("img");
-                    img.src = c.profileImageUrl;
-                    img.alt = c.name || "thumbnail";
-                    img.className = "thumb";
-                    tw.appendChild(img);
-                } else {
-                    const fb = document.createElement("div");
-                    fb.className = "thumb-fallback";
-                    tw.appendChild(fb);
-                }
-                const body = document.createElement("div");
-                body.className = "card-body";
-                const nameEl = document.createElement("div");
-                nameEl.className = "creator-name";
-                nameEl.textContent = c.name || "—";
-                const comp = document.createElement("div");
-                comp.className = "creator-company";
-                comp.textContent = c.company || "";
-                const footer = document.createElement("div");
-                footer.className = "card-footer";
-                const likesLabel = document.createElement("span");
-                likesLabel.textContent = c.likes + " ♥";
-                const btn = document.createElement("button");
-                btn.className = "like-btn";
-                btn.innerHTML = '<span class="heart">👍</span> いいね';
-                btn.addEventListener("click", e => {
-                    e.stopPropagation();
-                    handleLike(c, likesLabel);
-                });
-                footer.appendChild(likesLabel);
-                footer.appendChild(btn);
-                body.appendChild(nameEl);
-                body.appendChild(comp);
-                body.appendChild(footer);
-                card.appendChild(tw);
-                card.appendChild(body);
-                card.addEventListener("click", () => openDetail(c));
-                grid.appendChild(card);
+        /* ======================================================
+           音楽に連動してGlowアニメーション
+        ======================================================*/
+        function glowAnimation() {
+            document.querySelectorAll(".creator-card").forEach(card => {
+                card.style.animation = "glowPulse 2.6s infinite ease-in-out";
             });
         }
+        glowAnimation();
 
-        async function handleLike(c, labelEl) {
-            try {
-                const ref = doc(db, "creators", c.id);
-                await updateDoc(ref, { likes: increment(1) });
-                c.likes += 1;
-                labelEl.textContent = c.likes + " ♥";
-            } catch (e) {
-                console.error(e);
-                alert("いいねの送信に失敗しました");
-            }
-        }
-
-        function openDetail(c) {
-            currentCreator = c;
-            const avatar = $("#detailAvatar");
-            avatar.innerHTML = "";
-            if (c.profileImageUrl) {
-                const img = document.createElement("img");
-                img.src = c.profileImageUrl;
-                img.alt = c.name || "avatar";
-                avatar.appendChild(img);
-            }
-            $("#detailName").textContent = c.name || "Creator";
-            $("#detailCompany").textContent = c.company || "";
-            const urlBox = $("#detailUrl");
-            urlBox.innerHTML = "";
-            if (c.url) {
-                const a = document.createElement("a");
-                a.href = c.url;
-                a.target = "_blank";
-                a.rel = "noopener noreferrer";
-                a.textContent = c.url;
-                urlBox.appendChild(a);
-            }
-            $("#detailDesc").textContent = c.videoTitle || "Main Video";
-            $("#detailAbout").textContent = c.summary || "—";
-
-            const v = $("#detailVideo");
-            if (c.videoUrl) {
-                v.src = c.videoUrl;
-            } else {
-                v.removeAttribute("src");
-            }
-            v.load();
-            $("#detailOverlay").classList.add("show");
-        }
-
-        function closeDetail() {
-            $("#detailOverlay").classList.remove("show");
-            const v = $("#detailVideo");
-            try { v.pause(); } catch (e) { }
-            v.removeAttribute("src");
-            v.load();
-        }
-
-        function setupEditLogin() {
-            const overlay = $("#editLoginOverlay");
-            const openBtn = $("#openEditLogin");
-            const emailEl = $("#editLoginEmail");
-            const passEl = $("#editLoginPassword");
-            const btn = $("#editLoginButton");
-            const err = $("#editLoginError");
-
-            openBtn.addEventListener("click", () => {
-                overlay.style.display = "flex";
-                err.textContent = "";
-                emailEl.value = "";
-                passEl.value = "";
-            });
-
-            btn.addEventListener("click", async () => {
-                const email = emailEl.value.trim();
-                const pass = passEl.value;
-                if (!email || !pass) {
-                    err.textContent = "メールアドレスとパスワードを入力してください。";
-                    return;
-                }
-                err.textContent = "";
-                btn.disabled = true;
-                btn.textContent = "ログイン中...";
-                try {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    window.location.href = "edit.html";
-                } catch (e) {
-                    console.error(e);
-                    err.textContent = "ログインに失敗しました。IDまたはパスワードを確認してください。";
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = "ログインして編集へ";
-                }
-            });
-
-            overlay.addEventListener("click", e => {
-                if (e.target.id === "editLoginOverlay") {
-                    overlay.style.display = "none";
-                }
-            });
-        }
-
-        (function init() {
-            loadCreators();
-            $("#sortSelect").addEventListener("change", e => {
-                currentSort = e.target.value || "newest";
-                renderGrid();
-            });
-            $("#detailClose").addEventListener("click", closeDetail);
-            $("#detailOverlay").addEventListener("click", e => {
-                if (e.target.id === "detailOverlay") closeDetail();
-            });
-            window.addEventListener("keydown", e => {
-                if (e.key === "Escape") {
-                    closeDetail();
-                }
-            });
-            setupEditLogin();
-        })();
+        /* ======================================================
+           END
+        ======================================================*/
     </script>
+
 </body>
 
 </html>
