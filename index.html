@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PLAY. CREATE. LIVE. — Edit Creators</title>
+    <title>PLAY. CREATE. LIVE. — Creator's Voice</title>
 
     <style>
         :root {
-            --bg: #05060a;
+            --bg: #0b0c10;
             --card: #11131aee;
             --border: #ffffff20;
             --text: #eaeef6;
@@ -16,8 +16,9 @@
             --accent: #ffb457;
             --accent2: #ff8c37;
             --danger: #ff6b6b;
-            --radius: 20px;
+            --radius: 22px;
             --shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
+            --glow: 0 0 22px #ffb457aa, 0 0 46px #ff8c37aa, 0 0 80px #ff6a00aa;
         }
 
         * {
@@ -33,224 +34,384 @@
             margin: 0;
             font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", sans-serif;
             color: var(--text);
-            background: radial-gradient(circle at 0% 0%, #1f2937, #020617 60%);
+            background: var(--bg);
             overflow-x: hidden;
         }
 
+        #particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(1200px 1200px at 10% 10%, #1b2540 0%, transparent 60%),
+                radial-gradient(1000px 900px at 90% 20%, #3b1a4b 0%, transparent 65%),
+                radial-gradient(900px 1000px at 50% 100%, #093a47 0%, transparent 55%),
+                var(--bg);
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .09;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.6"/></svg>');
+            mix-blend-mode: overlay;
+        }
+
         header {
-            padding: 18px 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 40px 24px 10px;
+            text-align: center;
+            position: relative;
         }
 
         .title {
-            font-weight: 700;
+            font-weight: 900;
             letter-spacing: .08em;
-            font-size: 14px;
+            font-size: clamp(28px, 6vw, 64px);
+            text-transform: uppercase;
+            filter: drop-shadow(0 6px 26px rgba(0, 0, 0, .5));
+            animation: float 6.8s ease-in-out infinite, glow 2.6s ease-in-out infinite;
         }
 
-        .lockstate {
-            font-size: 12px;
-            color: #ffd9b8;
-            margin-left: 8px;
+        .subtitle {
+            margin-top: 6px;
+            font-weight: 300;
+            letter-spacing: .14em;
+            color: var(--muted);
         }
 
-        .back-link {
-            text-decoration: none;
-            font-size: 12px;
-            color: #cbd5f5;
-            padding: 8px 14px;
-            border-radius: 999px;
+        .jpcopy {
+            max-width: 860px;
+            margin: 18px auto 28px;
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            backdrop-filter: blur(14px);
+            background: var(--card);
             border: 1px solid var(--border);
-            background: linear-gradient(135deg, #ffffff12, #ffffff03);
+            box-shadow: var(--shadow);
+            font-size: 15.5px;
+            line-height: 1.85;
         }
 
-        .back-link:hover {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, .35);
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                text-shadow: var(--glow);
+            }
+
+            50% {
+                text-shadow: 0 0 10px #ffb45755, 0 0 20px #ff8c3755;
+            }
         }
 
         .container {
             max-width: 1120px;
             margin: 0 auto;
-            padding: 0 20px 40px;
+            padding: 0 20px 60px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+
+        .toolbar-label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .toolbar select {
+            background: #050816;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 10px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .grid {
+            margin-top: 4px;
             display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
-            gap: 20px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        @media (max-width:1024px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width:768px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width:520px) {
+            .grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+
+        .card {
+            position: relative;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: linear-gradient(145deg, #151926dd, #0b101bdd);
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            min-height: 170px;
+            transition: .18s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
+            border-color: #ffb45788;
+        }
+
+        .thumb-wrap {
+            position: relative;
+            padding-top: 62%;
+            overflow: hidden;
+        }
+
+        .thumb {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb-fallback {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 0% 0%, #ffb45755, transparent 55%),
+                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
+                #101322;
+        }
+
+        .card-body {
+            padding: 10px 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .creator-name {
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .creator-company {
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-footer {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .like-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .like-btn span.heart {
+            color: #fb7185;
+            font-size: 12px;
+        }
+
+        /* DETAIL MODAL（1.5倍サイズ & 動画埋め込み） */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            place-items: center;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(18px);
+            z-index: 1500;
+        }
+
+        .modal-overlay.show {
+            display: grid;
+        }
+
+        .modal {
+            width: min(1100px, 96vw);
+            background: #111622f2;
+            border-radius: 24px;
+            border: 1px solid #ffffff22;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.88);
+            overflow: hidden;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px 10px;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #222;
+            border: 1px solid #ffffff33;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .close {
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            font-size: 22px;
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 10px 20px 20px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+            gap: 18px;
         }
 
         @media(max-width:900px) {
-            .container {
+            .modal {
+                width: 95vw;
+            }
+
+            .modal-body {
                 grid-template-columns: 1fr;
             }
         }
 
-        .glass {
-            border-radius: var(--radius);
-            background: linear-gradient(135deg, #ffffff0f, #ffffff03);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            padding: 16px 18px 18px;
+        .video-panel {
+            background: #111827;
+            border-radius: 18px;
+            border: 1px solid #ffffff22;
+            padding: 12px 12px 14px;
         }
 
-        h2 {
-            font-size: 13px;
-            letter-spacing: .1em;
-            text-transform: uppercase;
-            margin: 0 0 8px;
+        .video-panel video {
+            width: 100%;
+            border-radius: 14px;
+            background: #000;
         }
 
-        .hint {
-            font-size: 12px;
-            color: var(--muted);
-            margin-bottom: 10px;
-        }
-
-        .dropzone {
-            position: relative;
-            border: 1px dashed #ffb45777;
-            border-radius: 16px;
-            padding: 18px;
-            text-align: center;
-            transition: .2s border-color, .2s background;
-            background: linear-gradient(180deg, #ffb45715, transparent);
-            margin-bottom: 10px;
-        }
-
-        .dropzone.dragover {
-            border-color: #ffb457cc;
-            background: linear-gradient(180deg, #ffb45722, transparent);
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        @media(max-width:640px) {
-            .row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        label {
+        .meta-label {
             font-size: 11px;
-            color: #c8d0dc;
-            letter-spacing: .06em;
+            color: #cfd6e6;
+            letter-spacing: .08em;
             text-transform: uppercase;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            margin-top: 4px;
-            padding: 9px 10px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: #020617cc;
-            color: var(--text);
-            font-size: 13px;
-            outline: none;
-            transition: border .2s, box-shadow .2s;
-        }
-
-        textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
-
-        input:focus,
-        textarea:focus {
-            border-color: #ffb457aa;
-            box-shadow: 0 0 0 3px #ffb45730;
-        }
-
-        .btns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .btn {
-            appearance: none;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: linear-gradient(135deg, #ffffff22, #ffffff08);
-            color: var(--text);
-            padding: 8px 14px;
-            font-size: 12px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn.primary {
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            border: none;
-            color: #111827;
-            font-weight: 600;
-        }
-
-        .btn.danger {
-            border-color: #ff6b6b77;
-            background: linear-gradient(135deg, #ef444477, #b91c1c55);
-            color: #fee2e2;
-        }
-
-        .btn:disabled {
-            opacity: .5;
-            cursor: not-allowed;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
             margin-top: 8px;
+        }
+
+        .meta-text {
+            font-size: 13px;
+            color: #dde3f6;
+        }
+
+        .detail-about {
+            font-size: 13px;
+            color: #dde3f6;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        /* EDIT ボタン（下センター） */
+        .edit-bottom-wrap {
+            margin-top: 32px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .edit-bottom-btn {
+            padding: 10px 18px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            color: #111827;
             font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
         }
 
-        thead {
-            background: #020617cc;
+        footer {
+            margin: 30px 0 18px;
+            text-align: center;
+            color: #b8c2d4;
+            font-size: 12px;
+            opacity: .8;
         }
 
-        th,
-        td {
-            padding: 6px 6px;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        th {
-            text-align: left;
-            font-weight: 500;
-            color: #cbd5f5;
-        }
-
-        tr:hover td {
-            background: #0b1220;
-        }
-
-        .badge-lock {
-            font-size: 11px;
-            color: #facc15;
-        }
-
-        /* LOGIN OVERLAY */
-        .login-backdrop {
+        /* EDIT用ログインモーダル */
+        .edit-login-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, .85);
             backdrop-filter: blur(14px);
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 2000;
         }
 
-        .login-card {
+        .edit-login-card {
             width: min(360px, 90vw);
             border-radius: 20px;
             background: #0b1120ee;
@@ -259,20 +420,20 @@
             box-shadow: 0 24px 60px rgba(0, 0, 0, .8);
         }
 
-        .login-card h1 {
+        .edit-login-card h2 {
             margin: 0 0 8px;
-            font-size: 18px;
-            letter-spacing: .1em;
+            font-size: 16px;
+            letter-spacing: .08em;
             text-transform: uppercase;
         }
 
-        .login-card p {
+        .edit-login-card p {
             margin: 0 0 14px;
             font-size: 12px;
             color: #9ca3af;
         }
 
-        .login-card label {
+        .edit-login-card label {
             display: block;
             font-size: 11px;
             letter-spacing: .06em;
@@ -281,7 +442,7 @@
             margin-top: 10px;
         }
 
-        .login-card input {
+        .edit-login-card input {
             width: 100%;
             margin-top: 4px;
             padding: 9px 10px;
@@ -293,12 +454,12 @@
             outline: none;
         }
 
-        .login-card input:focus {
+        .edit-login-card input:focus {
             border-color: #ffb457aa;
             box-shadow: 0 0 0 2px #ffb45733;
         }
 
-        .login-card button {
+        .edit-login-card button {
             margin-top: 14px;
             width: 100%;
             padding: 9px 0;
@@ -310,128 +471,99 @@
             cursor: pointer;
         }
 
-        .login-error {
+        .edit-login-error {
             font-size: 11px;
             color: #fecaca;
             margin-top: 8px;
+            min-height: 16px;
         }
     </style>
 </head>
 
 <body>
-    <!-- LOGIN -->
-    <div id="loginOverlay" class="login-backdrop">
-        <div class="login-card">
-            <h1>EDIT PANEL</h1>
-            <p>登録・編集には管理者IDでのサインインが必要です。</p>
-            <label for="loginEmail">メールアドレス</label>
-            <input id="loginEmail" type="email" placeholder="admin@example.com" />
-            <label for="loginPassword">パスワード</label>
-            <input id="loginPassword" type="password" placeholder="password" />
-            <button id="loginButton">ログイン</button>
-            <div id="loginError" class="login-error"></div>
+
+    <canvas id="particles"></canvas>
+    <div class="grain"></div>
+
+    <!-- DETAIL POPUP -->
+    <div id="detailOverlay" class="modal-overlay">
+        <div class="modal" id="detailModal">
+            <div class="modal-head">
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <div class="avatar" id="detailAvatar"></div>
+                    <div>
+                        <div id="detailName" style="font-weight:700;font-size:18px;">Creator</div>
+                        <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
+                        <div id="detailUrl" style="font-size:11px;margin-top:3px;"></div>
+                    </div>
+                </div>
+                <button class="close" id="detailClose">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="video-panel">
+                    <video id="detailVideo" controls playsinline></video>
+                    <div class="meta-label">Main Video</div>
+                    <div class="meta-text" id="detailDesc">—</div>
+                </div>
+
+                <div>
+                    <div class="meta-label">ABOUT</div>
+                    <div class="detail-about" id="detailAbout">—</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <header>
-        <div>
-            <span class="title">PLAY. CREATE. LIVE. — EDIT</span>
-            <span class="lockstate" id="lockState">🔒 Locked</span>
+    <!-- EDIT ログイン用オーバーレイ -->
+    <div id="editLoginOverlay" class="edit-login-overlay">
+        <div class="edit-login-card">
+            <h2>EDIT LOGIN</h2>
+            <p>コンテンツを編集するには管理者IDでサインインしてください。</p>
+            <label for="editLoginEmail">メールアドレス</label>
+            <input id="editLoginEmail" type="email" placeholder="admin@example.com" />
+            <label for="editLoginPassword">パスワード</label>
+            <input id="editLoginPassword" type="password" placeholder="password" />
+            <button id="editLoginButton">ログインして編集へ</button>
+            <div id="editLoginError" class="edit-login-error"></div>
         </div>
-        <a href="index.html" class="back-link">← Back to TOP</a>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="title">PLAY. CREATE. LIVE.</div>
+        <div class="subtitle">Creeds of the Playful Creators.</div>
+        <div class="jpcopy">
+            遊ぶように発想し、創るように生きる。<br>
+            枠にとらわれず、世界を面白がる者たちの信条。<br>
+            創造とは、日常を遊びに変えるチカラだ。
+        </div>
     </header>
 
     <main class="container">
-        <!-- FORM -->
-        <section class="glass">
-            <h2>CREATOR FORM</h2>
-            <p class="hint">動画とプロフィールを登録します。保存はFirebaseに行われ、どの端末からでも閲覧できます。（編集は管理者のみ）</p>
+        <div class="toolbar">
+            <span class="toolbar-label">並び順：</span>
+            <select id="sortSelect">
+                <option value="newest">新着順</option>
+                <option value="oldest">古い順</option>
+                <option value="name-asc">名前 A→Z</option>
+                <option value="name-desc">名前 Z→A</option>
+            </select>
+        </div>
 
-            <div class="dropzone" id="videoDrop">
-                <input id="videoInput" type="file" accept="video/*"
-                    style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                <div style="pointer-events:none">
-                    <div style="font-size:32px">⬆</div>
-                    <div style="font-size:13px;margin-top:2px;">ここにメイン動画をドロップ</div>
-                    <div class="hint">MP4 / MOV ・ 16:9推奨 ・ 500MB未満</div>
-                </div>
-            </div>
+        <div id="grid" class="grid"></div>
 
-            <div class="row">
-                <div>
-                    <label for="name">氏名（Creator Name）</label>
-                    <input id="name" type="text" placeholder="例：Daijiro Majima">
-                </div>
-                <div>
-                    <label for="company">会社名（Company）</label>
-                    <input id="company" type="text" placeholder="例：TOPPAN Inc.">
-                </div>
-            </div>
-
-            <div class="row">
-                <div>
-                    <label for="url">URL</label>
-                    <input id="url" type="text" placeholder="https://example.com">
-                </div>
-                <div>
-                    <label for="videoTitle">動画タイトル（任意）</label>
-                    <input id="videoTitle" type="text" placeholder="例：Space-CX Showreel">
-                </div>
-            </div>
-
-            <div style="margin-top:10px;">
-                <label for="summary">概要 / コメント</label>
-                <textarea id="summary" placeholder="この動画やクリエイターについての簡単な説明"></textarea>
-            </div>
-
-            <div style="margin-top:10px;">
-                <label>プロフィール画像（任意）</label>
-                <div class="btns" style="margin-top:6px;">
-                    <label class="btn" style="position:relative;overflow:hidden;">
-                        画像を選択
-                        <input id="profileInput" type="file" accept="image/*"
-                            style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                    </label>
-                    <span class="hint" id="profileHint">未選択</span>
-                </div>
-            </div>
-
-            <div class="btns">
-                <button class="btn primary" id="saveBtn">保存 / 追加</button>
-                <button class="btn" id="clearBtn">入力クリア</button>
-            </div>
-            <p class="hint">※ 編集・削除は管理者のみ。全削除はFirebaseコンソールから行ってください。</p>
-        </section>
-
-        <!-- LIST -->
-        <section class="glass">
-            <h2>CREATOR LIST</h2>
-            <p class="hint">登録済みのクリエイター一覧。クリックでフォームに読み込み、上書き保存や削除ができます。（要管理者ログイン）</p>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:40px;">No</th>
-                        <th>氏名</th>
-                        <th>会社名</th>
-                        <th>URL</th>
-                        <th style="width:110px;">操作</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody">
-                    <tr>
-                        <td colspan="5" style="text-align:center;padding:16px 0;color:#9ca3af;">まだ登録がありません。</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+        <div class="edit-bottom-wrap">
+            <button id="openEditLogin" class="edit-bottom-btn">EDIT</button>
+        </div>
     </main>
+
+    <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
@@ -447,318 +579,266 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        // ★ここをあなたの管理者メールアドレスに変える
-        const ADMIN_EMAIL = "mjmdjr@gmail.com";
 
         function $(s) { return document.querySelector(s); }
 
-        let currentVideoFile = null;
-        let currentProfileFile = null;
-        let editingId = null;
-        let editingEntry = null;
+        let currentSort = "newest";
+        let creators = [];
+        let currentCreator = null;
 
-        function setLockState(text) {
-            $('#lockState').textContent = text;
-        }
-
-        function bindDnD() {
-            const dz = $('#videoDrop');
-            const input = $('#videoInput');
-            const hint = dz.querySelector('.hint');
-
-            function setDrag(on) { dz.classList.toggle('dragover', !!on); }
-            ['dragenter', 'dragover'].forEach(ev => {
-                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
-            });
-            ['dragleave', 'drop'].forEach(ev => {
-                dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); setDrag(false); });
-            });
-
-            dz.addEventListener('drop', e => {
-                const files = e.dataTransfer.files;
-                const f = files && files[0];
-                if (f && f.type.indexOf('video/') === 0) {
-                    currentVideoFile = f;
-                    hint.textContent = '動画読み込み中... (' + f.name + ')';
-                    setTimeout(() => { hint.textContent = '選択中: ' + f.name; }, 500);
-                }
-            });
-
-            input.addEventListener('change', e => {
-                const files = e.target.files;
-                const f = files && files[0];
-                if (f && f.type.indexOf('video/') === 0) {
-                    currentVideoFile = f;
-                    hint.textContent = '動画読み込み中... (' + f.name + ')';
-                    setTimeout(() => { hint.textContent = '選択中: ' + f.name; }, 500);
-                }
-            });
-
-            $('#profileInput').addEventListener('change', e => {
-                const files = e.target.files;
-                const f = files && files[0];
-                if (f) {
-                    currentProfileFile = f;
-                    const ph = $('#profileHint');
-                    ph.textContent = '画像読み込み中... (' + f.name + ')';
-                    setTimeout(() => { ph.textContent = '選択中: ' + f.name; }, 500);
-                }
-            });
-        }
-
-        function clearForm() {
-            $('#name').value = '';
-            $('#company').value = '';
-            $('#url').value = '';
-            $('#videoTitle').value = '';
-            $('#summary').value = '';
-            $('#videoInput').value = '';
-            $('#profileInput').value = '';
-            $('#videoDrop').querySelector('.hint').textContent = 'MP4 / MOV ・ 16:9推奨 ・ 500MB未満';
-            $('#profileHint').textContent = '未選択';
-            currentVideoFile = null;
-            currentProfileFile = null;
-            editingId = null;
-            editingEntry = null;
-        }
-
-        function flashSaveButton(message) {
-            const btn = $('#saveBtn');
-            const origText = btn.textContent;
-            const origBg = btn.style.backgroundImage;
-            btn.textContent = message || 'Saved!';
-            btn.style.backgroundImage = 'linear-gradient(135deg,#22c55e,#16a34a)';
-            setTimeout(() => {
-                btn.textContent = origText;
-                btn.style.backgroundImage = origBg || '';
-            }, 900);
-        }
-
-        function uploadWithProgress(file, path, where) {
-            return new Promise((resolve, reject) => {
-                const storageRef = ref(storage, path);
-                const task = uploadBytesResumable(storageRef, file);
-                const indicator = document.createElement('span');
-                indicator.style.fontSize = '11px';
-                indicator.style.marginLeft = '8px';
-                indicator.textContent = '0%';
-                where.appendChild(indicator);
-                task.on('state_changed',
-                    snap => {
-                        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
-                        indicator.textContent = pct + '%';
-                    },
-                    err => { console.error(err); reject(err); },
-                    async () => {
-                        const url = await getDownloadURL(task.snapshot.ref);
-                        indicator.textContent = '100%';
-                        resolve(url);
-                    }
-                );
-            });
-        }
-
-        async function renderList() {
-            const tbody = $('#tbody');
-            tbody.innerHTML = '';
-            const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
-            const snap = await getDocs(q);
-            if (snap.empty) {
-                const tr = document.createElement('tr');
-                const td = document.createElement('td');
-                td.colSpan = 5;
-                td.style.textAlign = 'center';
-                td.style.padding = '16px 0';
-                td.style.color = '#9ca3af';
-                td.textContent = 'まだ登録がありません。';
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-                return;
+        // パーティクル（濃いめ）
+        (function () {
+            const c = document.getElementById('particles');
+            const ctx = c.getContext('2d');
+            let W, H, dpr = window.devicePixelRatio || 1;
+            function resize() {
+                W = c.width = innerWidth * dpr;
+                H = c.height = innerHeight * dpr;
+                c.style.width = innerWidth + 'px';
+                c.style.height = innerHeight + 'px';
             }
-            let index = 1;
-            snap.forEach(docSnap => {
-                const it = docSnap.data();
-                const tr = document.createElement('tr');
-                tr.innerHTML =
-                    '<td>' + index + '</td>' +
-                    '<td>' + (it.name || '') + '</td>' +
-                    '<td>' + (it.company || '') + '</td>' +
-                    '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.url || '') + '</td>' +
-                    '<td>' +
-                    '<button class="btn" data-edit="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">編集</button> ' +
-                    '<button class="btn danger" data-delete="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">削除</button>' +
-                    '</td>';
-                tbody.appendChild(tr);
-                index++;
-            });
-        }
-
-        async function handleRowClick(e) {
-            const editId = e.target.getAttribute('data-edit');
-            const delId = e.target.getAttribute('data-delete');
-            if (editId) {
-                const q = query(collection(db, 'creators'), orderBy('createdAt', 'desc'));
-                const snap = await getDocs(q);
-                snap.forEach(docSnap => {
-                    if (docSnap.id === editId) {
-                        const it = docSnap.data();
-                        editingId = editId;
-                        editingEntry = it;
-                        $('#name').value = it.name || '';
-                        $('#company').value = it.company || '';
-                        $('#url').value = it.url || '';
-                        $('#videoTitle').value = it.videoTitle || '';
-                        $('#summary').value = it.summary || '';
-                        $('#profileHint').textContent = it.profileImageUrl ? '既存画像あり' : '未選択';
-                    }
+            resize();
+            window.addEventListener('resize', resize);
+            const N = 90, parts = [];
+            for (let i = 0; i < N; i++) {
+                parts.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: Math.random() * 3 * dpr + 1,
+                    a: Math.random() * Math.PI * 2,
+                    v: 0.25 + Math.random() * 0.5
                 });
-            } else if (delId) {
-                if (!confirm('このクリエイターを削除しますか？')) return;
-                await deleteDoc(doc(db, 'creators', delId));
-                await renderList();
             }
-        }
-
-        function saveEntry() {
-            const user = auth.currentUser;
-            if (!user) {
-                alert('保存にはログインが必要です。');
-                return;
-            }
-            if (user.email !== ADMIN_EMAIL) {
-                alert('編集権限がありません（管理者のみ）。');
-                return;
-            }
-
-            const saveBtn = $('#saveBtn');
-            const origText = saveBtn.textContent;
-            saveBtn.textContent = '保存中...';
-            saveBtn.disabled = true;
-            saveBtn.style.opacity = '0.7';
-
-            (async function () {
-                try {
-                    const name = $('#name').value.trim();
-                    const company = $('#company').value.trim();
-                    const url = $('#url').value.trim();
-                    const videoTitle = $('#videoTitle').value.trim();
-                    const summary = $('#summary').value.trim();
-                    if (!name) {
-                        alert('氏名を入力してください。');
-                        return;
-                    }
-
-                    let videoUrl = editingEntry && editingEntry.videoUrl ? editingEntry.videoUrl : null;
-                    let profileUrl = editingEntry && editingEntry.profileImageUrl ? editingEntry.profileImageUrl : null;
-
-                    const basePath = 'creators/' + Date.now() + '-' + Math.random().toString(36).slice(2);
-
-                    if (currentVideoFile) {
-                        const dz = $('#videoDrop');
-                        videoUrl = await uploadWithProgress(currentVideoFile, basePath + '/video', dz);
-                    } else if (!editingEntry) {
-                        alert('メイン動画を選択してください。');
-                        return;
-                    }
-
-                    if (currentProfileFile) {
-                        const ph = $('#profileHint');
-                        profileUrl = await uploadWithProgress(currentProfileFile, basePath + '/profile', ph);
-                    }
-
-                    const payload = {
-                        name,
-                        company,
-                        url,
-                        videoTitle,
-                        summary,
-                        profileImageUrl: profileUrl || null,
-                        videoUrl: videoUrl || null,
-                        likes: editingEntry && typeof editingEntry.likes === "number" ? editingEntry.likes : 0,
-                        createdAt: editingEntry && editingEntry.createdAt ? editingEntry.createdAt : Date.now()
-                    };
-
-                    if (editingId) {
-                        await updateDoc(doc(db, 'creators', editingId), payload);
-                    } else {
-                        await addDoc(collection(db, 'creators'), payload);
-                    }
-
-                    clearForm();
-                    await renderList();
-                    flashSaveButton(editingId ? '更新しました' : '保存しました');
-                } catch (e) {
-                    console.error(e);
-                    alert('保存中にエラーが発生しました');
-                } finally {
-                    saveBtn.disabled = false;
-                    saveBtn.style.opacity = '1';
-                    saveBtn.textContent = origText;
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                for (const p of parts) {
+                    p.x += Math.cos(p.a) * p.v;
+                    p.y += Math.sin(p.a) * p.v;
+                    p.a += (Math.random() - 0.5) * 0.03;
+                    if (p.x < 0) p.x = W;
+                    if (p.x > W) p.x = 0;
+                    if (p.y < 0) p.y = H;
+                    if (p.y > H) p.y = 0;
+                    ctx.beginPath();
+                    ctx.fillStyle = "rgba(255,180,87,0.6)";
+                    ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+                    ctx.fill();
                 }
-            })();
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        async function loadCreators() {
+            const grid = $("#grid");
+            grid.innerHTML = "";
+            const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
+            const snap = await getDocs(q);
+            const list = [];
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                list.push({
+                    id: docSnap.id,
+                    name: d.name || "",
+                    company: d.company || "",
+                    url: d.url || "",
+                    videoTitle: d.videoTitle || "",
+                    summary: d.summary || "",
+                    profileImageUrl: d.profileImageUrl || "",
+                    videoUrl: d.videoUrl || "",
+                    likes: typeof d.likes === "number" ? d.likes : 0,
+                    createdAt: d.createdAt || 0
+                });
+            });
+            creators = list;
+            renderGrid();
         }
 
-        function setupLogin() {
-            const overlay = $('#loginOverlay');
-            const emailEl = $('#loginEmail');
-            const passEl = $('\#loginPassword');
-            const btn = $('\#loginButton');
-            const err = $('\#loginError');
+        function sortCreators(list) {
+            const arr = list.slice();
+            if (currentSort === "newest") {
+                arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else if (currentSort === "oldest") {
+                arr.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+            } else if (currentSort === "name-asc") {
+                arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+            } else if (currentSort === "name-desc") {
+                arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+            }
+            return arr;
+        }
 
-            const passInput = $('#loginPassword');
-            const loginBtn = $('#loginButton');
+        function renderGrid() {
+            const grid = $("#grid");
+            grid.innerHTML = "";
+            if (!creators.length) {
+                grid.style.display = "none";
+                return;
+            }
+            grid.style.display = "grid";
+            const list = sortCreators(creators);
+            list.forEach(c => {
+                const card = document.createElement("div");
+                card.className = "card";
+                const tw = document.createElement("div");
+                tw.className = "thumb-wrap";
+                if (c.profileImageUrl) {
+                    const img = document.createElement("img");
+                    img.src = c.profileImageUrl;
+                    img.alt = c.name || "thumbnail";
+                    img.className = "thumb";
+                    tw.appendChild(img);
+                } else {
+                    const fb = document.createElement("div");
+                    fb.className = "thumb-fallback";
+                    tw.appendChild(fb);
+                }
+                const body = document.createElement("div");
+                body.className = "card-body";
+                const nameEl = document.createElement("div");
+                nameEl.className = "creator-name";
+                nameEl.textContent = c.name || "—";
+                const comp = document.createElement("div");
+                comp.className = "creator-company";
+                comp.textContent = c.company || "";
+                const footer = document.createElement("div");
+                footer.className = "card-footer";
+                const likesLabel = document.createElement("span");
+                likesLabel.textContent = c.likes + " ♥";
+                const btn = document.createElement("button");
+                btn.className = "like-btn";
+                btn.innerHTML = '<span class="heart">👍</span> いいね';
+                btn.addEventListener("click", e => {
+                    e.stopPropagation();
+                    handleLike(c, likesLabel);
+                });
+                footer.appendChild(likesLabel);
+                footer.appendChild(btn);
+                body.appendChild(nameEl);
+                body.appendChild(comp);
+                body.appendChild(footer);
+                card.appendChild(tw);
+                card.appendChild(body);
+                card.addEventListener("click", () => openDetail(c));
+                grid.appendChild(card);
+            });
+        }
 
-            loginBtn.addEventListener('click', () => {
+        async function handleLike(c, labelEl) {
+            try {
+                const ref = doc(db, "creators", c.id);
+                await updateDoc(ref, { likes: increment(1) });
+                c.likes += 1;
+                labelEl.textContent = c.likes + " ♥";
+            } catch (e) {
+                console.error(e);
+                alert("いいねの送信に失敗しました");
+            }
+        }
+
+        function openDetail(c) {
+            currentCreator = c;
+            const avatar = $("#detailAvatar");
+            avatar.innerHTML = "";
+            if (c.profileImageUrl) {
+                const img = document.createElement("img");
+                img.src = c.profileImageUrl;
+                img.alt = c.name || "avatar";
+                avatar.appendChild(img);
+            }
+            $("#detailName").textContent = c.name || "Creator";
+            $("#detailCompany").textContent = c.company || "";
+            const urlBox = $("#detailUrl");
+            urlBox.innerHTML = "";
+            if (c.url) {
+                const a = document.createElement("a");
+                a.href = c.url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.textContent = c.url;
+                urlBox.appendChild(a);
+            }
+            $("#detailDesc").textContent = c.videoTitle || "Main Video";
+            $("#detailAbout").textContent = c.summary || "—";
+
+            const v = $("#detailVideo");
+            if (c.videoUrl) {
+                v.src = c.videoUrl;
+            } else {
+                v.removeAttribute("src");
+            }
+            v.load();
+            $("#detailOverlay").classList.add("show");
+        }
+
+        function closeDetail() {
+            $("#detailOverlay").classList.remove("show");
+            const v = $("#detailVideo");
+            try { v.pause(); } catch (e) { }
+            v.removeAttribute("src");
+            v.load();
+        }
+
+        function setupEditLogin() {
+            const overlay = $("#editLoginOverlay");
+            const openBtn = $("#openEditLogin");
+            const emailEl = $("#editLoginEmail");
+            const passEl = $("#editLoginPassword");
+            const btn = $("#editLoginButton");
+            const err = $("#editLoginError");
+
+            openBtn.addEventListener("click", () => {
+                overlay.style.display = "flex";
+                err.textContent = "";
+                emailEl.value = "";
+                passEl.value = "";
+            });
+
+            btn.addEventListener("click", async () => {
                 const email = emailEl.value.trim();
-                const pass = passInput.value;
+                const pass = passEl.value;
                 if (!email || !pass) {
-                    err.textContent = 'メールアドレスとパスワードを入力してください。';
+                    err.textContent = "メールアドレスとパスワードを入力してください。";
                     return;
                 }
-                err.textContent = '';
-                loginBtn.disabled = true;
-                loginBtn.textContent = 'ログイン中...';
-                signInWithEmailAndPassword(auth, email, pass)
-                    .then(() => {/* onAuthStateChangedで処理 */ })
-                    .catch(e => {
-                        console.error(e);
-                        err.textContent = 'ログインに失敗しました。IDまたはパスワードを確認してください。';
-                    })
-                    .finally(() => {
-                        loginBtn.disabled = false;
-                        loginBtn.textContent = 'ログイン';
-                    });
+                err.textContent = "";
+                btn.disabled = true;
+                btn.textContent = "ログイン中...";
+                try {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                    window.location.href = "edit.html";
+                } catch (e) {
+                    console.error(e);
+                    err.textContent = "ログインに失敗しました。IDまたはパスワードを確認してください。";
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "ログインして編集へ";
+                }
+            });
+
+            overlay.addEventListener("click", e => {
+                if (e.target.id === "editLoginOverlay") {
+                    overlay.style.display = "none";
+                }
             });
         }
 
         (function init() {
-            bindDnD();
-            setupLogin();
-
-            onAuthStateChanged(auth, user => {
-                const overlay = $('#loginOverlay');
-                if (!user) {
-                    overlay.style.display = 'flex';
-                    setLockState('🔒 Locked');
-                    return;
-                }
-                if (user.email !== ADMIN_EMAIL) {
-                    overlay.style.display = 'flex';
-                    setLockState('🔒 Locked');
-                    alert('この編集画面は管理者専用です。TOPへ戻ります。');
-                    signOut(auth).then(() => { window.location.href = 'index.html'; });
-                    return;
-                }
-                overlay.style.display = 'none';
-                setLockState('🔓 Unlocked');
-                renderList();
+            loadCreators();
+            $("#sortSelect").addEventListener("change", e => {
+                currentSort = e.target.value || "newest";
+                renderGrid();
             });
-
-            $('#saveBtn').addEventListener('click', saveEntry);
-            $('#clearBtn').addEventListener('click', clearForm);
-            $('#tbody').addEventListener('click', handleRowClick);
+            $("#detailClose").addEventListener("click", closeDetail);
+            $("#detailOverlay").addEventListener("click", e => {
+                if (e.target.id === "detailOverlay") closeDetail();
+            });
+            window.addEventListener("keydown", e => {
+                if (e.key === "Escape") {
+                    closeDetail();
+                }
+            });
+            setupEditLogin();
         })();
     </script>
 </body>
