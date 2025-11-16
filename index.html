@@ -127,6 +127,7 @@
 
         .toolbar {
             display: flex;
+            flex-wrap: wrap;
             justify-content: flex-end;
             align-items: center;
             margin-bottom: 12px;
@@ -138,7 +139,8 @@
             color: var(--muted);
         }
 
-        .toolbar select {
+        .toolbar select,
+        .toolbar input[type="search"] {
             background: #050816;
             border-radius: 999px;
             border: 1px solid var(--border);
@@ -146,6 +148,11 @@
             padding: 6px 10px;
             font-size: 12px;
             outline: none;
+        }
+
+        .toolbar input[type="search"] {
+            flex: 1 1 140px;
+            min-width: 120px;
         }
 
         .grid {
@@ -193,8 +200,8 @@
         }
 
         .card:active {
-            transform: translateY(-1px) scale(0.985);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .7), 0 0 20px rgba(255, 180, 87, .7);
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .7), 0 0 24px rgba(255, 180, 87, .7);
             border-color: #ffb457cc;
         }
 
@@ -210,15 +217,10 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: .75;
+            opacity: .45;
+            /* 待機状態：少し薄め */
+            transform: scale(1.03);
             transition: opacity .18s, transform .18s;
-            transform: scale(1.02);
-        }
-
-        .card:hover .thumb,
-        .card:active .thumb {
-            opacity: 1;
-            transform: scale(1.05);
         }
 
         .thumb-fallback {
@@ -229,13 +231,18 @@
                 #101322;
         }
 
-        /* グローするタイトルテキスト（画像上） */
+        .card:hover .thumb,
+        .card:active .thumb {
+            opacity: 1;
+            transform: scale(1.06);
+        }
+
         .thumb-title {
             position: absolute;
             left: 0;
             right: 0;
             bottom: 0;
-            padding: 8px 10px;
+            padding: 8px 10px 9px;
             background: linear-gradient(to top, rgba(0, 0, 0, .85), transparent);
             font-size: 11px;
             letter-spacing: .12em;
@@ -245,6 +252,9 @@
                 0 0 8px rgba(255, 180, 87, .9),
                 0 0 16px rgba(236, 72, 153, .7);
             pointer-events: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .card-body {
@@ -296,7 +306,7 @@
             font-size: 12px;
         }
 
-        /* DETAIL MODAL（1.5倍サイズ & 動画埋め込み & スクロール最適化） */
+        /* DETAIL MODAL */
 
         .modal-overlay {
             position: fixed;
@@ -315,6 +325,18 @@
             display: flex;
         }
 
+        @keyframes modal-in {
+            0% {
+                opacity: 0;
+                transform: translateY(12px) scale(0.96);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .modal {
             width: min(1100px, 96vw);
             background: #111622f2;
@@ -325,6 +347,7 @@
             max-height: 90vh;
             display: flex;
             flex-direction: column;
+            animation: modal-in .22s ease-out;
         }
 
         .modal-head {
@@ -413,6 +436,86 @@
             color: #dde3f6;
             line-height: 1.7;
             white-space: pre-wrap;
+        }
+
+        /* チャット欄 */
+        .comment-section {
+            margin-top: 16px;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid #1f2937;
+            background: rgba(15, 23, 42, 0.9);
+            max-height: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .comment-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .comment-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .comment-bubble {
+            max-width: 80%;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+            background: #0f172a;
+            border: 1px solid #1f2937;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .comment-meta {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .comment-delete {
+            border: none;
+            background: transparent;
+            color: #fca5a5;
+            font-size: 10px;
+            cursor: pointer;
+            padding: 2px 4px;
+        }
+
+        .comment-input-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .comment-input-row input {
+            flex: 1;
+            font-size: 12px;
+            border-radius: 999px;
+            border: 1px solid #1f2937;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 6px 10px;
+        }
+
+        .comment-input-row button {
+            border-radius: 999px;
+            border: none;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            color: #111827;
         }
 
         /* EDIT ボタン（下センター） */
@@ -555,6 +658,16 @@
                 <div>
                     <div class="meta-label">ABOUT</div>
                     <div class="detail-about" id="detailAbout">—</div>
+
+                    <div class="meta-label" style="margin-top:12px;">CHAT</div>
+                    <div class="comment-section">
+                        <div id="commentList" class="comment-list"></div>
+                        <div class="comment-input-row">
+                            <input id="commentInput" type="text" placeholder="メッセージを入力..." />
+                            <button id="commentSend">送信</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -564,12 +677,12 @@
     <div id="editLoginOverlay" class="edit-login-overlay">
         <div class="edit-login-card">
             <h2>EDIT LOGIN</h2>
-            <p>コンテンツを編集するには管理者IDでサインインしてください。</p>
+            <p>コンテンツを編集・チャットするにはIDでサインインしてください。</p>
             <label for="editLoginEmail">メールアドレス</label>
-            <input id="editLoginEmail" type="email" placeholder="admin@example.com" />
+            <input id="editLoginEmail" type="email" placeholder="you@example.com" />
             <label for="editLoginPassword">パスワード</label>
             <input id="editLoginPassword" type="password" placeholder="password" />
-            <button id="editLoginButton">ログインして編集へ</button>
+            <button id="editLoginButton">ログイン</button>
             <div id="editLoginError" class="edit-login-error"></div>
         </div>
     </div>
@@ -587,6 +700,10 @@
 
     <main class="container">
         <div class="toolbar">
+            <input id="searchInput" type="search" placeholder="名前で検索…" />
+            <select id="categorySelect">
+                <option value="">すべてのカテゴリ</option>
+            </select>
             <span class="toolbar-label">並び順：</span>
             <select id="sortSelect">
                 <option value="newest">新着順</option>
@@ -608,7 +725,20 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            query,
+            orderBy,
+            doc,
+            updateDoc,
+            increment,
+            addDoc,
+            serverTimestamp,
+            onSnapshot,
+            deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
@@ -621,6 +751,8 @@
             measurementId: "G-ZFHF93QQCJ"
         };
 
+        const ADMIN_EMAIL = "mjmdjr@gmail.com"; // 管理者メール（チャット削除権限用）
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -628,10 +760,13 @@
         function $(s) { return document.querySelector(s); }
 
         let currentSort = "newest";
+        let currentSearch = "";
+        let currentCategory = "";
         let creators = [];
         let currentCreator = null;
+        let messagesUnsub = null;
 
-        // パーティクル（濃いめ）
+        // パーティクル
         (function () {
             const c = document.getElementById('particles');
             const ctx = c.getContext('2d');
@@ -675,8 +810,6 @@
         })();
 
         async function loadCreators() {
-            const grid = $("#grid");
-            grid.innerHTML = "";
             const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
             const snap = await getDocs(q);
             const list = [];
@@ -692,11 +825,39 @@
                     profileImageUrl: d.profileImageUrl || "",
                     videoUrl: d.videoUrl || "",
                     likes: typeof d.likes === "number" ? d.likes : 0,
-                    createdAt: d.createdAt || 0
+                    createdAt: d.createdAt || 0,
+                    categories: Array.isArray(d.categories) ? d.categories : []
                 });
             });
             creators = list;
+            rebuildCategoryOptions();
             renderGrid();
+        }
+
+        function rebuildCategoryOptions() {
+            const select = $("#categorySelect");
+            if (!select) return;
+            const set = new Set();
+            creators.forEach(c => {
+                if (Array.isArray(c.categories)) {
+                    c.categories.forEach(cat => {
+                        const t = (cat || "").trim();
+                        if (t) set.add(t);
+                    });
+                }
+            });
+            select.innerHTML = "";
+            const allOpt = document.createElement("option");
+            allOpt.value = "";
+            allOpt.textContent = "すべてのカテゴリ";
+            select.appendChild(allOpt);
+
+            Array.from(set).sort().forEach(cat => {
+                const opt = document.createElement("option");
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
         }
 
         function sortCreators(list) {
@@ -720,8 +881,34 @@
                 grid.style.display = "none";
                 return;
             }
+
+            const searchLower = currentSearch.trim().toLowerCase();
+            const list = sortCreators(
+                creators.filter(c => {
+                    const name = (c.name || "").toLowerCase();
+                    const byName = !searchLower || name.includes(searchLower);
+
+                    const cats = Array.isArray(c.categories) ? c.categories : [];
+                    const byCat = !currentCategory || cats.includes(currentCategory);
+
+                    return byName && byCat;
+                })
+            );
+
+            if (!list.length) {
+                grid.style.display = "block";
+                const msg = document.createElement("div");
+                msg.style.padding = "20px 0";
+                msg.style.textAlign = "center";
+                msg.style.color = "#9ca3af";
+                msg.style.fontSize = "13px";
+                msg.textContent = "条件に合うクリエイターが見つかりませんでした。";
+                grid.appendChild(msg);
+                return;
+            }
+
             grid.style.display = "grid";
-            const list = sortCreators(creators);
+
             list.forEach(c => {
                 const card = document.createElement("div");
                 card.className = "card";
@@ -740,7 +927,6 @@
                     tw.appendChild(fb);
                 }
 
-                // グローするタイトル（videoTitleがあればそれ、なければname）
                 const titleOverlay = document.createElement("div");
                 titleOverlay.className = "thumb-title";
                 titleOverlay.textContent = c.videoTitle || c.name || "Untitled";
@@ -789,6 +975,67 @@
             }
         }
 
+        function setupChat(creator) {
+            const list = $("#commentList");
+            const input = $("#commentInput");
+            const btn = $("#commentSend");
+
+            list.innerHTML = "";
+            input.value = "";
+            input.disabled = false;
+            btn.disabled = false;
+
+            if (messagesUnsub) {
+                messagesUnsub();
+                messagesUnsub = null;
+            }
+
+            const msgsRef = collection(db, "creators", creator.id, "messages");
+            const q = query(msgsRef, orderBy("createdAt", "asc"));
+
+            messagesUnsub = onSnapshot(q, snap => {
+                list.innerHTML = "";
+                snap.forEach(docSnap => {
+                    const m = docSnap.data();
+                    const row = document.createElement("div");
+                    row.className = "comment-row";
+
+                    const bubble = document.createElement("div");
+                    bubble.className = "comment-bubble";
+                    bubble.textContent = m.text || "";
+
+                    const meta = document.createElement("div");
+                    meta.className = "comment-meta";
+                    const name = m.authorName || "";
+                    meta.textContent = name;
+                    bubble.appendChild(meta);
+
+                    row.appendChild(bubble);
+
+                    const user = auth.currentUser;
+                    const isAdmin = user && user.email === ADMIN_EMAIL;
+
+                    if (isAdmin) {
+                        const delBtn = document.createElement("button");
+                        delBtn.className = "comment-delete";
+                        delBtn.textContent = "削除";
+                        delBtn.addEventListener("click", async (e) => {
+                            e.stopPropagation();
+                            try {
+                                await deleteDoc(doc(db, "creators", creator.id, "messages", docSnap.id));
+                            } catch (err) {
+                                console.error(err);
+                                alert("メッセージ削除に失敗しました");
+                            }
+                        });
+                        row.appendChild(delBtn);
+                    }
+
+                    list.appendChild(row);
+                });
+            });
+        }
+
         function openDetail(c) {
             currentCreator = c;
             const avatar = $("#detailAvatar");
@@ -821,6 +1068,8 @@
                 v.removeAttribute("src");
             }
             v.load();
+
+            setupChat(c);
             $("#detailOverlay").classList.add("show");
         }
 
@@ -830,6 +1079,13 @@
             try { v.pause(); } catch (e) { }
             v.removeAttribute("src");
             v.load();
+
+            if (messagesUnsub) {
+                messagesUnsub();
+                messagesUnsub = null;
+            }
+            $("#commentList").innerHTML = "";
+            $("#commentInput").value = "";
         }
 
         function setupEditLogin() {
@@ -859,19 +1115,79 @@
                 btn.textContent = "ログイン中...";
                 try {
                     await signInWithEmailAndPassword(auth, email, pass);
+                    // チャットだけならこのままでもOK。編集に行くなら edit.html へ遷移
                     window.location.href = "edit.html";
                 } catch (e) {
                     console.error(e);
                     err.textContent = "ログインに失敗しました。IDまたはパスワードを確認してください。";
                 } finally {
                     btn.disabled = false;
-                    btn.textContent = "ログインして編集へ";
+                    btn.textContent = "ログイン";
                 }
             });
 
             overlay.addEventListener("click", e => {
                 if (e.target.id === "editLoginOverlay") {
                     overlay.style.display = "none";
+                }
+            });
+        }
+
+        function setupSearchAndCategory() {
+            const searchInput = $("#searchInput");
+            const categorySelect = $("#categorySelect");
+
+            if (searchInput) {
+                searchInput.addEventListener("input", e => {
+                    currentSearch = e.target.value || "";
+                    renderGrid();
+                });
+            }
+
+            if (categorySelect) {
+                categorySelect.addEventListener("change", e => {
+                    currentCategory = e.target.value || "";
+                    renderGrid();
+                });
+            }
+        }
+
+        function setupChatInput() {
+            const input = $("#commentInput");
+            const btn = $("#commentSend");
+
+            btn.addEventListener("click", async () => {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("メッセージを送るにはログインしてください。（EDITボタンからログインできます）");
+                    $("#editLoginOverlay").style.display = "flex";
+                    return;
+                }
+                if (!currentCreator) return;
+                const text = input.value.trim();
+                if (!text) return;
+
+                try {
+                    await addDoc(
+                        collection(db, "creators", currentCreator.id, "messages"),
+                        {
+                            text,
+                            authorId: user.uid,
+                            authorName: user.email || "",
+                            createdAt: serverTimestamp()
+                        }
+                    );
+                    input.value = "";
+                } catch (e) {
+                    console.error(e);
+                    alert("メッセージ送信に失敗しました");
+                }
+            });
+
+            input.addEventListener("keydown", e => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    btn.click();
                 }
             });
         }
@@ -891,7 +1207,10 @@
                     closeDetail();
                 }
             });
+
             setupEditLogin();
+            setupSearchAndCategory();
+            setupChatInput();
         })();
     </script>
 </body>

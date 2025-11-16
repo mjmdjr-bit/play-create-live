@@ -143,7 +143,8 @@
         }
 
         input[type="text"],
-        textarea {
+        textarea,
+        select {
             width: 100%;
             margin-top: 4px;
             padding: 9px 10px;
@@ -162,7 +163,8 @@
         }
 
         input:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             border-color: #ffb457aa;
             box-shadow: 0 0 0 3px #ffb45730;
         }
@@ -379,6 +381,27 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div>
+                    <label for="category">カテゴリー</label>
+                    <select id="category">
+                        <option value="">未選択</option>
+                        <option value="CXプロデューサー">CXプロデューサー</option>
+                        <option value="建築デザイナー">建築デザイナー</option>
+                        <option value="インテリアデザイナー">インテリアデザイナー</option>
+                        <option value="グラフィックデザイナー">グラフィックデザイナー</option>
+                        <option value="映像プロデューサー">映像プロデューサー</option>
+                        <option value="プロデューサー">プロデューサー</option>
+                        <option value="プランナー">プランナー</option>
+                        <option value="エンジニア">エンジニア</option>
+                        <option value="ミュージシャン">ミュージシャン</option>
+                        <option value="アーティスト">アーティスト</option>
+                        <option value="料理家">料理家</option>
+                    </select>
+                </div>
+                <div></div>
+            </div>
+
             <div style="margin-top:10px;">
                 <label for="summary">概要 / コメント</label>
                 <textarea id="summary" placeholder="この動画やクリエイターについての簡単な説明"></textarea>
@@ -414,7 +437,7 @@
                         <th style="width:40px;">No</th>
                         <th>氏名</th>
                         <th>会社名</th>
-                        <th>URL</th>
+                        <th>カテゴリー</th>
                         <th style="width:110px;">操作</th>
                     </tr>
                 </thead>
@@ -430,8 +453,23 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            updateDoc,
+            deleteDoc,
+            doc,
+            getDocs,
+            query,
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytesResumable,
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
@@ -444,13 +482,12 @@
             measurementId: "G-ZFHF93QQCJ"
         };
 
+        const ADMIN_EMAIL = "mjmdjr@gmail.com"; // 管理者メール
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
-
-        // ★ここをあなたの管理者メールアドレスに変える
-        const ADMIN_EMAIL = "mjmdjr@gmail.com";
 
         function $(s) { return document.querySelector(s); }
 
@@ -514,6 +551,7 @@
             $('#url').value = '';
             $('#videoTitle').value = '';
             $('#summary').value = '';
+            $('#category').value = '';
             $('#videoInput').value = '';
             $('#profileInput').value = '';
             $('#videoDrop').querySelector('.hint').textContent = 'MP4 / MOV ・ 16:9推奨 ・ 500MB未満';
@@ -580,12 +618,13 @@
             let index = 1;
             snap.forEach(docSnap => {
                 const it = docSnap.data();
+                const cats = Array.isArray(it.categories) ? it.categories : [];
                 const tr = document.createElement('tr');
                 tr.innerHTML =
                     '<td>' + index + '</td>' +
                     '<td>' + (it.name || '') + '</td>' +
                     '<td>' + (it.company || '') + '</td>' +
-                    '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.url || '') + '</td>' +
+                    '<td>' + (cats.join(', ')) + '</td>' +
                     '<td>' +
                     '<button class="btn" data-edit="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">編集</button> ' +
                     '<button class="btn danger" data-delete="' + docSnap.id + '" style="padding:4px 8px;font-size:11px;">削除</button>' +
@@ -611,6 +650,8 @@
                         $('#url').value = it.url || '';
                         $('#videoTitle').value = it.videoTitle || '';
                         $('#summary').value = it.summary || '';
+                        const cats = Array.isArray(it.categories) ? it.categories : [];
+                        $('#category').value = cats[0] || '';
                         $('#profileHint').textContent = it.profileImageUrl ? '既存画像あり' : '未選択';
                     }
                 });
@@ -645,6 +686,7 @@
                     const url = $('#url').value.trim();
                     const videoTitle = $('#videoTitle').value.trim();
                     const summary = $('#summary').value.trim();
+                    const category = $('#category').value.trim();
                     if (!name) {
                         alert('氏名を入力してください。');
                         return;
@@ -677,6 +719,7 @@
                         profileImageUrl: profileUrl || null,
                         videoUrl: videoUrl || null,
                         likes: editingEntry && typeof editingEntry.likes === "number" ? editingEntry.likes : 0,
+                        categories: category ? [category] : [],
                         createdAt: editingEntry && editingEntry.createdAt ? editingEntry.createdAt : Date.now()
                     };
 
@@ -703,12 +746,12 @@
         function setupLogin() {
             const overlay = $('#loginOverlay');
             const emailEl = $('#loginEmail');
-            const passEl = $('\#loginPassword');
-            const btn = $('\#loginButton');
-            const err = $('\#loginError');
+            const passEl = $(`#loginPassword`);
+            const btn = $(`#loginButton`);
+            const err = $(`#loginError`);
 
-            const passInput = $('#loginPassword');
             const loginBtn = $('#loginButton');
+            const passInput = $('#loginPassword');
 
             loginBtn.addEventListener('click', () => {
                 const email = emailEl.value.trim();
@@ -721,7 +764,7 @@
                 loginBtn.disabled = true;
                 loginBtn.textContent = 'ログイン中...';
                 signInWithEmailAndPassword(auth, email, pass)
-                    .then(() => {/* onAuthStateChangedで処理 */ })
+                    .then(() => {/* onAuthStateChanged で処理 */ })
                     .catch(e => {
                         console.error(e);
                         err.textContent = 'ログインに失敗しました。IDまたはパスワードを確認してください。';
@@ -733,7 +776,7 @@
             });
         }
 
-        (function init() {
+        (function initEdit() {
             bindDnD();
             setupLogin();
 
