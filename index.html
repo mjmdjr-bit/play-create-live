@@ -218,7 +218,6 @@
             height: 100%;
             object-fit: cover;
             opacity: .45;
-            /* 待機状態：少し薄め */
             transform: scale(1.03);
             transition: opacity .18s, transform .18s;
         }
@@ -408,6 +407,9 @@
             border-radius: 18px;
             border: 1px solid #ffffff22;
             padding: 12px 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .video-panel video {
@@ -438,7 +440,52 @@
             white-space: pre-wrap;
         }
 
-        /* チャット欄 */
+        /* URLリンク（グロー演出） */
+        .detail-url {
+            margin-top: 4px;
+        }
+
+        .detail-url a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #facc15;
+            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.25), transparent 60%);
+            box-shadow:
+                0 0 8px rgba(250, 204, 21, 0.6),
+                0 0 18px rgba(248, 113, 113, 0.4);
+            border: 1px solid rgba(250, 204, 21, 0.5);
+            transition: transform .15s ease-out, box-shadow .15s ease-out, background .15s ease-out;
+        }
+
+        .detail-url a::before {
+            content: "↗";
+            font-size: 10px;
+            opacity: .8;
+        }
+
+        .detail-url a:hover {
+            transform: translateY(-1px) scale(1.03);
+            box-shadow:
+                0 0 12px rgba(250, 204, 21, 0.9),
+                0 0 26px rgba(248, 113, 113, 0.7);
+            background: radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.35), transparent 70%);
+        }
+
+        .detail-url a:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow:
+                0 0 6px rgba(250, 204, 21, 0.7),
+                0 0 14px rgba(248, 113, 113, 0.5);
+        }
+
+        /* チャット欄（動画の下） */
         .comment-section {
             margin-top: 16px;
             padding: 10px 12px;
@@ -642,7 +689,7 @@
                     <div>
                         <div id="detailName" style="font-weight:700;font-size:18px;">Creator</div>
                         <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
-                        <div id="detailUrl" style="font-size:11px;margin-top:3px;"></div>
+                        <div id="detailUrl" class="detail-url"></div>
                     </div>
                 </div>
                 <button class="close" id="detailClose">×</button>
@@ -653,11 +700,6 @@
                     <video id="detailVideo" controls playsinline></video>
                     <div class="meta-label">Main Video</div>
                     <div class="meta-text" id="detailDesc">—</div>
-                </div>
-
-                <div>
-                    <div class="meta-label">ABOUT</div>
-                    <div class="detail-about" id="detailAbout">—</div>
 
                     <div class="meta-label" style="margin-top:12px;">CHAT</div>
                     <div class="comment-section">
@@ -667,7 +709,11 @@
                             <button id="commentSend">送信</button>
                         </div>
                     </div>
+                </div>
 
+                <div>
+                    <div class="meta-label">ABOUT</div>
+                    <div class="detail-about" id="detailAbout">—</div>
                 </div>
             </div>
         </div>
@@ -676,8 +722,8 @@
     <!-- EDIT ログイン用オーバーレイ -->
     <div id="editLoginOverlay" class="edit-login-overlay">
         <div class="edit-login-card">
-            <h2>EDIT LOGIN</h2>
-            <p>コンテンツを編集・チャットするにはIDでサインインしてください。</p>
+            <h2>LOGIN</h2>
+            <p>編集やチャットにはサインインが必要です。</p>
             <label for="editLoginEmail">メールアドレス</label>
             <input id="editLoginEmail" type="email" placeholder="you@example.com" />
             <label for="editLoginPassword">パスワード</label>
@@ -751,7 +797,7 @@
             measurementId: "G-ZFHF93QQCJ"
         };
 
-        const ADMIN_EMAIL = "mjmdjr@gmail.com"; // 管理者メール（チャット削除権限用）
+        const ADMIN_EMAIL = "mjmdjr@gmail.com"; // 管理者（チャット削除用）
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -766,7 +812,7 @@
         let currentCreator = null;
         let messagesUnsub = null;
 
-        // パーティクル
+        // 背景パーティクル
         (function () {
             const c = document.getElementById('particles');
             const ctx = c.getContext('2d');
@@ -851,7 +897,6 @@
             allOpt.value = "";
             allOpt.textContent = "すべてのカテゴリ";
             select.appendChild(allOpt);
-
             Array.from(set).sort().forEach(cat => {
                 const opt = document.createElement("option");
                 opt.value = cat;
@@ -887,10 +932,8 @@
                 creators.filter(c => {
                     const name = (c.name || "").toLowerCase();
                     const byName = !searchLower || name.includes(searchLower);
-
                     const cats = Array.isArray(c.categories) ? c.categories : [];
                     const byCat = !currentCategory || cats.includes(currentCategory);
-
                     return byName && byCat;
                 })
             );
@@ -975,23 +1018,14 @@
             }
         }
 
-        function setupChat(creator) {
+        function setupChatRealtime(creatorId) {
             const list = $("#commentList");
-            const input = $("#commentInput");
-            const btn = $("#commentSend");
-
             list.innerHTML = "";
-            input.value = "";
-            input.disabled = false;
-            btn.disabled = false;
 
-            if (messagesUnsub) {
-                messagesUnsub();
-                messagesUnsub = null;
-            }
-
-            const msgsRef = collection(db, "creators", creator.id, "messages");
+            const msgsRef = collection(db, "creators", creatorId, "messages");
             const q = query(msgsRef, orderBy("createdAt", "asc"));
+
+            if (messagesUnsub) messagesUnsub();
 
             messagesUnsub = onSnapshot(q, snap => {
                 list.innerHTML = "";
@@ -1006,28 +1040,26 @@
 
                     const meta = document.createElement("div");
                     meta.className = "comment-meta";
-                    const name = m.authorName || "";
-                    meta.textContent = name;
+                    meta.textContent = m.authorName || "匿名";
                     bubble.appendChild(meta);
 
                     row.appendChild(bubble);
 
                     const user = auth.currentUser;
                     const isAdmin = user && user.email === ADMIN_EMAIL;
-
                     if (isAdmin) {
                         const delBtn = document.createElement("button");
                         delBtn.className = "comment-delete";
                         delBtn.textContent = "削除";
-                        delBtn.addEventListener("click", async (e) => {
+                        delBtn.onclick = async (e) => {
                             e.stopPropagation();
                             try {
-                                await deleteDoc(doc(db, "creators", creator.id, "messages", docSnap.id));
+                                await deleteDoc(doc(db, "creators", creatorId, "messages", docSnap.id));
                             } catch (err) {
                                 console.error(err);
                                 alert("メッセージ削除に失敗しました");
                             }
-                        });
+                        };
                         row.appendChild(delBtn);
                     }
 
@@ -1036,8 +1068,48 @@
             });
         }
 
+        function setupChatInput(creatorId) {
+            const input = $("#commentInput");
+            const btn = $("#commentSend");
+
+            btn.onclick = async () => {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("メッセージを送るにはログインしてください。（下のEDITボタンからログイン）");
+                    $("#editLoginOverlay").style.display = "flex";
+                    return;
+                }
+                const text = input.value.trim();
+                if (!text) return;
+
+                try {
+                    await addDoc(
+                        collection(db, "creators", creatorId, "messages"),
+                        {
+                            text,
+                            authorId: user.uid,
+                            authorName: user.email || "",
+                            createdAt: serverTimestamp()
+                        }
+                    );
+                    input.value = "";
+                } catch (e) {
+                    console.error(e);
+                    alert("メッセージ送信に失敗しました: " + (e.message || e));
+                }
+            };
+
+            input.onkeydown = (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    btn.click();
+                }
+            };
+        }
+
         function openDetail(c) {
             currentCreator = c;
+
             const avatar = $("#detailAvatar");
             avatar.innerHTML = "";
             if (c.profileImageUrl) {
@@ -1048,6 +1120,7 @@
             }
             $("#detailName").textContent = c.name || "Creator";
             $("#detailCompany").textContent = c.company || "";
+
             const urlBox = $("#detailUrl");
             urlBox.innerHTML = "";
             if (c.url) {
@@ -1055,9 +1128,10 @@
                 a.href = c.url;
                 a.target = "_blank";
                 a.rel = "noopener noreferrer";
-                a.textContent = c.url;
+                a.textContent = c.url.replace(/^https?:\/\//, "");
                 urlBox.appendChild(a);
             }
+
             $("#detailDesc").textContent = c.videoTitle || "Main Video";
             $("#detailAbout").textContent = c.summary || "—";
 
@@ -1069,7 +1143,9 @@
             }
             v.load();
 
-            setupChat(c);
+            setupChatRealtime(c.id);
+            setupChatInput(c.id);
+
             $("#detailOverlay").classList.add("show");
         }
 
@@ -1115,7 +1191,6 @@
                 btn.textContent = "ログイン中...";
                 try {
                     await signInWithEmailAndPassword(auth, email, pass);
-                    // チャットだけならこのままでもOK。編集に行くなら edit.html へ遷移
                     window.location.href = "edit.html";
                 } catch (e) {
                     console.error(e);
@@ -1152,46 +1227,6 @@
             }
         }
 
-        function setupChatInput() {
-            const input = $("#commentInput");
-            const btn = $("#commentSend");
-
-            btn.addEventListener("click", async () => {
-                const user = auth.currentUser;
-                if (!user) {
-                    alert("メッセージを送るにはログインしてください。（EDITボタンからログインできます）");
-                    $("#editLoginOverlay").style.display = "flex";
-                    return;
-                }
-                if (!currentCreator) return;
-                const text = input.value.trim();
-                if (!text) return;
-
-                try {
-                    await addDoc(
-                        collection(db, "creators", currentCreator.id, "messages"),
-                        {
-                            text,
-                            authorId: user.uid,
-                            authorName: user.email || "",
-                            createdAt: serverTimestamp()
-                        }
-                    );
-                    input.value = "";
-                } catch (e) {
-                    console.error(e);
-                    alert("メッセージ送信に失敗しました");
-                }
-            });
-
-            input.addEventListener("keydown", e => {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    btn.click();
-                }
-            });
-        }
-
         (function init() {
             loadCreators();
             $("#sortSelect").addEventListener("change", e => {
@@ -1210,7 +1245,6 @@
 
             setupEditLogin();
             setupSearchAndCategory();
-            setupChatInput();
         })();
     </script>
 </body>
