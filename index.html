@@ -80,6 +80,7 @@
             color: var(--muted);
         }
 
+        /* 解説文のクールなフェード＋スライドイン */
         .jpcopy {
             max-width: 860px;
             margin: 18px auto 28px;
@@ -91,6 +92,27 @@
             box-shadow: var(--shadow);
             font-size: 15.5px;
             line-height: 1.85;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: introCopy 0.9s ease-out 0.35s forwards;
+        }
+
+        @keyframes introCopy {
+            0% {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                text-shadow: 0 0 18px rgba(255, 180, 87, 0.3);
+            }
         }
 
         @keyframes float {
@@ -305,373 +327,33 @@
             font-size: 12px;
         }
 
-        /* DETAIL MODAL */
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.78);
-            backdrop-filter: blur(18px);
-            z-index: 1500;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        @keyframes modal-in {
-            0% {
-                opacity: 0;
-                transform: translateY(12px) scale(0.96);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .modal {
-            width: min(1100px, 96vw);
-            background: #111622f2;
-            border-radius: 24px;
-            border: 1px solid #ffffff22;
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.88);
-            overflow: hidden;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            animation: modal-in .22s ease-out;
-        }
-
-        .modal-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px 10px;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #222;
-            border: 1px solid #ffffff33;
-            flex-shrink: 0;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .close {
-            background: transparent;
-            border: 0;
-            cursor: pointer;
-            font-size: 22px;
-            color: #fff;
-        }
-
-        .modal-body {
-            padding: 10px 20px 20px;
-            display: grid;
-            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-            gap: 18px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        @media(max-width:900px) {
-            .modal {
-                width: 95vw;
-            }
-
-            .modal-body {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-        }
-
-        .video-panel {
-            background: #111827;
-            border-radius: 18px;
-            border: 1px solid #ffffff22;
-            padding: 12px 12px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .video-panel video {
-            width: 100%;
-            border-radius: 14px;
-            background: #000;
-            max-height: 50vh;
-            object-fit: contain;
-        }
-
-        .meta-label {
-            font-size: 11px;
-            color: #cfd6e6;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-top: 8px;
-        }
-
-        .meta-text {
-            font-size: 13px;
-            color: #dde3f6;
-        }
-
-        .detail-about {
-            font-size: 13px;
-            color: #dde3f6;
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-
-        /* URLリンク（グロー演出） */
-        .detail-url {
-            margin-top: 4px;
-        }
-
-        .detail-url a {
+        /* カテゴリーチップ（カード & ポップアップ共通） */
+        .category-chip {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(96, 165, 250, 0.6);
+            background: radial-gradient(circle at 0 0, rgba(96, 165, 250, 0.2), transparent 60%);
             font-size: 11px;
+            color: #dbeafe;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
             letter-spacing: .08em;
             text-transform: uppercase;
-            color: #facc15;
-            text-decoration: none;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.25), transparent 60%);
-            box-shadow:
-                0 0 8px rgba(250, 204, 21, 0.6),
-                0 0 18px rgba(248, 113, 113, 0.4);
-            border: 1px solid rgba(250, 204, 21, 0.5);
-            transition: transform .15s ease-out, box-shadow .15s ease-out, background .15s ease-out;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .detail-url a::before {
-            content: "↗";
-            font-size: 10px;
-            opacity: .8;
+        .category-chip::before {
+            content: "◎";
+            font-size: 9px;
+            opacity: .9;
         }
 
-        .detail-url a:hover {
-            transform: translateY(-1px) scale(1.03);
-            box-shadow:
-                0 0 12px rgba(250, 204, 21, 0.9),
-                0 0 26px rgba(248, 113, 113, 0.7);
-            background: radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.35), transparent 70%);
-        }
-
-        .detail-url a:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow:
-                0 0 6px rgba(250, 204, 21, 0.7),
-                0 0 14px rgba(248, 113, 113, 0.5);
-        }
-
-        /* チャット欄（動画の下） */
-        .comment-section {
-            margin-top: 16px;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid #1f2937;
-            background: rgba(15, 23, 42, 0.9);
-            max-height: 260px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .comment-list {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .comment-row {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 6px;
-            margin-bottom: 4px;
-        }
-
-        .comment-bubble {
-            max-width: 80%;
-            padding: 6px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            line-height: 1.5;
-            background: #0f172a;
-            border: 1px solid #1f2937;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-
-        .comment-meta {
-            font-size: 10px;
-            color: #9ca3af;
-            margin-top: 2px;
-        }
-
-        .comment-delete {
-            border: none;
-            background: transparent;
-            color: #fca5a5;
-            font-size: 10px;
-            cursor: pointer;
-            padding: 2px 4px;
-        }
-
-        .comment-input-row {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .comment-input-row input {
-            flex: 1;
-            font-size: 12px;
-            border-radius: 999px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            padding: 6px 10px;
-        }
-
-        .comment-input-row button {
-            border-radius: 999px;
-            border: none;
-            padding: 6px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-        }
-
-        /* EDIT ボタン（下センター） */
-        .edit-bottom-wrap {
-            margin-top: 32px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .edit-bottom-btn {
-            padding: 10px 18px;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        footer {
-            margin: 30px 0 18px;
-            text-align: center;
-            color: #b8c2d4;
-            font-size: 12px;
-            opacity: .8;
-        }
-
-        /* EDIT用ログインモーダル */
-        .edit-login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .85);
-            backdrop-filter: blur(14px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .edit-login-card {
-            width: min(360px, 90vw);
-            border-radius: 20px;
-            background: #0b1120ee;
-            border: 1px solid #ffffff22;
-            padding: 20px 22px 22px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .8);
-        }
-
-        .edit-login-card h2 {
-            margin: 0 0 8px;
-            font-size: 16px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-
-        .edit-login-card p {
-            margin: 0 0 14px;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .edit-login-card label {
-            display: block;
-            font-size: 11px;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: #cbd5f5;
-            margin-top: 10px;
-        }
-
-        .edit-login-card input {
-            width: 100%;
-            margin-top: 4px;
-            padding: 9px 10px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: #020617;
-            color: #e5e7eb;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .edit-login-card input:focus {
-            border-color: #ffb457aa;
-            box-shadow: 0 0 0 2px #ffb45733;
-        }
-
-        .edit-login-card button {
-            margin-top: 14px;
-            width: 100%;
-            padding: 9px 0;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .edit-login-error {
-            font-size: 11px;
-            color: #fecaca;
-            margin-top: 8px;
-            min-height: 16px;
-        }
+        /* DETAIL MODAL …（続きは PART2） */
     </style>
 </head>
 
@@ -689,6 +371,7 @@
                     <div>
                         <div id="detailName" style="font-weight:700;font-size:18px;">Creator</div>
                         <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
+                        <!-- ★ グローさせるURLバッジ用 -->
                         <div id="detailUrl" class="detail-url"></div>
                     </div>
                 </div>
@@ -696,6 +379,7 @@
             </div>
 
             <div class="modal-body">
+                <!-- 左カラム：動画＋チャット -->
                 <div class="video-panel">
                     <video id="detailVideo" controls playsinline></video>
                     <div class="meta-label">Main Video</div>
@@ -711,6 +395,7 @@
                     </div>
                 </div>
 
+                <!-- 右カラム：ABOUT -->
                 <div>
                     <div class="meta-label">ABOUT</div>
                     <div class="detail-about" id="detailAbout">—</div>
@@ -737,6 +422,7 @@
     <header>
         <div class="title">PLAY. CREATE. LIVE.</div>
         <div class="subtitle">Creeds of the Playful Creators.</div>
+        <!-- ★ このブロックにアニメーションを当てたいなら、CSS側で .jpcopy に animation を追加 -->
         <div class="jpcopy">
             遊ぶように発想し、創るように生きる。<br>
             枠にとらわれず、世界を面白がる者たちの信条。<br>
@@ -797,13 +483,16 @@
             measurementId: "G-ZFHF93QQCJ"
         };
 
-        const ADMIN_EMAIL = "mjmdjr@gmail.com"; // 管理者（チャット削除用）
+        // 管理者メール（チャット削除権限）
+        const ADMIN_EMAIL = "mjmdjr@gmail.com";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        function $(s) { return document.querySelector(s); }
+        function $(selector) {
+            return document.querySelector(selector);
+        }
 
         let currentSort = "newest";
         let currentSearch = "";
@@ -814,18 +503,21 @@
 
         // 背景パーティクル
         (function () {
-            const c = document.getElementById('particles');
-            const ctx = c.getContext('2d');
+            const c = document.getElementById("particles");
+            const ctx = c.getContext("2d");
             let W, H, dpr = window.devicePixelRatio || 1;
+
             function resize() {
                 W = c.width = innerWidth * dpr;
                 H = c.height = innerHeight * dpr;
-                c.style.width = innerWidth + 'px';
-                c.style.height = innerHeight + 'px';
+                c.style.width = innerWidth + "px";
+                c.style.height = innerHeight + "px";
             }
             resize();
-            window.addEventListener('resize', resize);
-            const N = 90, parts = [];
+            window.addEventListener("resize", resize);
+
+            const N = 90;
+            const parts = [];
             for (let i = 0; i < N; i++) {
                 parts.push({
                     x: Math.random() * W,
@@ -835,6 +527,7 @@
                     v: 0.25 + Math.random() * 0.5
                 });
             }
+
             function draw() {
                 ctx.clearRect(0, 0, W, H);
                 for (const p of parts) {
@@ -855,6 +548,7 @@
             draw();
         })();
 
+        // クリエイター読み込み
         async function loadCreators() {
             const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
             const snap = await getDocs(q);
@@ -880,6 +574,7 @@
             renderGrid();
         }
 
+        // カテゴリプルダウンを再生成
         function rebuildCategoryOptions() {
             const select = $("#categorySelect");
             if (!select) return;
@@ -897,6 +592,7 @@
             allOpt.value = "";
             allOpt.textContent = "すべてのカテゴリ";
             select.appendChild(allOpt);
+
             Array.from(set).sort().forEach(cat => {
                 const opt = document.createElement("option");
                 opt.value = cat;
@@ -905,6 +601,7 @@
             });
         }
 
+        // 並び替え
         function sortCreators(list) {
             const arr = list.slice();
             if (currentSort === "newest") {
@@ -919,6 +616,7 @@
             return arr;
         }
 
+        // グリッド描画（カード＋カテゴリバッジ）
         function renderGrid() {
             const grid = $("#grid");
             grid.innerHTML = "";
@@ -970,6 +668,7 @@
                     tw.appendChild(fb);
                 }
 
+                // 画像上タイトル
                 const titleOverlay = document.createElement("div");
                 titleOverlay.className = "thumb-title";
                 titleOverlay.textContent = c.videoTitle || c.name || "Untitled";
@@ -977,6 +676,26 @@
 
                 const body = document.createElement("div");
                 body.className = "card-body";
+
+                // カテゴリバッジ（カード用）
+                const catBadge = document.createElement("div");
+                catBadge.textContent = (c.categories && c.categories[0]) ? c.categories[0] : "";
+                if (catBadge.textContent) {
+                    catBadge.style.fontSize = "10px";
+                    catBadge.style.display = "inline-flex";
+                    catBadge.style.alignItems = "center";
+                    catBadge.style.padding = "2px 8px";
+                    catBadge.style.borderRadius = "999px";
+                    catBadge.style.marginBottom = "4px";
+                    catBadge.style.color = "#fef9c3";
+                    catBadge.style.letterSpacing = ".08em";
+                    catBadge.style.textTransform = "uppercase";
+                    catBadge.style.background = "radial-gradient(circle at 0% 0%, rgba(250,204,21,0.25), transparent 60%)";
+                    catBadge.style.boxShadow = "0 0 8px rgba(250,204,21,0.6),0 0 18px rgba(248,113,113,0.4)";
+                    catBadge.style.border = "1px solid rgba(250,204,21,0.5)";
+                    body.appendChild(catBadge);
+                }
+
                 const nameEl = document.createElement("div");
                 nameEl.className = "creator-name";
                 nameEl.textContent = c.name || "—";
@@ -1018,6 +737,7 @@
             }
         }
 
+        // チャット：リアルタイム購読（LINE風左右分割）
         function setupChatRealtime(creatorId) {
             const list = $("#commentList");
             list.innerHTML = "";
@@ -1029,6 +749,9 @@
 
             messagesUnsub = onSnapshot(q, snap => {
                 list.innerHTML = "";
+
+                const user = auth.currentUser;
+
                 snap.forEach(docSnap => {
                     const m = docSnap.data();
                     const row = document.createElement("div");
@@ -1043,9 +766,21 @@
                     meta.textContent = m.authorName || "匿名";
                     bubble.appendChild(meta);
 
+                    const isMe = user && m.authorId === user.uid;
+
+                    // 左右分け（inline styleでLINE風に）
+                    if (isMe) {
+                        row.style.justifyContent = "flex-end";
+                        bubble.style.background = "#1d4ed8";          // 青
+                        bubble.style.border = "1px solid #60a5fa";
+                        bubble.style.color = "#e5f0ff";
+                    } else {
+                        row.style.justifyContent = "flex-start";
+                        // デフォルトのグレー系はCSS側のまま
+                    }
+
                     row.appendChild(bubble);
 
-                    const user = auth.currentUser;
                     const isAdmin = user && user.email === ADMIN_EMAIL;
                     if (isAdmin) {
                         const delBtn = document.createElement("button");
@@ -1068,6 +803,7 @@
             });
         }
 
+        // チャット送信
         function setupChatInput(creatorId) {
             const input = $("#commentInput");
             const btn = $("#commentSend");
@@ -1107,6 +843,7 @@
             };
         }
 
+        // ポップアップオープン
         function openDetail(c) {
             currentCreator = c;
 
@@ -1121,6 +858,7 @@
             $("#detailName").textContent = c.name || "Creator";
             $("#detailCompany").textContent = c.company || "";
 
+            // URL（グローするバッジ）
             const urlBox = $("#detailUrl");
             urlBox.innerHTML = "";
             if (c.url) {
@@ -1132,9 +870,11 @@
                 urlBox.appendChild(a);
             }
 
+            // ABOUT
             $("#detailDesc").textContent = c.videoTitle || "Main Video";
             $("#detailAbout").textContent = c.summary || "—";
 
+            // 動画
             const v = $("#detailVideo");
             if (c.videoUrl) {
                 v.src = c.videoUrl;
@@ -1143,6 +883,7 @@
             }
             v.load();
 
+            // チャット
             setupChatRealtime(c.id);
             setupChatInput(c.id);
 
@@ -1164,6 +905,7 @@
             $("#commentInput").value = "";
         }
 
+        // EDITボタン用ログイン
         function setupEditLogin() {
             const overlay = $("#editLoginOverlay");
             const openBtn = $("#openEditLogin");
@@ -1208,6 +950,7 @@
             });
         }
 
+        // 検索＆カテゴリフィルタ
         function setupSearchAndCategory() {
             const searchInput = $("#searchInput");
             const categorySelect = $("#categorySelect");
@@ -1227,16 +970,20 @@
             }
         }
 
+        // 初期化
         (function init() {
             loadCreators();
+
             $("#sortSelect").addEventListener("change", e => {
                 currentSort = e.target.value || "newest";
                 renderGrid();
             });
+
             $("#detailClose").addEventListener("click", closeDetail);
             $("#detailOverlay").addEventListener("click", e => {
                 if (e.target.id === "detailOverlay") closeDetail();
             });
+
             window.addEventListener("keydown", e => {
                 if (e.key === "Escape") {
                     closeDetail();
