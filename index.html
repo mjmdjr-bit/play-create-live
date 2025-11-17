@@ -38,6 +38,7 @@
             overflow-x: hidden;
         }
 
+        /* 背景アニメ */
         #particles {
             position: fixed;
             inset: 0;
@@ -58,6 +59,7 @@
             mix-blend-mode: overlay;
         }
 
+        /* HEADER */
         header {
             padding: 40px 24px 10px;
             text-align: center;
@@ -80,6 +82,7 @@
             color: var(--muted);
         }
 
+        /* 解説文アニメーション */
         .jpcopy {
             max-width: 860px;
             margin: 18px auto 28px;
@@ -93,7 +96,7 @@
             line-height: 1.85;
             opacity: 0;
             transform: translateY(14px);
-            animation: introCopy 0.9s ease-out 0.35s forwards;
+            animation: introCopy .9s ease-out .35s forwards;
         }
 
         @keyframes introCopy {
@@ -110,7 +113,7 @@
             100% {
                 opacity: 1;
                 transform: translateY(0);
-                text-shadow: 0 0 18px rgba(255, 180, 87, 0.3);
+                text-shadow: 0 0 18px rgba(255, 180, 87, .3);
             }
         }
 
@@ -140,12 +143,14 @@
             }
         }
 
+        /* コンテナ */
         .container {
             max-width: 1120px;
             margin: 0 auto;
             padding: 0 20px 60px;
         }
 
+        /* FILTER TOOLBAR */
         .toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -176,6 +181,7 @@
             min-width: 120px;
         }
 
+        /* GRID */
         .grid {
             margin-top: 4px;
             display: grid;
@@ -201,6 +207,7 @@
             }
         }
 
+        /* CARD */
         .card {
             position: relative;
             border-radius: 18px;
@@ -230,6 +237,9 @@
             position: relative;
             padding-top: 62%;
             overflow: hidden;
+
+            /* 追加：背後にあるカードクリックを遮らない */
+            pointer-events: none;
         }
 
         .thumb {
@@ -241,14 +251,6 @@
             opacity: .45;
             transform: scale(1.03);
             transition: opacity .18s, transform .18s;
-        }
-
-        .thumb-fallback {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 0% 0%, #ffb45755, transparent 55%),
-                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
-                #101322;
         }
 
         .card:hover .thumb,
@@ -268,9 +270,7 @@
             letter-spacing: .12em;
             text-transform: uppercase;
             color: #fef9c3;
-            text-shadow:
-                0 0 8px rgba(255, 180, 87, .9),
-                0 0 16px rgba(236, 72, 153, .7);
+            text-shadow: 0 0 8px rgba(255, 180, 87, .9), 0 0 16px rgba(236, 72, 153, .7);
             pointer-events: none;
             white-space: nowrap;
             overflow: hidden;
@@ -284,31 +284,7 @@
             gap: 4px;
         }
 
-        .creator-name {
-            font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .creator-company {
-            font-size: 11px;
-            color: var(--muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-footer {
-            margin-top: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--muted);
-        }
-
+        /* スマホでいいねボタンをタップ可能にする最重要部分 */
         .like-btn {
             display: inline-flex;
             align-items: center;
@@ -319,14 +295,14 @@
             background: rgba(0, 0, 0, 0.35);
             cursor: pointer;
             font-size: 11px;
+
+            position: relative;
+            z-index: 20;
+            /* ← 最優先でタップさせる */
+            pointer-events: auto;
+            /* ← サムネの pointer-events:none に勝つ */
         }
 
-        .like-btn span.heart {
-            color: #fb7185;
-            font-size: 12px;
-        }
-
-        /* カテゴリーチップ（カード & ポップアップ共通） */
         .category-chip {
             display: inline-flex;
             align-items: center;
@@ -346,14 +322,28 @@
             text-overflow: ellipsis;
             margin-bottom: 4px;
         }
+    </style>
+</head>
 
-        .category-chip::before {
-            content: "◎";
-            font-size: 9px;
-        }
+<body>
 
-        /* DETAIL MODAL */
+    <canvas id="particles"></canvas>
+    <div class="grain"></div>
 
+    <!-- HEADER -->
+    <header>
+        <div class="title">PLAY. CREATE. LIVE.</div>
+        <div class="subtitle">Creeds of the Playful Creators.</div>
+
+        <div class="jpcopy">
+            遊ぶように発想し、創るように生きる。<br>
+            枠にとらわれず、世界を面白がる者たちの信条。<br>
+            創造とは、日常を遊びに変えるチカラだ。
+        </div>
+    </header>
+    <!-- ▼▼▼ PART2: ポップアップ・チャット・ログイン用スタイル ▼▼▼ -->
+    <style>
+        /* モーダルオーバーレイ */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -487,7 +477,7 @@
             white-space: pre-wrap;
         }
 
-        /* URLリンク（グロー演出） */
+        /* URL グローリンク */
         .detail-url {
             margin-top: 4px;
         }
@@ -501,7 +491,7 @@
             text-transform: uppercase;
             color: #facc15;
             text-decoration: none;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 999px;
             background: radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.25), transparent 60%);
             box-shadow:
@@ -509,10 +499,10 @@
                 0 0 18px rgba(248, 113, 113, 0.4);
             border: 1px solid rgba(250, 204, 21, 0.5);
             transition: transform .15s ease-out, box-shadow .15s ease-out, background .15s ease-out;
+            white-space: nowrap;
             max-width: 220px;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .detail-url a::before {
@@ -536,9 +526,9 @@
                 0 0 14px rgba(248, 113, 113, 0.5);
         }
 
-        /* チャット（LINE風左右） */
+        /* チャット（左右分割のLINE風） */
         .comment-section {
-            margin-top: 16px;
+            margin-top: 4px;
             padding: 10px 12px;
             border-radius: 16px;
             border: 1px solid #1f2937;
@@ -635,8 +625,7 @@
             color: #111827;
         }
 
-        /* EDIT ボタン＋フッター＋ログインオーバーレイ */
-
+        /* EDITボタンとフッター */
         .edit-bottom-wrap {
             margin-top: 32px;
             display: flex;
@@ -665,6 +654,7 @@
             opacity: .8;
         }
 
+        /* EDITログインモーダル */
         .edit-login-overlay {
             position: fixed;
             inset: 0;
@@ -738,12 +728,9 @@
             min-height: 16px;
         }
     </style>
-</head>
+    <!-- ▲▲▲ PART2 スタイルここまで ▲▲▲ -->
 
-<body>
-
-    <canvas id="particles"></canvas>
-    <div class="grain"></div>
+    <!-- ▼▼▼ PART2: HTML本体 ▼▼▼ -->
 
     <!-- DETAIL POPUP -->
     <div id="detailOverlay" class="modal-overlay">
@@ -761,7 +748,7 @@
             </div>
 
             <div class="modal-body">
-                <!-- 左：動画＋チャット -->
+                <!-- 左：動画 + チャット -->
                 <div class="video-panel">
                     <video id="detailVideo" controls playsinline></video>
                     <div class="meta-label">Main Video</div>
@@ -791,26 +778,19 @@
         <div class="edit-login-card">
             <h2>LOGIN</h2>
             <p>編集やチャットにはサインインが必要です。</p>
+
             <label for="editLoginEmail">メールアドレス</label>
             <input id="editLoginEmail" type="email" placeholder="you@example.com" />
+
             <label for="editLoginPassword">パスワード</label>
             <input id="editLoginPassword" type="password" placeholder="password" />
+
             <button id="editLoginButton">ログイン</button>
             <div id="editLoginError" class="edit-login-error"></div>
         </div>
     </div>
 
-    <!-- HEADER -->
-    <header>
-        <div class="title">PLAY. CREATE. LIVE.</div>
-        <div class="subtitle">Creeds of the Playful Creators.</div>
-        <div class="jpcopy">
-            遊ぶように発想し、創るように生きる。<br>
-            枠にとらわれず、世界を面白がる者たちの信条。<br>
-            創造とは、日常を遊びに変えるチカラだ。
-        </div>
-    </header>
-
+    <!-- MAIN コンテンツ -->
     <main class="container">
         <div class="toolbar">
             <input id="searchInput" type="search" placeholder="名前で検索…" />
@@ -834,7 +814,6 @@
     </main>
 
     <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
@@ -864,7 +843,7 @@
             measurementId: "G-ZFHF93QQCJ"
         };
 
-        const ADMIN_EMAIL = "mjmdjr@gmail.com";
+        const ADMIN_EMAIL = "mjmdjr@gmail.com";  // 管理者メール（チャット削除権限）
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -922,7 +901,7 @@
             draw();
         })();
 
-        // Creators 読み込み
+        // クリエイター一覧取得
         async function loadCreators() {
             const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
             const snap = await getDocs(q);
@@ -948,6 +927,7 @@
             renderGrid();
         }
 
+        // カテゴリプルダウン再構築
         function rebuildCategoryOptions() {
             const select = $("#categorySelect");
             if (!select) return;
@@ -965,7 +945,6 @@
             allOpt.value = "";
             allOpt.textContent = "すべてのカテゴリ";
             select.appendChild(allOpt);
-
             Array.from(set).sort().forEach(cat => {
                 const opt = document.createElement("option");
                 opt.value = cat;
@@ -974,6 +953,7 @@
             });
         }
 
+        // 並び替え
         function sortCreators(list) {
             const arr = list.slice();
             if (currentSort === "newest") {
@@ -988,6 +968,7 @@
             return arr;
         }
 
+        // カード描画
         function renderGrid() {
             const grid = $("#grid");
             grid.innerHTML = "";
@@ -1047,6 +1028,7 @@
                 const body = document.createElement("div");
                 body.className = "card-body";
 
+                // カテゴリーバッジ（カード上）
                 if (Array.isArray(c.categories) && c.categories[0]) {
                     const chip = document.createElement("div");
                     chip.className = "category-chip";
@@ -1064,15 +1046,18 @@
 
                 const footer = document.createElement("div");
                 footer.className = "card-footer";
+
                 const likesLabel = document.createElement("span");
                 likesLabel.textContent = c.likes + " ♥";
+
                 const btn = document.createElement("button");
                 btn.className = "like-btn";
                 btn.innerHTML = '<span class="heart">👍</span> いいね';
                 btn.addEventListener("click", e => {
-                    e.stopPropagation();
+                    e.stopPropagation();      // カードクリック（ポップアップ）をキャンセル
                     handleLike(c, likesLabel);
                 });
+
                 footer.appendChild(likesLabel);
                 footer.appendChild(btn);
 
@@ -1084,6 +1069,7 @@
                 card.appendChild(body);
 
                 card.addEventListener("click", () => openDetail(c));
+
                 grid.appendChild(card);
             });
         }
@@ -1100,6 +1086,7 @@
             }
         }
 
+        // チャット（LINE風左右分割）のリアルタイム購読
         function setupChatRealtime(creatorId) {
             const list = $("#commentList");
             list.innerHTML = "";
@@ -1107,7 +1094,9 @@
             const msgsRef = collection(db, "creators", creatorId, "messages");
             const q = query(msgsRef, orderBy("createdAt", "asc"));
 
-            if (messagesUnsub) messagesUnsub();
+            if (messagesUnsub) {
+                messagesUnsub();
+            }
 
             messagesUnsub = onSnapshot(q, snap => {
                 list.innerHTML = "";
@@ -1115,8 +1104,9 @@
 
                 snap.forEach(docSnap => {
                     const m = docSnap.data();
+
+                    const isMe = user && user.uid === m.authorId;
                     const row = document.createElement("div");
-                    const isMe = user && m.authorId === user.uid;
                     row.className = "comment-row " + (isMe ? "mine" : "theirs");
 
                     const bubble = document.createElement("div");
@@ -1130,6 +1120,7 @@
 
                     row.appendChild(bubble);
 
+                    // 管理者だけ削除ボタン
                     const isAdmin = user && user.email === ADMIN_EMAIL;
                     if (isAdmin) {
                         const delBtn = document.createElement("button");
@@ -1152,6 +1143,7 @@
             });
         }
 
+        // チャット送信（ニックネームがあれば優先）
         function setupChatInput(creatorId) {
             const input = $("#commentInput");
             const btn = $("#commentSend");
@@ -1163,8 +1155,15 @@
                     $("#editLoginOverlay").style.display = "flex";
                     return;
                 }
+
                 const text = input.value.trim();
                 if (!text) return;
+
+                // ニックネーム欄があればそれを使う、なければメールか匿名
+                const nick = document.getElementById("nicknameInput");
+                const authorName =
+                    (nick && nick.value.trim()) ||
+                    (user.email || "匿名");
 
                 try {
                     await addDoc(
@@ -1172,7 +1171,7 @@
                         {
                             text,
                             authorId: user.uid,
-                            authorName: user.email || "",
+                            authorName,
                             createdAt: serverTimestamp()
                         }
                     );
@@ -1191,6 +1190,7 @@
             };
         }
 
+        // ポップアップを開く
         function openDetail(c) {
             currentCreator = c;
 
@@ -1202,6 +1202,7 @@
                 img.alt = c.name || "avatar";
                 avatar.appendChild(img);
             }
+
             $("#detailName").textContent = c.name || "Creator";
             $("#detailCompany").textContent = c.company || "";
 
@@ -1248,6 +1249,7 @@
             $("#commentInput").value = "";
         }
 
+        // EDIT ログイン
         function setupEditLogin() {
             const overlay = $("#editLoginOverlay");
             const openBtn = $("#openEditLogin");
@@ -1292,6 +1294,7 @@
             });
         }
 
+        // 検索＆カテゴリフィルタ
         function setupSearchAndCategory() {
             const searchInput = $("#searchInput");
             const categorySelect = $("#categorySelect");
@@ -1311,6 +1314,7 @@
             }
         }
 
+        // 初期化
         (function init() {
             loadCreators();
 
@@ -1325,9 +1329,7 @@
             });
 
             window.addEventListener("keydown", e => {
-                if (e.key === "Escape") {
-                    closeDetail();
-                }
+                if (e.key === "Escape") closeDetail();
             });
 
             setupEditLogin();
