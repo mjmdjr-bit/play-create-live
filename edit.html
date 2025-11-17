@@ -38,18 +38,45 @@
             padding: 24px 16px 60px;
         }
 
+        /* ヘッダー行（タイトル＋TOPボタン） */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
         h1 {
             font-size: 22px;
             font-weight: 800;
             letter-spacing: .08em;
             text-transform: uppercase;
-            margin: 0 0 8px;
+            margin: 0 0 4px;
         }
 
         .sub {
             font-size: 12px;
             color: var(--muted);
-            margin-bottom: 16px;
+            margin-bottom: 4px;
+        }
+
+        .top-btn {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 180, 87, 0.6);
+            background: radial-gradient(circle at 0% 0%, rgba(255, 180, 87, 0.2), transparent 60%);
+            color: #facc15;
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+        }
+
+        .top-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 10px rgba(255, 180, 87, .7), 0 0 20px rgba(248, 113, 113, .5);
         }
 
         .box {
@@ -144,7 +171,6 @@
             border: 1px solid #b91c1c;
         }
 
-        /* 一覧表示 */
         .list-title {
             font-size: 14px;
             font-weight: 600;
@@ -233,9 +259,16 @@
 
 <body>
     <div class="container">
-        <h1>CREATOR EDIT</h1>
-        <div class="sub">
-            PLAY. CREATE. LIVE. のクリエイター情報を管理するページです（管理者専用）。
+
+        <!-- ヘッダー＋TOPボタン -->
+        <div class="top-bar">
+            <div>
+                <h1>CREATOR EDIT</h1>
+                <div class="sub">
+                    PLAY. CREATE. LIVE. のクリエイター情報を管理するページです（管理者専用）。
+                </div>
+            </div>
+            <button id="backToTopBtn" class="top-btn">TOP画面へ</button>
         </div>
 
         <!-- 入力フォーム -->
@@ -262,25 +295,25 @@
                     <select id="categoryInput">
                         <option value="">未選択</option>
 
-                        <!-- 既存カテゴリ -->
+                        <!-- 基本カテゴリ -->
                         <option value="CXプロデューサー">CXプロデューサー</option>
                         <option value="建築デザイナー">建築デザイナー</option>
                         <option value="インテリアデザイナー">インテリアデザイナー</option>
                         <option value="グラフィックデザイナー">グラフィックデザイナー</option>
-                        <option value="デザインビルダー">デザインビルダー</option>
                         <option value="映像プロデューサー">映像プロデューサー</option>
                         <option value="プロデューサー">プロデューサー</option>
                         <option value="プランナー">プランナー</option>
                         <option value="エンジニア">エンジニア</option>
                         <option value="ミュージシャン">ミュージシャン</option>
                         <option value="アーティスト">アーティスト</option>
+                        <option value="クリエイティブビルダー">クリエイティブビルダー</option>
 
-                        <!-- コック系追加 -->
-                        <option value="鮨食人">鮨職人</option>
+                        <!-- コック系 -->
+                        <option value="コック">コック</option>
                         <option value="シェフ">シェフ</option>
                         <option value="料理人">料理人</option>
 
-                        <!-- 追加5カテゴリ -->
+                        <!-- 追加カテゴリ -->
                         <option value="ヘアメイクアーティスト">ヘアメイクアーティスト</option>
                         <option value="展示デザイナー">展示デザイナー</option>
                         <option value="アスリート">アスリート</option>
@@ -297,10 +330,12 @@
                 <div>
                     <label for="profileImageInput">プロフィール画像（任意）</label>
                     <input id="profileImageInput" type="file" accept="image/*" />
+                    <div id="profileStatus" class="small">未登録</div>
                 </div>
                 <div>
                     <label for="videoInput">動画ファイル（任意 / MP4推奨）</label>
                     <input id="videoInput" type="file" accept="video/*" />
+                    <div id="videoStatus" class="small">未登録</div>
                 </div>
             </div>
 
@@ -318,7 +353,7 @@
             <div class="small">※ 編集ボタンでフォームに読み込み、保存すると上書きされます。</div>
         </div>
 
-        <!-- ▼▼▼ PART2: Firebase & 編集ロジック ▼▼▼ -->
+        <!-- ▼▼▼ Firebase & 編集ロジック ▼▼▼ -->
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
             import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
@@ -366,10 +401,13 @@
             const categoryInput = document.getElementById("categoryInput");
             const profileImageInput = document.getElementById("profileImageInput");
             const videoInput = document.getElementById("videoInput");
+            const profileStatus = document.getElementById("profileStatus");
+            const videoStatus = document.getElementById("videoStatus");
 
             const saveBtn = document.getElementById("saveBtn");
             const clearBtn = document.getElementById("clearBtn");
             const cancelEditBtn = document.getElementById("cancelEditBtn");
+            const backToTopBtn = document.getElementById("backToTopBtn");
             const creatorList = document.getElementById("creatorList");
 
             let editingId = null;   // 編集中のドキュメントID
@@ -385,7 +423,14 @@
                 }
             });
 
-            // 画像アップロード（任意）
+            // TOP画面へ
+            if (backToTopBtn) {
+                backToTopBtn.addEventListener("click", () => {
+                    window.location.href = "index.html";
+                });
+            }
+
+            // 任意ファイルアップロード
             async function uploadFileIfNeeded(fileInput, pathPrefix) {
                 if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
                 const file = fileInput.files[0];
@@ -409,22 +454,20 @@
                 editingData = null;
                 cancelEditBtn.style.display = "none";
                 saveBtn.textContent = "保存 / 追加";
+
+                if (profileStatus) profileStatus.textContent = "未登録";
+                if (videoStatus) videoStatus.textContent = "未登録";
             }
 
-            clearBtn.addEventListener("click", () => {
-                clearForm();
-            });
-
-            cancelEditBtn.addEventListener("click", () => {
-                clearForm();
-            });
+            clearBtn.addEventListener("click", clearForm);
+            cancelEditBtn.addEventListener("click", clearForm);
 
             // クリエイター一覧読み込み
             async function loadCreators() {
                 creatorList.innerHTML = "";
                 const snap = await getDocs(collection(db, "creators"));
                 if (snap.empty) {
-                    creatorList.innerHTML = "<div style='font-size:12px;color:#9ca3af;'>まだ登録がありません。</div>";
+                    creatorList.innerHTML = "<div class='small'>まだ登録がありません。</div>";
                     return;
                 }
 
@@ -471,7 +514,7 @@
                 });
             }
 
-            // 単一クリエイターをフォームに読み込む（編集モード）
+            // 単一クリエイターをフォームに読み込み
             async function loadOneCreatorToForm(id) {
                 const ref = doc(db, "creators", id);
                 const snap = await getDoc(ref);
@@ -492,6 +535,17 @@
 
                 if (profileImageInput) profileImageInput.value = "";
                 if (videoInput) videoInput.value = "";
+
+                if (profileStatus) {
+                    profileStatus.textContent = d.profileImageUrl
+                        ? "既存画像あり（変更する場合はファイルを選択）"
+                        : "未登録";
+                }
+                if (videoStatus) {
+                    videoStatus.textContent = d.videoUrl
+                        ? "既存動画あり（変更する場合はファイルを選択）"
+                        : "未登録";
+                }
 
                 saveBtn.textContent = "更新する";
                 cancelEditBtn.style.display = "inline-flex";
@@ -514,15 +568,14 @@
                     categories: categoryInput.value ? [categoryInput.value] : [],
                 };
 
-                // 新規アップロードするファイル（任意）
+                // 既存URLを保持
                 let profileUrl = editingData && editingData.profileImageUrl ? editingData.profileImageUrl : "";
                 let videoUrl = editingData && editingData.videoUrl ? editingData.videoUrl : "";
 
-                // 画像ファイルが選ばれていたらアップロード
+                // 新しいファイルがあれば差し替え
                 const newProfileUrl = await uploadFileIfNeeded(profileImageInput, "profiles");
                 if (newProfileUrl) profileUrl = newProfileUrl;
 
-                // 動画ファイルが選ばれていたらアップロード
                 const newVideoUrl = await uploadFileIfNeeded(videoInput, "videos");
                 if (newVideoUrl) videoUrl = newVideoUrl;
 
