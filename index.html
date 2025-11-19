@@ -1,14 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PLAY. CREATE. LIVE. — Creator's Voice</title>
 
-    <style type="text/css">
-        /*<![CDATA[*/
+    <style>
         :root {
             --bg: #0b0c10;
             --card: #11131aee;
@@ -34,13 +32,13 @@
 
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, "Noto Sans JP", sans-serif;
             color: var(--text);
             background: var(--bg);
             overflow-x: hidden;
         }
 
-        /* 背景（XHTMLでも壊れないようCDN不要・CSS内CDAT化） */
+        /* 背景アニメ */
         #particles {
             position: fixed;
             inset: 0;
@@ -57,16 +55,107 @@
             inset: 0;
             pointer-events: none;
             opacity: .09;
-            /* SVG をそのまま文字列で埋めているため、XHTML では CDATA が必須 */
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.6"/></svg>');
             mix-blend-mode: overlay;
+        }
+
+        /* ハンバーガーメニュー */
+        .menu-button {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            z-index: 2600;
+        }
+
+        .menu-button .bar {
+            height: 3px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            box-shadow: 0 0 8px rgba(0, 0, 0, .6);
+            transition: transform .25s ease, opacity .25s ease;
+        }
+
+        .menu-button.active .bar:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+
+        .menu-button.active .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-button.active .bar:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .88);
+            backdrop-filter: blur(18px);
+            z-index: 2550;
+        }
+
+        .menu-overlay.show {
+            display: flex;
+        }
+
+        .menu-panel {
+            width: min(360px, 90vw);
+            border-radius: 24px;
+            background: rgba(15, 23, 42, .96);
+            border: 1px solid #ffffff22;
+            padding: 20px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
+        }
+
+        .menu-panel h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-list li a {
+            display: block;
+            padding: 12px 14px;
+            background: rgba(255, 200, 50, .08);
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            color: #e5e7eb;
+            text-decoration: none;
+            font-size: 13px;
+            transition: .2s ease;
+        }
+
+        .menu-list li a:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 200, 50, .18);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
         }
 
         /* HEADER */
         header {
             padding: 40px 24px 10px;
             text-align: center;
-            position: relative;
         }
 
         .title {
@@ -74,7 +163,6 @@
             letter-spacing: .08em;
             font-size: clamp(28px, 6vw, 64px);
             text-transform: uppercase;
-            filter: drop-shadow(0 6px 26px rgba(0, 0, 0, .5));
             animation: float 6.8s ease-in-out infinite, glow 2.6s ease-in-out infinite;
         }
 
@@ -87,8 +175,8 @@
 
         .jpcopy {
             max-width: 860px;
-            margin: 18px auto 28px;
-            padding: 16px 18px;
+            margin: 18px auto 30px;
+            padding: 18px;
             border-radius: var(--radius);
             backdrop-filter: blur(14px);
             background: var(--card);
@@ -107,15 +195,9 @@
                 transform: translateY(14px);
             }
 
-            60% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
             100% {
                 opacity: 1;
                 transform: translateY(0);
-                text-shadow: 0 0 18px rgba(255, 180, 87, .3);
             }
         }
 
@@ -157,13 +239,8 @@
             flex-wrap: wrap;
             justify-content: flex-end;
             align-items: center;
-            margin-bottom: 12px;
             gap: 8px;
-        }
-
-        .toolbar-label {
-            font-size: 12px;
-            color: var(--muted);
+            margin-bottom: 16px;
         }
 
         .toolbar select,
@@ -174,36 +251,30 @@
             color: var(--text);
             padding: 6px 10px;
             font-size: 12px;
-            outline: none;
-        }
-
-        .toolbar input[type="search"] {
-            flex: 1 1 140px;
-            min-width: 120px;
         }
 
         .grid {
-            margin-top: 4px;
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 18px;
+            margin-top: 4px;
         }
 
-        @media (max-width:1024px) {
+        @media(max-width:1024px) {
             .grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
 
-        @media (max-width:768px) {
+        @media(max-width:768px) {
             .grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        @media (max-width:520px) {
+        @media(max-width:520px) {
             .grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(1, 1fr);
             }
         }
 
@@ -212,32 +283,24 @@
             position: relative;
             border-radius: 18px;
             border: 1px solid var(--border);
-            background: linear-gradient(145deg, #151926dd, #0b101bdd);
+            background: linear-gradient(145deg, #151926, #0b101b);
             overflow: hidden;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             min-height: 170px;
-            transition: transform .18s, box-shadow .18s, border-color .18s;
+            transition: .2s;
         }
 
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
-            border-color: #ffb45788;
-        }
-
-        .card:active {
-            transform: translateY(-1px) scale(0.98);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .7), 0 0 24px rgba(255, 180, 87, .7);
-            border-color: #ffb457cc;
         }
 
         .thumb-wrap {
             position: relative;
             padding-top: 62%;
             overflow: hidden;
-            pointer-events: none;
         }
 
         .thumb {
@@ -246,22 +309,12 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: .45;
+            opacity: .5;
             transform: scale(1.03);
-            transition: opacity .18s, transform .18s;
+            transition: .2s;
         }
 
-        .thumb-fallback {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 0% 0%, #ffb45755, transparent 55%),
-                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
-                #101322;
-        }
-
-        .card:hover .thumb,
-        .card:active .thumb {
+        .card:hover .thumb {
             opacity: 1;
             transform: scale(1.06);
         }
@@ -271,397 +324,59 @@
             left: 0;
             right: 0;
             bottom: 0;
-            padding: 8px 10px 9px;
+            padding: 8px;
             background: linear-gradient(to top, rgba(0, 0, 0, .85), transparent);
-            font-size: 11px;
-            letter-spacing: .12em;
-            text-transform: uppercase;
             color: #fef9c3;
-            text-shadow: 0 0 8px rgba(255, 180, 87, .9), 0 0 16px rgba(236, 72, 153, .7);
-            pointer-events: none;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            /* ← 修正済み */
+            font-size: 11px;
+            text-shadow: 0 0 8px #ffb457;
         }
 
-        .card-body {
-            padding: 10px 12px 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .category-chip {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 11px;
+            border-radius: 999px;
+            border: 1px solid #3b82f6;
+            background: rgba(59, 130, 246, .15);
+            color: #dbeafe;
+            margin-bottom: 4px;
         }
 
         .creator-name {
             font-size: 14px;
             font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .creator-company {
             font-size: 11px;
-            color: #9ca3af;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: var(--muted);
         }
 
         .card-footer {
-            margin-top: 6px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             font-size: 11px;
-            color: #9ca3af;
+            margin-top: 6px;
         }
 
         .like-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
             padding: 4px 8px;
             border-radius: 999px;
-            border: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.35);
-            cursor: pointer;
-            font-size: 12px;
-            position: relative;
-            z-index: 20;
-            pointer-events: auto;
+            background: rgba(0, 0, 0, .35);
+            color: white;
         }
 
-        .like-btn .heart {
-            color: #fb7185;
-            font-size: 12px;
-        }
-
-        .category-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(96, 165, 250, 0.6);
-            background: radial-gradient(circle at 0 0, rgba(96, 165, 250, 0.2), transparent 60%);
-            font-size: 11px;
-            color: #dbeafe;
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 4px;
-        }
-
-        .category-chip::before {
-            content: "◎";
-            font-size: 9px;
-        }
-
-        /* メニュー */
-        .menu-overlay {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, .88);
-            backdrop-filter: blur(18px);
-            z-index: 2400;
-        }
-
-        .menu-overlay.show {
-            display: flex;
-        }
-
-        .menu-panel {
-            width: min(360px, 90vw);
-            border-radius: 20px;
-            background: #020617ee;
-            border: 1px solid #ffffff22;
-            padding: 20px 22px 22px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
-        }
-
-        .menu-panel h2 {
-            margin: 0 0 12px;
-            font-size: 16px;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-        }
-
-        .menu-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .menu-list li a {
-            display: block;
-            padding: 8px 10px;
-            border-radius: 999px;
-            border: 1px solid #4b5563;
-            background: rgba(15, 23, 42, 0.9);
-            color: #e5e7eb;
-            font-size: 12px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            text-decoration: none;
-            text-align: center;
-            transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
-        }
-
-        .menu-list li a:hover {
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, .5);
-        }
-
-        .menu-button {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            width: 32px;
-            height: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            z-index: 2350;
-        }
-
-        .menu-button .bar {
-            height: 3px;
-            border-radius: 999px;
-            background: #e5e7eb;
-            box-shadow: 0 0 8px rgba(0, 0, 0, .6);
-            transition: transform .25s ease, opacity .25s ease, background .25s ease;
-        }
-
-        .menu-button.active .bar:nth-child(1) {
-            transform: translateY(9px) rotate(45deg);
-        }
-
-        .menu-button.active .bar:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-button.active .bar:nth-child(3) {
-            transform: translateY(-9px) rotate(-45deg);
-        }
-
-        /* EDIT / FOOTER */
-        .edit-bottom-wrap {
-            margin-top: 32px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .edit-bottom-btn {
-            padding: 10px 18px;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        footer {
-            margin: 30px 0 18px;
-            text-align: center;
-            color: #b8c2d4;
-            font-size: 12px;
-            opacity: .8;
-        }
-
-        /* EDIT ログイン */
-        .edit-login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .85);
-            backdrop-filter: blur(14px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2600;
-        }
-
-        .edit-login-card {
-            width: min(360px, 90vw);
-            border-radius: 20px;
-            background: #0b1120ee;
-            border: 1px solid #ffffff22;
-            padding: 20px 22px 22px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .8);
-        }
-
-        .edit-login-card h2 {
-            margin: 0 0 8px;
-            font-size: 16px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-
-        .edit-login-card p {
-            margin: 0 0 14px;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .edit-login-card label {
-            display: block;
-            margin-top: 10px;
-            font-size: 11px;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: #cbd5f5;
-        }
-
-        .edit-login-card input {
-            width: 100%;
-            margin-top: 4px;
-            padding: 9px 10px;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .edit-login-card button {
-            margin-top: 12px;
-            width: 100%;
-            padding: 9px 0;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .edit-login-error {
-            font-size: 11px;
-            color: #fecaca;
-            margin-top: 8px;
-            min-height: 16px;
-        }
-
-        /* ユーザーログイン */
-        .user-login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .9);
-            backdrop-filter: blur(20px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2700;
-        }
-
-        .user-login-card {
-            width: min(360px, 90vw);
-            border-radius: 20px;
-            background: #020617ee;
-            border: 1px solid #ffffff22;
-            padding: 20px 22px 22px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
-        }
-
-        .user-login-card h2 {
-            margin: 0 0 8px;
-            font-size: 18px;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-        }
-
-        .user-login-card p {
-            margin: 0 0 14px;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .user-login-card label {
-            display: block;
-            margin-top: 10px;
-            font-size: 11px;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: #cbd5f5;
-        }
-
-        .user-login-card input {
-            width: 100%;
-            margin-top: 4px;
-            padding: 9px 10px;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .user-login-card .btn-row {
-            margin-top: 14px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .user-login-card button {
-            flex: 1;
-            padding: 9px 0;
-            border-radius: 999px;
-            border: none;
-            font-size: 12px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-
-        #userLoginBtn {
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-weight: 600;
-        }
-
-        #userSignupBtn {
-            background: #111827;
-            color: #e5e7eb;
-            border: 1px solid #4b5563;
-        }
-
-        #userLoginError {
-            font-size: 11px;
-            color: #fecaca;
-            margin-top: 8px;
-            min-height: 16px;
-        }
-
-        /* DETAIL POPUP（肝） */
+        /* DETAIL モーダル */
         .modal-overlay {
             position: fixed;
             inset: 0;
+            background: rgba(0, 0, 0, .78);
+            backdrop-filter: blur(18px);
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, .88);
-            backdrop-filter: blur(18px);
-            z-index: 2500;
+            padding: 16px;
+            z-index: 2000;
         }
 
         .modal-overlay.show {
@@ -669,169 +384,141 @@
         }
 
         .modal {
-            width: min(1000px, 96vw);
-            max-height: 92vh;
-            overflow: auto;
-            border-radius: 20px;
-            background: #0b1120ee;
+            width: min(1100px, 96vw);
+            background: #111622f2;
+            border-radius: 24px;
             border: 1px solid #ffffff22;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, .88);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            overflow: hidden;
         }
 
         .modal-head {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 12px 16px;
-            border-bottom: 1px solid #1f2937;
+            align-items: center;
+            padding: 16px 20px 10px;
         }
 
-        .modal-head .close {
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            border-radius: 999px;
-            background: #111827;
-            color: #e5e7eb;
-            cursor: pointer;
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #222;
         }
 
         .modal-body {
+            padding: 16px;
             display: grid;
-            grid-template-columns: minmax(320px, 1fr) 1fr;
+            grid-template-columns: 1.6fr 1fr;
             gap: 16px;
-            padding: 14px;
+            overflow-y: auto;
+            flex: 1;
         }
 
-        @media (max-width:860px) {
+        @media(max-width:900px) {
             .modal-body {
                 grid-template-columns: 1fr;
             }
         }
 
-        .avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #1f2937, #111827);
-            border: 1px solid #ffffff22;
-        }
-
-        .detail-url a {
-            color: #93c5fd;
-            text-decoration: none;
-        }
-
-        .detail-url a:hover {
-            text-decoration: underline;
-        }
-
-        .meta-label {
-            margin-top: 8px;
-            font-size: 12px;
-            color: #9ca3af;
-            letter-spacing: .08em;
-        }
-
-        .meta-text {
-            font-size: 14px;
-            line-height: 1.7;
-        }
-
-        .detail-about {
-            font-size: 14px;
-            line-height: 1.8;
-            background: #0b0f1b;
-            border: 1px solid var(--border);
+        .video-panel {
+            background: #111827;
+            border-radius: 18px;
             padding: 12px;
-            border-radius: 12px;
-        }
-
-        .video-panel video {
-            width: 100%;
-            background: #000;
-            border-radius: 12px;
         }
 
         .comment-section {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #0b0f1b;
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 10px;
+            border: 1px solid #1f2937;
         }
 
         .comment-list {
-            max-height: 220px;
-            overflow: auto;
-            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        .comment-input-row {
+        .comment-row {
             display: flex;
+        }
+
+        .comment-row.mine {
+            justify-content: flex-end;
+        }
+
+        .comment-bubble {
+            background: #1d4ed8;
+            padding: 6px 10px;
+            border-radius: 12px;
+            color: white;
+            max-width: 80%;
+        }
+
+        .comment-row.theirs .comment-bubble {
+            background: #374151;
+        }
+
+        /* WORKS */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 8px;
-            padding: 8px;
-            border-top: 1px solid #1f2937;
         }
 
-        #commentInput {
-            flex: 1;
-            padding: 8px 10px;
-            border-radius: 999px;
-            border: 1px solid #1f2937;
+        .work-card {
             background: #020617;
-            color: #e5e7eb;
-            font-size: 13px;
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            padding: 6px;
+            font-size: 11px;
         }
 
-        #commentSend {
-            padding: 8px 12px;
-            border: none;
+        /* EDIT ボタン */
+        .edit-bottom-wrap {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .edit-bottom-btn {
+            padding: 10px 20px;
             border-radius: 999px;
             background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-weight: 600;
-            cursor: pointer;
+            color: black;
         }
 
-        #worksGroup .comment-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-            max-height: none;
-            padding: 12px;
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+            margin: 30px 0;
         }
-
-        .work-item {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: #0b101b;
-            font-size: 13px;
-        }
-
-        /*]]>*/
     </style>
 </head>
 
 <body>
+    <!-- 背景 -->
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
-    <!-- ハンバーガーメニュー -->
-    <div id="menuButton" class="menu-button" aria-label="メニューを開く" role="button" tabindex="0">
+    <!-- ハンバーガーメニューボタン（右上） -->
+    <div id="menuButton" class="menu-button">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
     </div>
-    <div id="menuOverlay" class="menu-overlay" aria-hidden="true">
+
+    <!-- メニューオーバーレイ -->
+    <div id="menuOverlay" class="menu-overlay">
         <div class="menu-panel">
-            <h2>Creator's Menu</h2>
+            <h2>CREATOR'S MENU</h2>
             <ul class="menu-list">
                 <li><a href="#" id="linkMarket">Creator’s Market</a></li>
                 <li><a href="#" id="linkAI">Creator’s AI Consulting</a></li>
@@ -841,7 +528,7 @@
     </div>
 
     <!-- ユーザー用ログインゲート -->
-    <div id="userLoginOverlay" class="user-login-overlay" aria-hidden="true">
+    <div id="userLoginOverlay" class="user-login-overlay">
         <div class="user-login-card">
             <h2>WELCOME</h2>
             <p>PLAY. CREATE. LIVE. を利用するには、ユーザーIDでログインしてください。</p>
@@ -853,16 +540,16 @@
             <input id="userPassword" type="password" placeholder="パスワード" />
 
             <div class="btn-row">
-                <button id="userLoginBtn" type="button">ログイン</button>
-                <button id="userSignupBtn" type="button">新規登録</button>
+                <button id="userLoginBtn">ログイン</button>
+                <button id="userSignupBtn">新規登録</button>
             </div>
 
             <div id="userLoginError"></div>
         </div>
     </div>
 
-    <!-- DETAIL POPUP -->
-    <div id="detailOverlay" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+    <!-- DETAIL モーダル -->
+    <div id="detailOverlay" class="modal-overlay">
         <div class="modal" id="detailModal">
             <div class="modal-head">
                 <div style="display:flex; gap:12px; align-items:center;">
@@ -873,39 +560,40 @@
                         <div id="detailUrl" class="detail-url"></div>
                     </div>
                 </div>
-                <button class="close" id="detailClose" type="button" aria-label="閉じる">×</button>
+                <button class="close" id="detailClose">×</button>
             </div>
 
             <div class="modal-body">
                 <!-- 左：動画＋ニックネーム＋チャット -->
                 <div class="video-panel">
-                    <video id="detailVideo" controls="controls" playsinline="playsinline"></video>
+                    <video id="detailVideo" controls playsinline></video>
                     <div class="meta-label">Main Video</div>
                     <div class="meta-text" id="detailDesc">—</div>
 
                     <div class="meta-label" style="margin-top:12px;">NICKNAME</div>
                     <input id="nicknameInput" type="text" placeholder="ニックネーム（必須）" style="width:100%; padding:8px 10px; margin-bottom:8px;
                    border-radius:10px; border:1px solid #1f2937;
-                   background:#020617; color:#e5e7eb;" />
+                   background:#020617; color:#e5e7eb;">
 
                     <div class="meta-label">CHAT</div>
                     <div class="comment-section">
                         <div id="commentList" class="comment-list"></div>
                         <div class="comment-input-row">
                             <input id="commentInput" type="text" placeholder="メッセージを入力..." />
-                            <button id="commentSend" type="button">送信</button>
+                            <button id="commentSend">送信</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- 右：ABOUT + WORKS -->
                 <div>
+                    <div class="meta-label">ABOUT</div>
                     <div class="detail-about" id="detailAbout">—</div>
 
                     <div class="meta-label" style="margin-top:12px;">WORKS</div>
-                    <div id="worksGroup" class="comment-section">
+                    <div class="comment-section">
                         <div id="worksContainer" class="comment-list">
-                            <!-- JSで作品カードを差し込む -->
+                            <!-- JS で作品カードを差し込む -->
                         </div>
                     </div>
                 </div>
@@ -913,16 +601,19 @@
         </div>
     </div>
 
-    <!-- EDIT ログイン -->
-    <div id="editLoginOverlay" class="edit-login-overlay" aria-hidden="true">
+    <!-- EDIT ログインオーバーレイ（管理者用） -->
+    <div id="editLoginOverlay" class="edit-login-overlay">
         <div class="edit-login-card">
             <h2>EDIT LOGIN</h2>
             <p>コンテンツ編集には管理者IDでのサインインが必要です。</p>
+
             <label for="editLoginEmail">メールアドレス</label>
             <input id="editLoginEmail" type="email" placeholder="admin@example.com" />
+
             <label for="editLoginPassword">パスワード</label>
             <input id="editLoginPassword" type="password" placeholder="password" />
-            <button id="editLoginButton" type="button">ログイン</button>
+
+            <button id="editLoginButton">ログイン</button>
             <div id="editLoginError" class="edit-login-error"></div>
         </div>
     </div>
@@ -932,203 +623,793 @@
         <div class="title">PLAY. CREATE. LIVE.</div>
         <div class="subtitle">Creeds of the Playful Creators.</div>
         <div class="jpcopy">
-            あそぶように、つくり、生きる。<br />
-            ここはクリエイターの声と作品が集まる実験広場です。カードをクリックすると詳細モーダルが開き、
-            動画・プロフィール・作品群・簡易チャットを表示します。
+            遊ぶように発想し、創るように生きる。<br>
+            枠にとらわれず、世界を面白がる者たちの信条。<br>
+            創造とは、日常を遊びに変えるチカラだ。
         </div>
     </header>
 
     <!-- MAIN -->
     <main class="container">
         <div class="toolbar">
-            <span class="toolbar-label">Filter:</span>
-            <select id="categoryFilter">
-                <option value="">All</option>
-                <option value="video">Video</option>
-                <option value="music">Music</option>
-                <option value="design">Design</option>
+            <input id="searchInput" type="search" placeholder="名前で検索…" />
+            <select id="categorySelect">
+                <option value="">すべてのカテゴリ</option>
             </select>
-            <input id="searchInput" type="search" placeholder="Search creators..." />
+            <span class="toolbar-label">並び順：</span>
+            <select id="sortSelect">
+                <option value="newest">新着順</option>
+                <option value="oldest">古い順</option>
+                <option value="name-asc">名前 A→Z</option>
+                <option value="name-desc">名前 Z→A</option>
+            </select>
         </div>
 
-        <div class="grid" id="cardGrid">
-            <!-- サンプルカード（必要に応じ複製） -->
-            <button class="card" type="button" data-open-detail="true" data-name="Arisa K."
-                data-company="Playful Studio" data-url="https://example.com" data-desc="日常を切り取った短編ムービー。"
-                data-about="映像作家 / エディター。都市と人の距離感をテーマに制作。"
-                data-video="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-                data-works='["Work A","Work B","Work C"]'>
-                <div class="thumb-wrap">
-                    <div class="thumb-fallback"></div>
-                    <div class="thumb-title">City Fragments</div>
-                </div>
-                <div class="card-body">
-                    <div class="category-chip">Video</div>
-                    <div class="creator-name">Arisa K.</div>
-                    <div class="creator-company">Playful Studio</div>
-                    <div class="card-footer">
-                        <span>♥ 12</span>
-                        <span class="like-btn"><span class="heart">♥</span> Like</span>
-                    </div>
-                </div>
-            </button>
-
-            <button class="card" type="button" data-open-detail="true" data-name="Shun T." data-company="Indie Sound"
-                data-url="https://example.com" data-desc="深夜のループミュージック。" data-about="作曲家 / サウンドデザイナー。シンセとフィールド録音をミックス。"
-                data-video="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-                data-works='["Night Loop","Ambient Kit","Lofi Pack"]'>
-                <div class="thumb-wrap">
-                    <div class="thumb-fallback"></div>
-                    <div class="thumb-title">Night Loop</div>
-                </div>
-                <div class="card-body">
-                    <div class="category-chip">Music</div>
-                    <div class="creator-name">Shun T.</div>
-                    <div class="creator-company">Indie Sound</div>
-                    <div class="card-footer">
-                        <span>♥ 41</span>
-                        <span class="like-btn"><span class="heart">♥</span> Like</span>
-                    </div>
-                </div>
-            </button>
-
-            <button class="card" type="button" data-open-detail="true" data-name="Mina O." data-company="Studio Mint"
-                data-url="https://example.com" data-desc="活版風のタイポグラフィ展。" data-about="グラフィック / タイポグラフィ。クラフトとデジタルの接続に関心。"
-                data-video="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-                data-works='["Type &amp; Craft","Letterpress","Poster Set"]'>
-                <div class="thumb-wrap">
-                    <div class="thumb-fallback"></div>
-                    <div class="thumb-title">Type &amp; Craft</div>
-                </div>
-                <div class="card-body">
-                    <div class="category-chip">Design</div>
-                    <div class="creator-name">Mina O.</div>
-                    <div class="creator-company">Studio Mint</div>
-                    <div class="card-footer">
-                        <span>♥ 23</span>
-                        <span class="like-btn"><span class="heart">♥</span> Like</span>
-                    </div>
-                </div>
-            </button>
-        </div>
+        <div id="grid" class="grid"></div>
 
         <div class="edit-bottom-wrap">
-            <button class="edit-bottom-btn" id="openEditLogin" type="button">Edit</button>
+            <button id="openEditLogin" class="edit-bottom-btn">EDIT</button>
         </div>
     </main>
 
-    <footer>© 2025 PLAY. CREATE. LIVE.</footer>
+    <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
 
-    <script type="text/javascript">
-        //<![CDATA[
-        document.addEventListener('DOMContentLoaded', function () {
-            var menuBtn = document.getElementById('menuButton');
-            var menuOverlay = document.getElementById('menuOverlay');
-            var detailOverlay = document.getElementById('detailOverlay');
-            var detailClose = document.getElementById('detailClose');
-            var cardGrid = document.getElementById('cardGrid');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            query,
+            orderBy,
+            doc,
+            updateDoc,
+            increment,
+            addDoc,
+            serverTimestamp,
+            onSnapshot,
+            deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-            var nicknameInput = document.getElementById('nicknameInput');
-            var commentInput = document.getElementById('commentInput');
-            var commentSend = document.getElementById('commentSend');
-            var commentList = document.getElementById('commentList');
-            var worksContainer = document.getElementById('worksContainer');
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
+            authDomain: "play-create-live.firebaseapp.com",
+            databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
+            projectId: "play-create-live",
+            storageBucket: "play-create-live.firebasestorage.app",
+            messagingSenderId: "143889321354",
+            appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
+            measurementId: "G-ZFHF93QQCJ"
+        };
 
-            // 初期は確実に閉じる
-            if (menuOverlay) menuOverlay.classList.remove('show');
-            if (detailOverlay) detailOverlay.classList.remove('show');
+        const ADMIN_EMAIL = "mjmdjr@gmail.com";
 
-            // メニュー開閉
-            if (menuBtn && menuOverlay) {
-                function toggleMenu() {
-                    var open = !menuOverlay.classList.contains('show');
-                    menuOverlay.classList.toggle('show', open);
-                    menuBtn.classList.toggle('active', open);
-                    lockBodyScroll(open);
-                    menuOverlay.setAttribute('aria-hidden', String(!open));
-                }
-                menuBtn.addEventListener('click', toggleMenu);
-                menuBtn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMenu(); } });
-                menuOverlay.addEventListener('click', function (e) { if (e.target === menuOverlay) { toggleMenu(); } });
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const $ = (s) => document.querySelector(s);
+
+        let currentSort = "newest";
+        let currentSearch = "";
+        let currentCategory = "";
+        let creators = [];
+        let currentCreator = null;
+        let messagesUnsub = null;
+        let editingMessageId = null;
+
+        /* ============================
+           背景パーティクル
+        ============================ */
+        (function () {
+            const c = document.getElementById("particles");
+            const ctx = c.getContext("2d");
+            let W, H, dpr = window.devicePixelRatio || 1;
+
+            const palettes = [
+                "rgba(255,180,87,0.65)",
+                "rgba(72,219,251,0.65)",
+                "rgba(129,140,248,0.65)",
+                "rgba(45,212,191,0.65)",
+                "rgba(244,114,182,0.65)"
+            ];
+            const color = palettes[Math.floor(Math.random() * palettes.length)];
+
+            function resize() {
+                W = c.width = window.innerWidth * dpr;
+                H = c.height = window.innerHeight * dpr;
+                c.style.width = window.innerWidth + "px";
+                c.style.height = window.innerHeight + "px";
             }
+            resize();
+            window.addEventListener("resize", resize);
 
-            // カード→詳細
-            if (cardGrid && detailOverlay) {
-                cardGrid.addEventListener('click', function (e) {
-                    var card = e.target.closest('[data-open-detail]');
-                    if (!card) return;
-
-                    setText('detailName', card.getAttribute('data-name') || 'Creator');
-                    setText('detailCompany', card.getAttribute('data-company') || '');
-                    var url = card.getAttribute('data-url') || '';
-                    setHTML('detailUrl', url ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">Website</a>' : '');
-                    setText('detailDesc', card.getAttribute('data-desc') || '—');
-                    setText('detailAbout', card.getAttribute('data-about') || '—');
-
-                    var video = document.getElementById('detailVideo');
-                    if (video) {
-                        video.setAttribute('src', card.getAttribute('data-video') || '');
-                        try { video.pause(); video.currentTime = 0; } catch (e) { }
-                    }
-
-                    // WORKS
-                    worksContainer.innerHTML = '';
-                    try {
-                        var works = JSON.parse(card.getAttribute('data-works') || '[]');
-                        works.forEach(function (w) {
-                            var el = document.createElement('div');
-                            el.className = 'work-item';
-                            el.textContent = w;
-                            worksContainer.appendChild(el);
-                        });
-                    } catch (_) { }
-
-                    openDetail(true);
+            const N = 90;
+            const parts = [];
+            for (let i = 0; i < N; i++) {
+                parts.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: Math.random() * 3 * dpr + 1,
+                    a: Math.random() * Math.PI * 2,
+                    v: 0.25 + Math.random() * 0.5
                 });
             }
 
-            // 詳細の閉じる
-            function openDetail(flag) {
-                detailOverlay.classList.toggle('show', flag);
-                detailOverlay.setAttribute('aria-hidden', String(!flag));
-                lockBodyScroll(flag);
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                for (const p of parts) {
+                    p.x += Math.cos(p.a) * p.v;
+                    p.y += Math.sin(p.a) * p.v;
+                    p.a += (Math.random() - 0.5) * 0.03;
+
+                    if (p.x < 0) p.x = W;
+                    if (p.x > W) p.x = 0;
+                    if (p.y < 0) p.y = H;
+                    if (p.y > H) p.y = 0;
+
+                    ctx.beginPath();
+                    ctx.fillStyle = color;
+                    ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
             }
-            if (detailClose) detailClose.addEventListener('click', function () { openDetail(false); });
-            detailOverlay.addEventListener('click', function (e) { if (e.target === detailOverlay) { openDetail(false); } });
-            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { openDetail(false); if (menuOverlay) { menuOverlay.classList.remove('show'); menuBtn.classList.remove('active'); } lockBodyScroll(false); } });
+            draw();
+        })();
 
-            // コメント
-            function addComment() {
-                var nick = (nicknameInput.value || '').trim();
-                var msg = (commentInput.value || '').trim();
-                if (!nick) { nicknameInput.focus(); nicknameInput.style.outline = '2px solid #ff6b6b'; return; }
-                if (!msg) { commentInput.focus(); return; }
-                var row = document.createElement('div');
-                row.textContent = nick + '：' + msg;
-                commentList.appendChild(row);
-                commentInput.value = '';
-                commentList.scrollTop = commentList.scrollHeight;
+        /* ============================
+           Creators 一覧取得
+        ============================ */
+        async function loadCreators() {
+            const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
+            const snap = await getDocs(q);
+            const list = [];
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                list.push({
+                    id: docSnap.id,
+                    name: d.name || "",
+                    company: d.company || "",
+                    url: d.url || "",
+                    videoTitle: d.videoTitle || "",
+                    summary: d.summary || "",
+                    profileImageUrl: d.profileImageUrl || "",
+                    videoUrl: d.videoUrl || "",
+                    likes: typeof d.likes === "number" ? d.likes : 0,
+                    createdAt: d.createdAt ? d.createdAt.toMillis() : 0,
+                    categories: Array.isArray(d.categories) ? d.categories : [],
+                    works: Array.isArray(d.works) ? d.works : []
+                });
+            });
+            creators = list;
+            rebuildCategoryOptions();
+            renderGrid();
+        }
+
+        function rebuildCategoryOptions() {
+            const select = $("#categorySelect");
+            if (!select) return;
+
+            const set = new Set();
+            creators.forEach(c => {
+                (c.categories || []).forEach(cat => {
+                    const t = (cat || "").trim();
+                    if (t) set.add(t);
+                });
+            });
+
+            select.innerHTML = `<option value="">すべてのカテゴリ</option>`;
+            Array.from(set).sort().forEach(cat => {
+                const opt = document.createElement("option");
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+        }
+
+        function sortCreators(list) {
+            const arr = list.slice();
+            if (currentSort === "newest")
+                arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            else if (currentSort === "oldest")
+                arr.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+            else if (currentSort === "name-asc")
+                arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+            else if (currentSort === "name-desc")
+                arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+            return arr;
+        }
+
+        /* ============================
+           グリッド描画
+        ============================ */
+        function renderGrid() {
+            const grid = $("#grid");
+            grid.innerHTML = "";
+
+            if (!creators.length) {
+                grid.style.display = "none";
+                return;
             }
-            if (commentSend) commentSend.addEventListener('click', addComment);
-            if (commentInput) commentInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { addComment(); } });
 
-            // Edit ログインのダミー開閉
-            var openEdit = document.getElementById('openEditLogin');
-            var editOverlay = document.getElementById('editLoginOverlay');
-            if (openEdit && editOverlay) {
-                openEdit.addEventListener('click', function () { editOverlay.style.display = 'flex'; lockBodyScroll(true); });
-                editOverlay.addEventListener('click', function (e) { if (e.target === editOverlay) { editOverlay.style.display = 'none'; lockBodyScroll(false); } });
+            const s = currentSearch.toLowerCase();
+            let filtered = creators.filter(c => {
+                const name = (c.name || "").toLowerCase();
+                const cats = Array.isArray(c.categories) ? c.categories : [];
+                const okName = !s || name.includes(s);
+                const okCat = !currentCategory || cats.includes(currentCategory);
+                return okName && okCat;
+            });
+
+            filtered = sortCreators(filtered);
+
+            if (!filtered.length) {
+                grid.style.display = "block";
+                const msg = document.createElement("div");
+                msg.style.padding = "20px 0";
+                msg.style.textAlign = "center";
+                msg.style.color = "#9ca3af";
+                msg.style.fontSize = "13px";
+                msg.textContent = "条件に合うクリエイターが見つかりませんでした。";
+                grid.appendChild(msg);
+                return;
             }
 
-            // 背面スクロール制御
-            function lockBodyScroll(lock) { document.body.style.overflow = lock ? 'hidden' : ''; }
+            grid.style.display = "grid";
 
-            // utils
-            function setText(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; }
-            function setHTML(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
-            function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]); }); }
-        });
-        //]]>
+            filtered.forEach(c => {
+                const card = document.createElement("div");
+                card.className = "card";
+
+                const tw = document.createElement("div");
+                tw.className = "thumb-wrap";
+
+                if (c.profileImageUrl) {
+                    const img = document.createElement("img");
+                    img.src = c.profileImageUrl;
+                    img.alt = c.name || "thumbnail";
+                    img.className = "thumb";
+                    tw.appendChild(img);
+                } else {
+                    const fb = document.createElement("div");
+                    fb.className = "thumb-fallback";
+                    tw.appendChild(fb);
+                }
+
+                const titleOverlay = document.createElement("div");
+                titleOverlay.className = "thumb-title";
+                titleOverlay.textContent = c.videoTitle || c.name || "Untitled";
+                tw.appendChild(titleOverlay);
+
+                const body = document.createElement("div");
+                body.className = "card-body";
+
+                if (Array.isArray(c.categories) && c.categories[0]) {
+                    const chip = document.createElement("span");
+                    chip.className = "category-chip";
+                    chip.textContent = c.categories[0];
+                    body.appendChild(chip);
+                }
+
+                const nameEl = document.createElement("div");
+                nameEl.className = "creator-name";
+                nameEl.textContent = c.name || "—";
+
+                const compEl = document.createElement("div");
+                compEl.className = "creator-company";
+                compEl.textContent = c.company || "";
+
+                const footer = document.createElement("div");
+                footer.className = "card-footer";
+
+                const likeLabel = document.createElement("span");
+                likeLabel.textContent = `${c.likes} ♥`;
+
+                const likeBtn = document.createElement("button");
+                likeBtn.className = "like-btn";
+                likeBtn.innerHTML = `<span class="heart">👍</span> いいね`;
+                likeBtn.addEventListener("click", e => {
+                    e.stopPropagation();
+                    handleLike(c, likeLabel);
+                });
+
+                footer.appendChild(likeLabel);
+                footer.appendChild(likeBtn);
+
+                body.appendChild(nameEl);
+                body.appendChild(compEl);
+                body.appendChild(footer);
+
+                card.appendChild(tw);
+                card.appendChild(body);
+
+                card.addEventListener("click", () => openDetail(c));
+
+                grid.appendChild(card);
+            });
+        }
+
+        async function handleLike(c, labelEl) {
+            try {
+                await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
+                c.likes += 1;
+                labelEl.textContent = `${c.likes} ♥`;
+            } catch (err) {
+                console.error(err);
+                alert("いいねの送信に失敗しました");
+            }
+        }
+
+        /* ============================
+           チャット（リアルタイム）
+        ============================ */
+        function setupChatRealtime(creatorId) {
+            const list = $("#commentList");
+            if (!list) return;
+            list.innerHTML = "";
+
+            const msgsRef = collection(db, "creators", creatorId, "messages");
+            const q = query(msgsRef, orderBy("createdAt", "asc"));
+
+            if (messagesUnsub) messagesUnsub();
+
+            messagesUnsub = onSnapshot(q, snap => {
+                list.innerHTML = "";
+                const user = auth.currentUser;
+
+                snap.forEach(docSnap => {
+                    const m = docSnap.data();
+                    const isMe = user && user.uid === m.authorId;
+
+                    const row = document.createElement("div");
+                    row.className = "comment-row " + (isMe ? "mine" : "theirs");
+
+                    const bubble = document.createElement("div");
+                    bubble.className = "comment-bubble";
+                    bubble.textContent = m.text || "";
+
+                    const meta = document.createElement("div");
+                    meta.className = "comment-meta";
+                    meta.textContent = m.authorName || "匿名";
+                    bubble.appendChild(meta);
+
+                    row.appendChild(bubble);
+
+                    // 管理者なら削除ボタン
+                    if (user && user.email === ADMIN_EMAIL) {
+                        const del = document.createElement("button");
+                        del.className = "comment-delete";
+                        del.textContent = "削除";
+                        del.onclick = async (e) => {
+                            e.stopPropagation();
+                            try {
+                                await deleteDoc(doc(db, "creators", creatorId, "messages", docSnap.id));
+                            } catch (err) {
+                                console.error(err);
+                                alert("削除失敗");
+                            }
+                        };
+                        row.appendChild(del);
+                    }
+
+                    // 自分の投稿なら編集ボタン
+                    if (isMe) {
+                        const edit = document.createElement("button");
+                        edit.className = "comment-delete";
+                        edit.textContent = "編集";
+                        edit.onclick = (e) => {
+                            e.stopPropagation();
+                            const input = $("#commentInput");
+                            if (input) {
+                                input.value = m.text || "";
+                                input.focus();
+                            }
+                            editingMessageId = docSnap.id;
+                        };
+                        row.appendChild(edit);
+                    }
+
+                    list.appendChild(row);
+                });
+            });
+        }
+
+        /* ============================
+           チャット送信
+        ============================ */
+        function setupChatInput(creatorId) {
+            const input = $("#commentInput");
+            const btn = $("#commentSend");
+            const nick = $("#nicknameInput");
+            if (!input || !btn || !nick) return;
+
+            btn.onclick = async () => {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("メッセージを送るにはログインしてください。");
+                    return;
+                }
+
+                const text = input.value.trim();
+                if (!text) return;
+
+                const nickname = nick.value.trim();
+                if (!nickname) {
+                    alert("ニックネームを入力してください。");
+                    nick.focus();
+                    return;
+                }
+
+                localStorage.setItem("pcl_nickname", nickname);
+
+                try {
+                    if (editingMessageId) {
+                        await updateDoc(
+                            doc(db, "creators", creatorId, "messages", editingMessageId),
+                            { text, authorName: nickname, updatedAt: serverTimestamp() }
+                        );
+                        editingMessageId = null;
+                    } else {
+                        await addDoc(
+                            collection(db, "creators", creatorId, "messages"),
+                            {
+                                text,
+                                authorId: user.uid,
+                                authorName: nickname,
+                                createdAt: serverTimestamp()
+                            }
+                        );
+                    }
+                    input.value = "";
+                } catch (err) {
+                    console.error(err);
+                    alert("メッセージ送信に失敗しました");
+                }
+            };
+
+            input.addEventListener("keydown", e => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+        }
+
+        /* ============================
+           WORKS 表示
+        ============================ */
+        function renderWorks(c) {
+            const container = $("#worksContainer");
+            if (!container) return;
+            container.innerHTML = "";
+
+            const works = Array.isArray(c.works) ? c.works : [];
+            if (!works.length) {
+                container.innerHTML = `<div style="color:#6b7280;font-size:11px;">登録された作品はまだありません。</div>`;
+                return;
+            }
+
+            const grid = document.createElement("div");
+            grid.className = "works-grid";
+
+            works.forEach(w => {
+                const card = document.createElement("div");
+                card.className = "work-card";
+
+                const thumb = document.createElement("div");
+                thumb.className = "work-thumb";
+
+                if (w.type === "video") {
+                    thumb.innerHTML = `<video src="${w.url}" controls playsinline></video>`;
+                } else {
+                    thumb.innerHTML = `<img src="${w.url}" alt="${w.title || "work"}">`;
+                }
+
+                const t = document.createElement("div");
+                t.className = "work-title";
+                t.textContent = w.title || "";
+
+                const ty = document.createElement("div");
+                ty.className = "work-type";
+                ty.textContent = w.type || "";
+
+                card.appendChild(thumb);
+                card.appendChild(t);
+                card.appendChild(ty);
+
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+        }
+
+        /* ============================
+           DETAIL ポップアップ
+        ============================ */
+        function openDetail(c) {
+            currentCreator = c;
+
+            const avatar = $("#detailAvatar");
+            avatar.innerHTML = c.profileImageUrl
+                ? `<img src="${c.profileImageUrl}">`
+                : "";
+
+            $("#detailName").textContent = c.name || "";
+            $("#detailCompany").textContent = c.company || "";
+
+            const urlBox = $("#detailUrl");
+            urlBox.innerHTML = "";
+            if (c.url) {
+                urlBox.innerHTML = `<a href="${c.url}" target="_blank" rel="noopener noreferrer">
+          ${c.url.replace(/^https?:\/\//, "")}
+        </a>`;
+            }
+
+            $("#detailDesc").textContent = c.videoTitle || "";
+            $("#detailAbout").textContent = c.summary || "";
+
+            const v = $("#detailVideo");
+            v.src = c.videoUrl || "";
+            v.load();
+
+            renderWorks(c);
+            setupChatRealtime(c.id);
+            setupChatInput(c.id);
+
+            $("#detailOverlay").classList.add("show");
+        }
+
+        function closeDetail() {
+            $("#detailOverlay").classList.remove("show");
+
+            const v = $("#detailVideo");
+            v.pause();
+            v.src = "";
+            v.load();
+
+            const list = $("#commentList");
+            const input = $("#commentInput");
+            if (list) list.innerHTML = "";
+            if (input) input.value = "";
+
+            editingMessageId = null;
+            if (messagesUnsub) {
+                messagesUnsub();
+                messagesUnsub = null;
+            }
+        }
+
+        /* ============================
+           EDIT ログイン (管理者)
+        ============================ */
+        function setupEditLogin() {
+            const overlay = $("#editLoginOverlay");
+            const openBtn = $("#openEditLogin");
+            const emailEl = $("#editLoginEmail");
+            const passEl = $("#editLoginPassword");
+            const btn = $("#editLoginButton");
+            const err = $("#editLoginError");
+
+            if (!overlay || !openBtn) return;
+
+            openBtn.addEventListener("click", () => {
+                overlay.style.display = "flex";
+                err.textContent = "";
+                emailEl.value = "";
+                passEl.value = "";
+            });
+
+            btn.addEventListener("click", async () => {
+                const email = emailEl.value.trim();
+                const pass = passEl.value.trim();
+                if (!email || !pass) {
+                    err.textContent = "メールアドレスとパスワードを入力してください。";
+                    return;
+                }
+                err.textContent = "";
+                btn.disabled = true;
+                btn.textContent = "ログイン中...";
+
+                try {
+                    const cred = await signInWithEmailAndPassword(auth, email, pass);
+                    const user = cred.user;
+                    if (user.email !== ADMIN_EMAIL) throw new Error("unauthorized");
+                    window.location.href = "edit.html";
+                } catch (e) {
+                    console.error(e);
+                    err.textContent = "ログイン失敗（権限なし）";
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "ログイン";
+                }
+            });
+
+            overlay.addEventListener("click", e => {
+                if (e.target.id === "editLoginOverlay") {
+                    overlay.style.display = "none";
+                }
+            });
+        }
+
+        /* ============================
+           TOP 入口ログイン
+        ============================ */
+        function setupUserLoginGate() {
+            const overlay = $("#userLoginOverlay");
+            const emailEl = $("#userEmail");
+            const passEl = $("#userPassword");
+            const loginBtn = $("#userLoginBtn");
+            const signupBtn = $("#userSignupBtn");
+            const errEl = $("#userLoginError");
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    if (overlay) overlay.style.display = "none";
+                    await loadCreators();
+                    const nick = $("#nicknameInput");
+                    const storedNick = localStorage.getItem("pcl_nickname");
+                    if (nick && storedNick) nick.value = storedNick;
+                } else {
+                    if (overlay) overlay.style.display = "flex";
+                }
+            });
+
+            loginBtn.addEventListener("click", async () => {
+                const email = emailEl.value.trim();
+                const pass = passEl.value.trim();
+                if (!email || !pass) {
+                    errEl.textContent = "メールアドレスとパスワードを入力してください。";
+                    return;
+                }
+                errEl.textContent = "";
+                loginBtn.disabled = true;
+                signupBtn.disabled = true;
+                try {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } catch (e) {
+                    console.error(e);
+                    errEl.textContent = "ログインに失敗しました。";
+                } finally {
+                    loginBtn.disabled = false;
+                    signupBtn.disabled = false;
+                }
+            });
+
+            signupBtn.addEventListener("click", async () => {
+                const email = emailEl.value.trim();
+                const pass = passEl.value.trim();
+                if (!email || !pass) {
+                    errEl.textContent = "メールアドレスとパスワードを入力してください。";
+                    return;
+                }
+                if (pass.length < 6) {
+                    errEl.textContent = "パスワードは6文字以上にしてください。";
+                    return;
+                }
+                errEl.textContent = "";
+                loginBtn.disabled = true;
+                signupBtn.disabled = true;
+                try {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                } catch (e) {
+                    console.error(e);
+                    if (e.code === "auth/email-already-in-use") {
+                        errEl.textContent = "このメールアドレスは既に登録されています。";
+                    } else {
+                        errEl.textContent = "ユーザー登録に失敗しました。";
+                    }
+                } finally {
+                    loginBtn.disabled = false;
+                    signupBtn.disabled = false;
+                }
+            });
+        }
+
+        /* ============================
+           検索＆カテゴリフィルタ
+        ============================ */
+        function setupSearchAndCategory() {
+            const searchInput = $("#searchInput");
+            const categorySelect = $("#categorySelect");
+
+            if (searchInput) {
+                searchInput.addEventListener("input", e => {
+                    currentSearch = e.target.value || "";
+                    renderGrid();
+                });
+            }
+            if (categorySelect) {
+                categorySelect.addEventListener("change", e => {
+                    currentCategory = e.target.value || "";
+                    renderGrid();
+                });
+            }
+        }
+
+        /* ============================
+           ハンバーガーメニュー制御
+        ============================ */
+        function setupMenu() {
+            const menuButton = $("#menuButton");
+            const menuOverlay = $("#menuOverlay");
+            const linkMarket = $("#linkMarket");
+            const linkAI = $("#linkAI");
+            const linkGuild = $("#linkGuild");
+
+            if (!menuButton || !menuOverlay) return;
+
+            function toggle() {
+                menuButton.classList.toggle("active");
+                menuOverlay.classList.toggle("show");
+            }
+
+            menuButton.addEventListener("click", toggle);
+
+            menuOverlay.addEventListener("click", (e) => {
+                if (e.target.id === "menuOverlay") toggle();
+            });
+
+            if (linkMarket) {
+                linkMarket.addEventListener("click", e => {
+                    e.preventDefault();
+                    toggle();
+                    alert("Creator’s Market（ECモール）の仮画面へ遷移するイメージです。");
+                });
+            }
+            if (linkAI) {
+                linkAI.addEventListener("click", e => {
+                    e.preventDefault();
+                    toggle();
+                    alert("Creator’s AI Consulting（AIバーチャルクローン相談）の仮画面イメージです。");
+                });
+            }
+            if (linkGuild) {
+                linkGuild.addEventListener("click", e => {
+                    e.preventDefault();
+                    toggle();
+                    alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面イメージです。");
+                });
+            }
+        }
+
+        /* ============================
+           初期化
+        ============================ */
+        (function init() {
+            setupUserLoginGate();
+            setupEditLogin();
+            setupSearchAndCategory();
+            setupMenu();
+
+            const sortSel = $("#sortSelect");
+            if (sortSel) {
+                sortSel.addEventListener("change", e => {
+                    currentSort = e.target.value || "newest";
+                    renderGrid();
+                });
+            }
+
+            const detailClose = $("#detailClose");
+            if (detailClose) {
+                detailClose.addEventListener("click", closeDetail);
+            }
+            const detailOverlay = $("#detailOverlay");
+            if (detailOverlay) {
+                detailOverlay.addEventListener("click", e => {
+                    if (e.target.id === "detailOverlay") closeDetail();
+                });
+            }
+            window.addEventListener("keydown", e => {
+                if (e.key === "Escape") closeDetail();
+            });
+        })();
     </script>
 </body>
 
