@@ -8,93 +8,105 @@
 
     <style>
         :root {
-            --bg: #05060a;
+            --bg: #0b0c10;
             --card: #11131aee;
             --border: #ffffff22;
             --text: #eaeef6;
             --muted: #9aa3b2;
             --accent: #ffb457;
+            --accent2: #ff8c37;
+            --radius: 18px;
         }
 
         * {
             box-sizing: border-box;
         }
 
-        html,
-        body {
-            height: 100%;
-        }
-
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, "Noto Sans JP", sans-serif;
             background: #020617;
             color: var(--text);
         }
 
+        header {
+            padding: 18px 16px 8px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        header p {
+            margin: 4px 0 0;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
         .container {
             max-width: 960px;
-            margin: 0 auto;
-            padding: 24px 16px 60px;
+            margin: 10px auto 40px;
+            padding: 0 12px 24px;
         }
 
-        /* ヘッダー行（タイトル＋TOPボタン） */
-        .top-bar {
+        .card-wrap {
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .55);
+            padding: 18px 20px 20px;
+            margin-bottom: 18px;
+        }
+
+        .top-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        h1 {
-            font-size: 22px;
-            font-weight: 800;
+        .top-row h2 {
+            margin: 0;
+            font-size: 14px;
             letter-spacing: .08em;
             text-transform: uppercase;
-            margin: 0 0 4px;
         }
 
-        .sub {
-            font-size: 12px;
-            color: var(--muted);
-            margin-bottom: 4px;
-        }
-
-        .top-btn {
-            padding: 8px 12px;
+        .btn {
+            border: none;
             border-radius: 999px;
-            border: 1px solid rgba(255, 180, 87, 0.6);
-            background: radial-gradient(circle at 0% 0%, rgba(255, 180, 87, 0.2), transparent 60%);
-            color: #facc15;
+            padding: 7px 14px;
             font-size: 11px;
             letter-spacing: .08em;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
         }
 
-        .top-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 0 10px rgba(255, 180, 87, .7), 0 0 20px rgba(248, 113, 113, .5);
+        .btn-main {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #111827;
+            font-weight: 600;
         }
 
-        .box {
-            background: var(--card);
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            box-shadow: 0 12px 36px rgba(0, 0, 0, .45);
-            padding: 18px 18px 20px;
-            margin-bottom: 24px;
+        .btn-ghost {
+            background: #020617;
+            border: 1px solid #374151;
+            color: #e5e7eb;
         }
 
         label {
             display: block;
             margin-top: 10px;
             font-size: 11px;
-            letter-spacing: .08em;
+            letter-spacing: .06em;
             text-transform: uppercase;
-            color: #9ca3af;
+            color: var(--muted);
         }
 
         input,
@@ -102,7 +114,7 @@
         select {
             width: 100%;
             margin-top: 4px;
-            padding: 9px 10px;
+            padding: 8px 10px;
             border-radius: 10px;
             border: 1px solid #1f2937;
             background: #020617;
@@ -111,191 +123,161 @@
             outline: none;
         }
 
-        textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
         input:focus,
         textarea:focus,
         select:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(255, 180, 87, .25);
+            box-shadow: 0 0 0 1px rgba(255, 180, 87, .6);
         }
 
-        .row {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .row-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
-        @media (max-width:720px) {
-            .row {
+        @media (max-width: 720px) {
+            .row-2 {
                 grid-template-columns: 1fr;
             }
         }
 
-        .btn-row {
-            margin-top: 14px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+        .small {
+            margin-top: 4px;
+            font-size: 11px;
+            color: var(--muted);
         }
 
-        button {
-            padding: 9px 16px;
-            border-radius: 999px;
-            border: none;
-            font-size: 12px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-
-        #saveBtn {
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-weight: 600;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, .45);
-        }
-
-        #clearBtn {
-            background: #111827;
-            color: #e5e7eb;
-            border: 1px solid #374151;
-        }
-
-        #cancelEditBtn {
-            background: #111827;
-            color: #f87171;
-            border: 1px solid #b91c1c;
-        }
-
-        .list-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 10px;
+        .list-box {
+            margin-top: 8px;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            background: #020617;
+            max-height: 260px;
+            overflow-y: auto;
         }
 
         .creator-item {
-            background: #020617;
+            padding: 8px 10px;
+            font-size: 13px;
+            border-bottom: 1px solid #111827;
+            cursor: pointer;
+        }
+
+        .creator-item:last-child {
+            border-bottom: none;
+        }
+
+        .creator-item:hover {
+            background: #111827;
+        }
+
+        .creator-item.active {
+            background: #1f2937;
+            border-left: 3px solid var(--accent);
+            padding-left: 7px;
+        }
+
+        .works-box {
+            margin-top: 10px;
+            padding: 10px;
             border-radius: 12px;
             border: 1px solid #1f2937;
-            padding: 10px 12px;
+            background: #020617;
+        }
+
+        .works-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
             gap: 8px;
+            margin-bottom: 6px;
         }
 
-        .creator-main {
-            min-width: 0;
-        }
-
-        .creator-name {
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .creator-company {
+        .works-header span {
             font-size: 11px;
-            color: #9ca3af;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: var(--muted);
         }
 
-        .cat-label {
-            display: inline-block;
-            margin-top: 4px;
-            padding: 2px 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(250, 204, 21, .5);
-            background: rgba(250, 204, 21, .1);
-            font-size: 10px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: #facc15;
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .work-item {
+            border-radius: 10px;
+            border: 1px solid #1f2937;
+            background: #030712;
+            padding: 8px 10px;
+            margin-top: 8px;
         }
 
-        .creator-actions {
+        .work-inline {
             display: flex;
+            gap: 8px;
             flex-wrap: wrap;
-            gap: 4px;
         }
 
-        .edit-btn {
-            background: #111827;
-            color: #e5e7eb;
-            border: 1px solid #4b5563;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 11px;
+        .work-inline>div {
+            flex: 1 1 40%;
         }
 
-        .delete-btn {
-            background: #b91c1c;
-            color: #fee2e2;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-        }
-
-        .small {
-            font-size: 11px;
-            color: #9ca3af;
+        .btn-danger {
             margin-top: 6px;
+            background: #7f1d1d;
+            color: #fee2e2;
+            border: none;
         }
     </style>
 </head>
 
 <body>
+
+    <header>
+        <h1>EDIT — CREATOR'S DATABASE</h1>
+        <p>PLAY. CREATE. LIVE. のクリエイター情報を編集する管理専用画面</p>
+    </header>
+
     <div class="container">
 
-        <!-- ヘッダー＋TOPボタン -->
-        <div class="top-bar">
-            <div>
-                <h1>CREATOR EDIT</h1>
-                <div class="sub">
-                    PLAY. CREATE. LIVE. のクリエイター情報を管理するページです（管理者専用）。
-                </div>
+        <div class="card-wrap">
+            <div class="top-row">
+                <h2>クリエイター一覧</h2>
+                <button class="btn btn-ghost" onclick="location.href='index.html'">← TOPへ戻る</button>
             </div>
-            <button id="backToTopBtn" class="top-btn">TOP画面へ</button>
+            <div id="creatorList" class="list-box">
+                読み込み中…
+            </div>
+            <div class="small">※ 編集したいクリエイター名をクリックしてください。新規作成は「クリア」してから保存。</div>
         </div>
 
-        <!-- 入力フォーム -->
-        <div class="box">
-            <h2 style="margin:0 0 8px;font-size:14px;">クリエイター情報</h2>
-            <div class="small">※ 編集モードでは上書き保存、新規モードでは新規追加になります。</div>
+        <div class="card-wrap">
+            <div class="top-row">
+                <h2>基本情報</h2>
+                <div style="display:flex;gap:6px;">
+                    <button id="clearBtn" class="btn btn-ghost" type="button">入力クリア</button>
+                    <button id="saveBtn" class="btn btn-main" type="button">保存 / 更新</button>
+                </div>
+            </div>
 
-            <label for="nameInput">氏名（Creator Name）</label>
+            <label for="nameInput">名前</label>
             <input id="nameInput" type="text" placeholder="例： Daijiro Majima" />
 
-            <label for="companyInput">会社名（Company）</label>
-            <input id="companyInput" type="text" placeholder="例： TOPPAN Inc." />
+            <label for="companyInput">会社・肩書</label>
+            <input id="companyInput" type="text" placeholder="例： TOPPAN / CX Producer" />
 
             <label for="urlInput">URL（Web / SNS）</label>
-            <input id="urlInput" type="text" placeholder="https://..." />
+            <input id="urlInput" type="text" placeholder="https://〜" />
 
-            <div class="row">
+            <div class="row-2">
                 <div>
-                    <label for="videoTitleInput">動画タイトル（任意）</label>
-                    <input id="videoTitleInput" type="text" placeholder="例： Space-CX Showreel" />
+                    <label for="videoTitleInput">動画タイトル</label>
+                    <input id="videoTitleInput" type="text" placeholder="例： Credo Movie" />
                 </div>
                 <div>
-                    <label for="categoryInput">カテゴリ</label>
+                    <label for="categoryInput">メインカテゴリ</label>
                     <select id="categoryInput">
                         <option value="">未選択</option>
-
-                        <!-- 基本カテゴリ -->
                         <option value="CXプロデューサー">CXプロデューサー</option>
                         <option value="建築デザイナー">建築デザイナー</option>
                         <option value="インテリアデザイナー">インテリアデザイナー</option>
@@ -306,308 +288,328 @@
                         <option value="エンジニア">エンジニア</option>
                         <option value="ミュージシャン">ミュージシャン</option>
                         <option value="アーティスト">アーティスト</option>
-                        <option value="クリエイティブビルダー">クリエイティブビルダー</option>
-
-                        <!-- コック系 -->
-                        <option value="コック">コック</option>
-                        <option value="シェフ">シェフ</option>
-                        <option value="料理人">料理人</option>
-
-                        <!-- 追加カテゴリ -->
                         <option value="ヘアメイクアーティスト">ヘアメイクアーティスト</option>
                         <option value="展示デザイナー">展示デザイナー</option>
                         <option value="アスリート">アスリート</option>
                         <option value="エンターテイナー">エンターテイナー</option>
+                        <option value="クリエイティブビルダー">クリエイティブビルダー</option>
                         <option value="その他">その他</option>
                     </select>
                 </div>
             </div>
 
-            <label for="summaryInput">概要 / コメント</label>
-            <textarea id="summaryInput" placeholder="このクリエイターについての説明"></textarea>
+            <label for="summaryInput">ABOUT（解説文）</label>
+            <textarea id="summaryInput" placeholder="このクリエイターの世界観や活動内容などを記述"></textarea>
 
-            <div class="row">
+            <div class="row-2">
                 <div>
-                    <label for="profileImageInput">プロフィール画像（任意）</label>
+                    <label for="profileImageInput">プロフィール画像</label>
                     <input id="profileImageInput" type="file" accept="image/*" />
                     <div id="profileStatus" class="small">未登録</div>
                 </div>
                 <div>
-                    <label for="videoInput">動画ファイル（任意 / MP4推奨）</label>
+                    <label for="videoInput">メイン動画（mp4等）</label>
                     <input id="videoInput" type="file" accept="video/*" />
                     <div id="videoStatus" class="small">未登録</div>
                 </div>
             </div>
 
-            <div class="btn-row">
-                <button id="saveBtn">保存 / 追加</button>
-                <button id="clearBtn" type="button">入力クリア</button>
-                <button id="cancelEditBtn" type="button" style="display:none;">編集キャンセル</button>
+            <h2 style="margin-top:22px;">WORKS（作品）</h2>
+            <div class="works-box">
+                <div class="works-header">
+                    <span>代表作を1点登録（画像または動画）</span>
+                </div>
+
+                <label for="workTitleInput">作品タイトル</label>
+                <input id="workTitleInput" type="text" placeholder="例： Lighting Installation 2024" />
+
+                <label for="workTypeInput">作品種別</label>
+                <select id="workTypeInput">
+                    <option value="">未選択</option>
+                    <option value="image">IMAGE（画像）</option>
+                    <option value="video">VIDEO（動画）</option>
+                </select>
+
+                <label for="workFileInput">作品ファイル</label>
+                <input id="workFileInput" type="file" accept="image/*,video/*" />
+                <div id="workStatus" class="small">未登録</div>
             </div>
+
         </div>
 
-        <!-- 一覧エリア -->
-        <div class="box">
-            <div class="list-title">登録済みクリエイター一覧</div>
-            <div id="creatorList"></div>
-            <div class="small">※ 編集ボタンでフォームに読み込み、保存すると上書きされます。</div>
-        </div>
+    </div>
 
-        <!-- ▼▼▼ Firebase & 編集ロジック ▼▼▼ -->
-        <script type="module">
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-            import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-            import {
-                getFirestore,
-                collection,
-                addDoc,
-                getDocs,
-                getDoc,
-                doc,
-                deleteDoc,
-                setDoc,
-                serverTimestamp
-            } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-            import {
-                getStorage,
-                ref,
-                uploadBytes,
-                getDownloadURL
-            } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            doc,
+            updateDoc,
+            addDoc,
+            serverTimestamp,
+            setDoc
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytes,
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-            const firebaseConfig = {
-                apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
-                authDomain: "play-create-live.firebaseapp.com",
-                databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
-                projectId: "play-create-live",
-                storageBucket: "play-create-live.firebasestorage.app",
-                messagingSenderId: "143889321354",
-                appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
-                measurementId: "G-ZFHF93QQCJ"
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
+            authDomain: "play-create-live.firebaseapp.com",
+            databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
+            projectId: "play-create-live",
+            storageBucket: "play-create-live.firebasestorage.app",
+            messagingSenderId: "143889321354",
+            appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
+            measurementId: "G-ZFHF93QQCJ"
+        };
+
+        const ADMIN_EMAIL = "mjmdjr@gmail.com";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        const creatorList = document.getElementById("creatorList");
+        const nameInput = document.getElementById("nameInput");
+        const companyInput = document.getElementById("companyInput");
+        const urlInput = document.getElementById("urlInput");
+        const videoTitleInput = document.getElementById("videoTitleInput");
+        const summaryInput = document.getElementById("summaryInput");
+        const categoryInput = document.getElementById("categoryInput");
+        const profileImageInput = document.getElementById("profileImageInput");
+        const videoInput = document.getElementById("videoInput");
+        const profileStatus = document.getElementById("profileStatus");
+        const videoStatus = document.getElementById("videoStatus");
+
+        const workTitleInput = document.getElementById("workTitleInput");
+        const workTypeInput = document.getElementById("workTypeInput");
+        const workFileInput = document.getElementById("workFileInput");
+        const workStatus = document.getElementById("workStatus");
+
+        const saveBtn = document.getElementById("saveBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        let creators = [];
+        let editingId = null;
+        let editingData = null;
+
+        function clearForm() {
+            editingId = null;
+            editingData = null;
+
+            nameInput.value = "";
+            companyInput.value = "";
+            urlInput.value = "";
+            videoTitleInput.value = "";
+            summaryInput.value = "";
+            categoryInput.value = "";
+
+            profileImageInput.value = "";
+            videoInput.value = "";
+            if (profileStatus) profileStatus.textContent = "未登録";
+            if (videoStatus) videoStatus.textContent = "未登録";
+
+            workTitleInput.value = "";
+            workTypeInput.value = "";
+            workFileInput.value = "";
+            if (workStatus) workStatus.textContent = "未登録";
+        }
+
+        clearBtn.addEventListener("click", clearForm);
+
+        async function uploadFileIfNeeded(fileInput, pathPrefix) {
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
+            const file = fileInput.files[0];
+            const storageRef = ref(storage, `${pathPrefix}/${Date.now()}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            return await getDownloadURL(storageRef);
+        }
+
+        async function loadCreators() {
+            creatorList.innerHTML = "読み込み中…";
+            creators = [];
+
+            const snap = await getDocs(collection(db, "creators"));
+            creatorList.innerHTML = "";
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                const item = {
+                    id: docSnap.id,
+                    ...d
+                };
+                creators.push(item);
+
+                const div = document.createElement("div");
+                div.className = "creator-item";
+                div.textContent = d.name || "(無名)";
+                div.onclick = () => loadOneCreatorToForm(item.id);
+                creatorList.appendChild(div);
+            });
+
+            if (!creators.length) {
+                creatorList.innerHTML = "<div class='creator-item'>(まだ登録がありません)</div>";
+            }
+        }
+
+        function markActive(id) {
+            [...creatorList.children].forEach(ch => {
+                ch.classList.remove("active");
+                if (ch.textContent === (creators.find(c => c.id === id)?.name || "")) {
+                    ch.classList.add("active");
+                }
+            });
+        }
+
+        async function loadOneCreatorToForm(id) {
+            const c = creators.find(x => x.id === id);
+            if (!c) return;
+            editingId = id;
+            editingData = c;
+
+            markActive(id);
+
+            nameInput.value = c.name || "";
+            companyInput.value = c.company || "";
+            urlInput.value = c.url || "";
+            videoTitleInput.value = c.videoTitle || "";
+            summaryInput.value = c.summary || "";
+            categoryInput.value = (Array.isArray(c.categories) && c.categories[0]) || "";
+
+            profileImageInput.value = "";
+            videoInput.value = "";
+
+            if (profileStatus) {
+                profileStatus.textContent = c.profileImageUrl
+                    ? "既存画像あり（変更する場合はファイルを選択）"
+                    : "未登録";
+            }
+            if (videoStatus) {
+                videoStatus.textContent = c.videoUrl
+                    ? "既存動画あり（変更する場合はファイルを選択）"
+                    : "未登録";
+            }
+
+            const works = Array.isArray(c.works) ? c.works : [];
+            const w0 = works[0] || {};
+            workTitleInput.value = w0.title || "";
+            workTypeInput.value = w0.type || "";
+            workFileInput.value = "";
+
+            if (workStatus) {
+                workStatus.textContent = w0.url
+                    ? "既存作品あり（変更する場合はファイルを選択）"
+                    : "未登録";
+            }
+        }
+
+        saveBtn.addEventListener("click", async () => {
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert("名前は必須です。");
+                return;
+            }
+
+            const basePayload = {
+                name,
+                company: companyInput.value.trim(),
+                url: urlInput.value.trim(),
+                videoTitle: videoTitleInput.value.trim(),
+                summary: summaryInput.value.trim(),
+                categories: categoryInput.value ? [categoryInput.value] : []
             };
 
-            const ADMIN_EMAIL = "mjmdjr@gmail.com"; // 管理者メール
+            const original = editingData || {};
 
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-            const storage = getStorage(app);
+            let profileUrl = original.profileImageUrl || "";
+            let videoUrl = original.videoUrl || "";
 
-            const nameInput = document.getElementById("nameInput");
-            const companyInput = document.getElementById("companyInput");
-            const urlInput = document.getElementById("urlInput");
-            const videoTitleInput = document.getElementById("videoTitleInput");
-            const summaryInput = document.getElementById("summaryInput");
-            const categoryInput = document.getElementById("categoryInput");
-            const profileImageInput = document.getElementById("profileImageInput");
-            const videoInput = document.getElementById("videoInput");
-            const profileStatus = document.getElementById("profileStatus");
-            const videoStatus = document.getElementById("videoStatus");
+            const newProfileUrl = await uploadFileIfNeeded(profileImageInput, "profiles");
+            if (newProfileUrl) profileUrl = newProfileUrl;
 
-            const saveBtn = document.getElementById("saveBtn");
-            const clearBtn = document.getElementById("clearBtn");
-            const cancelEditBtn = document.getElementById("cancelEditBtn");
-            const backToTopBtn = document.getElementById("backToTopBtn");
-            const creatorList = document.getElementById("creatorList");
+            const newVideoUrl = await uploadFileIfNeeded(videoInput, "videos");
+            if (newVideoUrl) videoUrl = newVideoUrl;
 
-            let editingId = null;   // 編集中のドキュメントID
-            let editingData = null;   // 編集前のデータ
+            let works = Array.isArray(original.works) ? original.works.slice() : [];
+            const title = workTitleInput.value.trim();
+            const type = workTypeInput.value;
+            let workUrl = works[0] && works[0].url ? works[0].url : "";
 
-            // 🔐 管理者チェック
-            onAuthStateChanged(auth, user => {
-                if (!user || user.email !== ADMIN_EMAIL) {
-                    alert("このページは管理者専用です。TOP画面に戻ります。");
-                    window.location.href = "index.html";
+            const newWorkUrl = await uploadFileIfNeeded(workFileInput, "works");
+            if (newWorkUrl) {
+                workUrl = newWorkUrl;
+                if (workStatus) workStatus.textContent = "新しい作品ファイルを登録しました。";
+            } else {
+                if (workStatus) {
+                    workStatus.textContent = workUrl
+                        ? "既存作品あり（変更する場合はファイルを選択）"
+                        : "未登録";
+                }
+            }
+
+            if (title || type || workUrl) {
+                works[0] = {
+                    title: title || (works[0] && works[0].title) || "",
+                    type: type || (works[0] && works[0].type) || "image",
+                    url: workUrl
+                };
+            } else {
+                works = [];
+            }
+
+            const payload = {
+                ...basePayload,
+                profileImageUrl: profileUrl || "",
+                videoUrl: videoUrl || "",
+                works
+            };
+
+            try {
+                if (editingId) {
+                    await setDoc(doc(db, "creators", editingId), payload, { merge: true });
+                    alert("クリエイター情報を更新しました。");
                 } else {
-                    loadCreators();
-                }
-            });
-
-            // TOP画面へ
-            if (backToTopBtn) {
-                backToTopBtn.addEventListener("click", () => {
-                    window.location.href = "index.html";
-                });
-            }
-
-            // 任意ファイルアップロード
-            async function uploadFileIfNeeded(fileInput, pathPrefix) {
-                if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
-                const file = fileInput.files[0];
-                const storageRef = ref(storage, `${pathPrefix}/${Date.now()}_${file.name}`);
-                await uploadBytes(storageRef, file);
-                return await getDownloadURL(storageRef);
-            }
-
-            // 入力フォームを空に
-            function clearForm() {
-                nameInput.value = "";
-                companyInput.value = "";
-                urlInput.value = "";
-                videoTitleInput.value = "";
-                summaryInput.value = "";
-                categoryInput.value = "";
-                if (profileImageInput) profileImageInput.value = "";
-                if (videoInput) videoInput.value = "";
-
-                editingId = null;
-                editingData = null;
-                cancelEditBtn.style.display = "none";
-                saveBtn.textContent = "保存 / 追加";
-
-                if (profileStatus) profileStatus.textContent = "未登録";
-                if (videoStatus) videoStatus.textContent = "未登録";
-            }
-
-            clearBtn.addEventListener("click", clearForm);
-            cancelEditBtn.addEventListener("click", clearForm);
-
-            // クリエイター一覧読み込み
-            async function loadCreators() {
-                creatorList.innerHTML = "";
-                const snap = await getDocs(collection(db, "creators"));
-                if (snap.empty) {
-                    creatorList.innerHTML = "<div class='small'>まだ登録がありません。</div>";
-                    return;
-                }
-
-                snap.forEach(docSnap => {
-                    const d = docSnap.data();
-                    const div = document.createElement("div");
-                    div.className = "creator-item";
-
-                    const name = d.name || "";
-                    const company = d.company || "";
-                    const cat = (d.categories && d.categories[0]) || "";
-
-                    div.innerHTML = `
-          <div class="creator-main">
-            <div class="creator-name">${name}</div>
-            <div class="creator-company">${company}</div>
-            ${cat ? `<span class="cat-label">${cat}</span>` : ""}
-          </div>
-          <div class="creator-actions">
-            <button class="edit-btn" data-edit-id="${docSnap.id}">編集</button>
-            <button class="delete-btn" data-id="${docSnap.id}">削除</button>
-          </div>
-        `;
-
-                    creatorList.appendChild(div);
-                });
-
-                // 編集ボタン
-                document.querySelectorAll(".edit-btn").forEach(btn => {
-                    btn.addEventListener("click", () => {
-                        const id = btn.getAttribute("data-edit-id");
-                        loadOneCreatorToForm(id);
+                    await addDoc(collection(db, "creators"), {
+                        ...payload,
+                        createdAt: serverTimestamp(),
+                        likes: 0
                     });
-                });
+                    alert("クリエイターを追加しました。");
+                }
 
-                // 削除ボタン
-                document.querySelectorAll(".delete-btn").forEach(btn => {
-                    btn.addEventListener("click", async () => {
-                        const id = btn.getAttribute("data-id");
-                        if (!confirm("このクリエイターを削除しますか？")) return;
-                        await deleteDoc(doc(db, "creators", id));
-                        loadCreators();
-                    });
-                });
+                clearForm();
+                await loadCreators();
+            } catch (e) {
+                console.error(e);
+                alert("保存中にエラーが発生しました。");
             }
+        });
 
-            // 単一クリエイターをフォームに読み込み
-            async function loadOneCreatorToForm(id) {
-                const ref = doc(db, "creators", id);
-                const snap = await getDoc(ref);
-                if (!snap.exists()) {
-                    alert("該当のデータが見つかりません。");
-                    return;
-                }
-                const d = snap.data();
-                editingId = id;
-                editingData = d;
-
-                nameInput.value = d.name || "";
-                companyInput.value = d.company || "";
-                urlInput.value = d.url || "";
-                videoTitleInput.value = d.videoTitle || "";
-                summaryInput.value = d.summary || "";
-                categoryInput.value = (d.categories && d.categories[0]) || "";
-
-                if (profileImageInput) profileImageInput.value = "";
-                if (videoInput) videoInput.value = "";
-
-                if (profileStatus) {
-                    profileStatus.textContent = d.profileImageUrl
-                        ? "既存画像あり（変更する場合はファイルを選択）"
-                        : "未登録";
-                }
-                if (videoStatus) {
-                    videoStatus.textContent = d.videoUrl
-                        ? "既存動画あり（変更する場合はファイルを選択）"
-                        : "未登録";
-                }
-
-                saveBtn.textContent = "更新する";
-                cancelEditBtn.style.display = "inline-flex";
+        // 管理者チェック（簡易版）
+        onAuthStateChanged(auth, user => {
+            if (!user || user.email !== ADMIN_EMAIL) {
+                console.warn("管理者以外がアクセスしました");
+                // 強制リダイレクトしたければ以下を有効化
+                // location.href = "index.html";
+            } else {
+                loadCreators();
             }
+        });
 
-            // 保存 / 追加 ボタン
-            saveBtn.addEventListener("click", async () => {
-                const name = nameInput.value.trim();
-                if (!name) {
-                    alert("氏名は必須です。");
-                    return;
-                }
+        // auth イベントが来ない場合も一応ロード
+        loadCreators();
 
-                const basePayload = {
-                    name,
-                    company: companyInput.value.trim(),
-                    url: urlInput.value.trim(),
-                    videoTitle: videoTitleInput.value.trim(),
-                    summary: summaryInput.value.trim(),
-                    categories: categoryInput.value ? [categoryInput.value] : [],
-                };
-
-                // 既存URLを保持
-                let profileUrl = editingData && editingData.profileImageUrl ? editingData.profileImageUrl : "";
-                let videoUrl = editingData && editingData.videoUrl ? editingData.videoUrl : "";
-
-                // 新しいファイルがあれば差し替え
-                const newProfileUrl = await uploadFileIfNeeded(profileImageInput, "profiles");
-                if (newProfileUrl) profileUrl = newProfileUrl;
-
-                const newVideoUrl = await uploadFileIfNeeded(videoInput, "videos");
-                if (newVideoUrl) videoUrl = newVideoUrl;
-
-                const payload = {
-                    ...basePayload,
-                    profileImageUrl: profileUrl || "",
-                    videoUrl: videoUrl || "",
-                };
-
-                try {
-                    if (editingId) {
-                        // 既存更新
-                        await setDoc(doc(db, "creators", editingId), payload, { merge: true });
-                        alert("クリエイター情報を更新しました。");
-                    } else {
-                        // 新規追加
-                        await addDoc(collection(db, "creators"), {
-                            ...payload,
-                            createdAt: serverTimestamp(),
-                            likes: 0,
-                        });
-                        alert("クリエイターを追加しました。");
-                    }
-
-                    clearForm();
-                    loadCreators();
-                } catch (e) {
-                    console.error(e);
-                    alert("保存中にエラーが発生しました。");
-                }
-            });
-        </script>
+    </script>
 
 </body>
 
