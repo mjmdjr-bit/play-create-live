@@ -1029,8 +1029,19 @@
         })();
 
         async function loadCreators() {
-            const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
-            const snap = await getDocs(q);
+            let snap;
+
+            try {
+                // createdAt 付きの新しいデータ用（理想形）
+                const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
+                snap = await getDocs(q);
+            } catch (e) {
+                console.warn("orderBy(createdAt) で取得できなかったので、通常の取得にフォールバックします:", e);
+
+                // 古いデータに createdAt が無い場合はこちらで再チャレンジ
+                snap = await getDocs(collection(db, "creators"));
+            }
+
             const list = [];
             snap.forEach(docSnap => {
                 const d = docSnap.data();
@@ -1049,6 +1060,7 @@
                     works: Array.isArray(d.works) ? d.works : []
                 });
             });
+
             creators = list;
             rebuildCategoryOptions();
             renderGrid();
