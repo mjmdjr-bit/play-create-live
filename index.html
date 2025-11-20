@@ -37,6 +37,7 @@
             overflow-x: hidden;
         }
 
+        /* 背景アニメ */
         #particles {
             position: fixed;
             inset: 0;
@@ -57,7 +58,7 @@
             mix-blend-mode: overlay;
         }
 
-        /* ハンバーガーメニュー（見た目だけ） */
+        /* ハンバーガーメニュー */
         .menu-button {
             position: fixed;
             top: 16px;
@@ -76,8 +77,81 @@
             border-radius: 999px;
             background: #e5e7eb;
             box-shadow: 0 0 8px rgba(0, 0, 0, .6);
+            transition: transform .25s ease, opacity .25s ease;
         }
 
+        .menu-button.active .bar:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+
+        .menu-button.active .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-button.active .bar:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .88);
+            backdrop-filter: blur(18px);
+            z-index: 900;
+        }
+
+        .menu-overlay.show {
+            display: flex;
+        }
+
+        .menu-panel {
+            width: min(360px, 90vw);
+            border-radius: 24px;
+            background: rgba(15, 23, 42, .96);
+            border: 1px solid #ffffff22;
+            padding: 20px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
+        }
+
+        .menu-panel h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-list li a {
+            display: block;
+            padding: 12px 14px;
+            background: rgba(255, 200, 50, .08);
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            color: #e5e7eb;
+            text-decoration: none;
+            font-size: 13px;
+            transition: .2s ease;
+        }
+
+        .menu-list li a:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 200, 50, .18);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
+        }
+
+        /* HEADER */
         header {
             padding: 40px 24px 10px;
             text-align: center;
@@ -138,6 +212,7 @@
             }
         }
 
+        /* MAIN layout */
         .container {
             max-width: 1120px;
             margin: 0 auto;
@@ -168,6 +243,11 @@
             min-width: 120px;
         }
 
+        .toolbar-label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -193,6 +273,7 @@
             }
         }
 
+        /* CARD */
         .card {
             position: relative;
             border-radius: 18px;
@@ -313,6 +394,107 @@
             font-size: 11px;
         }
 
+        /* DETAIL モーダル */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .78);
+            backdrop-filter: blur(18px);
+            padding: 16px;
+            z-index: 800;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            width: min(720px, 96vw);
+            background: #111622f2;
+            border-radius: 24px;
+            border: 1px solid #ffffff22;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px 10px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #222;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .close {
+            background: transparent;
+            border: 0;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 12px 18px 18px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 12px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        @media(max-width:720px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: #cbd5e1;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+
+        .meta-text {
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+
+        .detail-about {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #e5e7eb;
+            white-space: pre-wrap;
+        }
+
+        .modal video {
+            width: 100%;
+            border-radius: 14px;
+            background: black;
+            max-height: 40vh;
+            object-fit: contain;
+        }
+
         .edit-bottom-wrap {
             text-align: center;
             margin-top: 30px;
@@ -350,6 +532,44 @@
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
+    </div>
+    <!-- メニューオーバーレイ -->
+    <div id="menuOverlay" class="menu-overlay">
+        <div class="menu-panel">
+            <h2>CREATOR'S MENU</h2>
+            <ul class="menu-list">
+                <li><a href="#" id="linkMarket">Creator’s Market</a></li>
+                <li><a href="#" id="linkAI">Creator’s AI Consulting</a></li>
+                <li><a href="#" id="linkGuild">Creator’s Guild Produce</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- DETAIL モーダル -->
+    <div id="detailOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-head">
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <div class="avatar" id="detailAvatar"></div>
+                    <div>
+                        <div id="detailName" style="font-size:16px;font-weight:700;">Creator</div>
+                        <div id="detailCompany" style="font-size:12px;color:#9ca3af;">Company</div>
+                    </div>
+                </div>
+                <button class="close" id="detailClose">×</button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <video id="detailVideo" controls playsinline></video>
+                    <div class="meta-label">MAIN VIDEO TITLE</div>
+                    <div class="meta-text" id="detailVideoTitle">—</div>
+                </div>
+                <div>
+                    <div class="meta-label">ABOUT</div>
+                    <div class="detail-about" id="detailAbout">—</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- HEADER -->
@@ -420,7 +640,7 @@
         let currentSearch = "";
         let currentCategory = "";
 
-        /* 背景パーティクルだけ残す */
+        /* 背景パーティクルだけ */
         (function () {
             const canvas = document.getElementById("particles");
             const ctx = canvas.getContext("2d");
@@ -442,7 +662,7 @@
             resize();
             addEventListener("resize", resize);
             const parts = [];
-            for (let i = 0; i < 90; i++)parts.push({
+            for (let i = 0; i < 80; i++)parts.push({
                 x: Math.random() * W,
                 y: Math.random() * H,
                 r: Math.random() * 3 * dpr + 1,
@@ -468,7 +688,6 @@
         })();
 
         async function loadCreators() {
-            // とりあえず creators を全部読む（orderBy なし・createdAt も使わない）
             const snap = await getDocs(collection(db, "creators"));
             const list = [];
             snap.forEach(docSnap => {
@@ -511,7 +730,6 @@
             const arr = list.slice();
             if (currentSort === "name-asc") arr.sort((a, b) => a.name.localeCompare(b.name));
             else if (currentSort === "name-desc") arr.sort((a, b) => b.name.localeCompare(a.name));
-            // new/old は createdAt 未使用なのでそのまま（将来用）
             return arr;
         }
 
@@ -548,10 +766,10 @@
                     fb.className = "thumb-fallback";
                     tw.appendChild(fb);
                 }
-                const overlay = document.createElement("div");
-                overlay.className = "thumb-title";
-                overlay.textContent = c.videoTitle || c.name || "Untitled";
-                tw.appendChild(overlay);
+                const title = document.createElement("div");
+                title.className = "thumb-title";
+                title.textContent = c.videoTitle || c.name || "Untitled";
+                tw.appendChild(title);
 
                 const body = document.createElement("div");
                 body.className = "card-body";
@@ -567,6 +785,7 @@
                 const compEl = document.createElement("div");
                 compEl.className = "creator-company";
                 compEl.textContent = c.company || "";
+
                 const footer = document.createElement("div");
                 footer.className = "card-footer";
                 const likesLabel = document.createElement("span");
@@ -582,6 +801,7 @@
                         likesLabel.textContent = `${c.likes} ♥`;
                     } catch (err) { console.error(err); }
                 });
+
                 footer.appendChild(likesLabel);
                 footer.appendChild(likeBtn);
 
@@ -592,33 +812,88 @@
                 card.appendChild(tw);
                 card.appendChild(body);
 
-                // 詳細表示はとりあえず後回し
-                card.addEventListener("click", () => {
-                    alert(`${c.name} / ${c.company}`);
-                });
+                card.addEventListener("click", () => openDetail(c));
 
                 grid.appendChild(card);
             });
         }
 
+        function openDetail(c) {
+            const avatar = $("#detailAvatar");
+            avatar.innerHTML = c.profileImageUrl ? `<img src="${c.profileImageUrl}">` : "";
+            $("#detailName").textContent = c.name || "";
+            $("#detailCompany").textContent = c.company || "";
+            $("#detailVideoTitle").textContent = c.videoTitle || "";
+            $("#detailAbout").textContent = c.summary || "";
+
+            const v = $("#detailVideo");
+            v.src = c.videoUrl || "";
+            v.load();
+
+            $("#detailOverlay").classList.add("show");
+        }
+
+        function closeDetail() {
+            $("#detailOverlay").classList.remove("show");
+            const v = $("#detailVideo");
+            v.pause(); v.src = ""; v.load();
+        }
+
         function setupSearchAndSort() {
             const sIn = $("#searchInput");
             const cSel = $("#categorySelect");
-            const sortSel = $("#sortSelect");
+            const sort = $("#sortSelect");
             if (sIn) sIn.addEventListener("input", e => {
                 currentSearch = e.target.value || ""; renderGrid();
             });
             if (cSel) cSel.addEventListener("change", e => {
                 currentCategory = e.target.value || ""; renderGrid();
             });
-            if (sortSel) sortSel.addEventListener("change", e => {
+            if (sort) sort.addEventListener("change", e => {
                 currentSort = e.target.value || "newest"; renderGrid();
+            });
+        }
+
+        function setupModalClose() {
+            const closeBtn = $("#detailClose");
+            const overlay = $("#detailOverlay");
+            if (closeBtn) closeBtn.addEventListener("click", closeDetail);
+            if (overlay) overlay.addEventListener("click", e => {
+                if (e.target.id === "detailOverlay") closeDetail();
+            });
+            window.addEventListener("keydown", e => {
+                if (e.key === "Escape") closeDetail();
+            });
+        }
+
+        function setupMenu() {
+            const btn = $("#menuButton");
+            const ov = $("#menuOverlay");
+            if (!btn || !ov) return;
+            function toggle() {
+                btn.classList.toggle("active");
+                ov.classList.toggle("show");
+            }
+            btn.addEventListener("click", toggle);
+            ov.addEventListener("click", e => {
+                if (e.target.id === "menuOverlay") toggle();
+            });
+            $("#linkMarket")?.addEventListener("click", e => {
+                e.preventDefault(); toggle(); alert("Creator's Market 構想ページ（仮）");
+            });
+            $("#linkAI")?.addEventListener("click", e => {
+                e.preventDefault(); toggle(); alert("Creator's AI Consulting 構想ページ（仮）");
+            });
+            $("#linkGuild")?.addEventListener("click", e => {
+                e.preventDefault(); toggle(); alert("Creator's Guild Produce 構想ページ（仮）");
             });
         }
 
         (function init() {
             setupSearchAndSort();
-            loadCreators();  // ログイン無しで即読み込む
+            setupModalClose();
+            setupMenu();
+            loadCreators();
         })();
     </script>
 </body>
