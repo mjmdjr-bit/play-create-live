@@ -1045,20 +1045,7 @@
             const list = [];
             snap.forEach(docSnap => {
                 const d = docSnap.data();
-                list.push({
-                    id: docSnap.id,
-                    name: d.name || "",
-                    company: d.company || "",
-                    url: d.url || "",
-                    videoTitle: d.videoTitle || "",
-                    summary: d.summary || "",
-                    profileImageUrl: d.profileImageUrl || "",
-                    videoUrl: d.videoUrl || "",
-                    likes: typeof d.likes === "number" ? d.likes : 0,
-                    createdAt: d.createdAt ? d.createdAt.toMillis() : 0,
-                    categories: Array.isArray(d.categories) ? d.categories : [],
-                    works: Array.isArray(d.works) ? d.works : []
-                });
+
             });
 
             creators = list;
