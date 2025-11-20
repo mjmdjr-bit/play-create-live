@@ -15,7 +15,6 @@
             --muted: #9aa3b2;
             --accent: #ffb457;
             --accent2: #ff8c37;
-            --danger: #ff6b6b;
             --radius: 22px;
             --shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
             --glow: 0 0 22px #ffb457aa, 0 0 46px #ff8c37aa, 0 0 80px #ff6a00aa;
@@ -38,7 +37,6 @@
             overflow-x: hidden;
         }
 
-        /* 背景アニメ */
         #particles {
             position: fixed;
             inset: 0;
@@ -59,7 +57,7 @@
             mix-blend-mode: overlay;
         }
 
-        /* ハンバーガーメニュー */
+        /* ハンバーガーメニュー（見た目だけ） */
         .menu-button {
             position: fixed;
             top: 16px;
@@ -70,7 +68,7 @@
             flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
-            z-index: 2400;
+            z-index: 1000;
         }
 
         .menu-button .bar {
@@ -78,81 +76,8 @@
             border-radius: 999px;
             background: #e5e7eb;
             box-shadow: 0 0 8px rgba(0, 0, 0, .6);
-            transition: transform .25s ease, opacity .25s ease;
         }
 
-        .menu-button.active .bar:nth-child(1) {
-            transform: translateY(9px) rotate(45deg);
-        }
-
-        .menu-button.active .bar:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-button.active .bar:nth-child(3) {
-            transform: translateY(-9px) rotate(-45deg);
-        }
-
-        .menu-overlay {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, .88);
-            backdrop-filter: blur(18px);
-            z-index: 2350;
-        }
-
-        .menu-overlay.show {
-            display: flex;
-        }
-
-        .menu-panel {
-            width: min(360px, 90vw);
-            border-radius: 24px;
-            background: rgba(15, 23, 42, .96);
-            border: 1px solid #ffffff22;
-            padding: 20px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
-        }
-
-        .menu-panel h2 {
-            margin: 0 0 12px;
-            font-size: 16px;
-            letter-spacing: .16em;
-            text-transform: uppercase;
-            color: #e5e7eb;
-        }
-
-        .menu-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .menu-list li a {
-            display: block;
-            padding: 12px 14px;
-            background: rgba(255, 200, 50, .08);
-            border-radius: 12px;
-            border: 1px solid #1f2937;
-            color: #e5e7eb;
-            text-decoration: none;
-            font-size: 13px;
-            transition: .2s ease;
-        }
-
-        .menu-list li a:hover {
-            transform: translateY(-1px);
-            background: rgba(255, 200, 50, .18);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
-        }
-
-        /* HEADER */
         header {
             padding: 40px 24px 10px;
             text-align: center;
@@ -185,21 +110,6 @@
             box-shadow: var(--shadow);
             font-size: 15.5px;
             line-height: 1.85;
-            opacity: 0;
-            transform: translateY(14px);
-            animation: introCopy .9s ease-out .35s forwards;
-        }
-
-        @keyframes introCopy {
-            0% {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         @keyframes float {
@@ -228,7 +138,6 @@
             }
         }
 
-        /* MAIN layout */
         .container {
             max-width: 1120px;
             margin: 0 auto;
@@ -284,7 +193,6 @@
             }
         }
 
-        /* CARD */
         .card {
             position: relative;
             border-radius: 18px;
@@ -320,18 +228,15 @@
             transition: .2s;
         }
 
-        .card:hover .thumb {
-            opacity: 1;
-            transform: scale(1.06);
-        }
-
         .thumb-fallback {
             position: absolute;
             inset: 0;
-            background:
-                radial-gradient(circle at 0 0, #ffb45755, transparent 55%),
-                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
-                #101322;
+            background: #111827;
+        }
+
+        .card:hover .thumb {
+            opacity: 1;
+            transform: scale(1.06);
         }
 
         .thumb-title {
@@ -345,7 +250,7 @@
             font-size: 11px;
             letter-spacing: .12em;
             text-transform: uppercase;
-            text-shadow: 0 0 8px #ffb457, 0 0 16px #ec4899;
+            text-shadow: 0 0 8px #ffb457;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -374,17 +279,17 @@
         .creator-name {
             font-size: 14px;
             font-weight: 700;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .creator-company {
             font-size: 11px;
             color: #9ca3af;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .card-footer {
@@ -405,251 +310,9 @@
             border: 1px solid var(--border);
             background: rgba(0, 0, 0, .35);
             cursor: pointer;
-        }
-
-        /* DETAIL モーダル */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, .78);
-            backdrop-filter: blur(18px);
-            padding: 16px;
-            z-index: 2000;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal {
-            width: min(1100px, 96vw);
-            background: #111622f2;
-            border-radius: 24px;
-            border: 1px solid #ffffff22;
-            box-shadow: 0 28px 80px rgba(0, 0, 0, .88);
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh;
-            overflow: hidden;
-        }
-
-        .modal-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px 10px;
-        }
-
-        .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #222;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .close {
-            background: transparent;
-            border: 0;
-            cursor: pointer;
-            font-size: 22px;
-            color: #fff;
-        }
-
-        .modal-body {
-            padding: 16px;
-            display: grid;
-            grid-template-columns: 1.6fr 1fr;
-            gap: 16px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        @media(max-width:900px) {
-            .modal-body {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .video-panel {
-            background: #111827;
-            border-radius: 18px;
-            border: 1px solid #ffffff22;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .video-panel video {
-            width: 100%;
-            border-radius: 14px;
-            background: #000;
-            max-height: 50vh;
-            object-fit: contain;
-        }
-
-        .meta-label {
             font-size: 11px;
-            color: #cbd5e1;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-top: 8px;
         }
 
-        .meta-text {
-            font-size: 13px;
-            color: #e5e7eb;
-        }
-
-        .detail-about {
-            font-size: 13px;
-            color: #e5e7eb;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            margin-bottom: 12px;
-        }
-
-        .detail-url a {
-            font-size: 11px;
-            color: #facc15;
-            text-decoration: none;
-        }
-
-        .comment-section {
-            background: #020617;
-            border-radius: 16px;
-            border: 1px solid #1f2937;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 260px;
-        }
-
-        .comment-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .comment-row {
-            display: flex;
-        }
-
-        .comment-row.mine {
-            justify-content: flex-end;
-        }
-
-        .comment-bubble {
-            background: #1d4ed8;
-            color: #e5f0ff;
-            border-radius: 12px;
-            padding: 6px 10px;
-            font-size: 12px;
-            max-width: 80%;
-            word-break: break-word;
-        }
-
-        .comment-row.theirs .comment-bubble {
-            background: #1f2937;
-            color: #e5e7eb;
-        }
-
-        .comment-meta {
-            font-size: 10px;
-            color: #9ca3af;
-            margin-top: 2px;
-        }
-
-        .comment-delete {
-            border: none;
-            background: transparent;
-            color: #fca5a5;
-            font-size: 10px;
-            cursor: pointer;
-            margin-left: 4px;
-        }
-
-        .comment-input-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .comment-input-row input {
-            flex: 1;
-            border-radius: 999px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            padding: 6px 10px;
-            font-size: 12px;
-        }
-
-        .comment-input-row button {
-            border-radius: 999px;
-            border: none;
-            padding: 6px 10px;
-            font-size: 12px;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            cursor: pointer;
-        }
-
-        /* WORKS */
-        .works-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 8px;
-        }
-
-        .work-card {
-            background: #020617;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            padding: 6px;
-            font-size: 11px;
-            color: #e5e7eb;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .work-thumb img,
-        .work-thumb video {
-            width: 100%;
-            border-radius: 8px;
-            display: block;
-            object-fit: cover;
-        }
-
-        .work-title {
-            font-size: 11px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .work-type {
-            font-size: 10px;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        /* EDITボタン・フッター */
         .edit-bottom-wrap {
             text-align: center;
             margin-top: 30px;
@@ -658,13 +321,13 @@
         .edit-bottom-btn {
             padding: 10px 20px;
             border-radius: 999px;
+            border: none;
             background: linear-gradient(135deg, #ffb457, #ff8c37);
             color: #111827;
             font-size: 12px;
             font-weight: 600;
             letter-spacing: .12em;
             text-transform: uppercase;
-            border: none;
             cursor: pointer;
             box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
         }
@@ -675,117 +338,6 @@
             color: #9ca3af;
             margin: 30px 0;
         }
-
-        /* EDIT ログイン */
-        .edit-login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .85);
-            backdrop-filter: blur(14px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2500;
-        }
-
-        .edit-login-card {
-            width: min(360px, 90vw);
-            border-radius: 20px;
-            background: #0b1120ee;
-            border: 1px solid #ffffff22;
-            padding: 20px 22px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .8);
-        }
-
-        /* ユーザー用ログインゲート */
-        .user-login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .9);
-            backdrop-filter: blur(20px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-        }
-
-        .user-login-card {
-            width: min(360px, 90vw);
-            border-radius: 20px;
-            background: #020617ee;
-            border: 1px solid #ffffff22;
-            padding: 20px 22px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
-        }
-
-        .user-login-card h2 {
-            margin: 0 0 8px;
-            font-size: 18px;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-        }
-
-        .user-login-card p {
-            margin: 0 0 14px;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .user-login-card label {
-            display: block;
-            margin-top: 10px;
-            font-size: 11px;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: #cbd5f5;
-        }
-
-        .user-login-card input {
-            width: 100%;
-            margin-top: 4px;
-            padding: 9px 10px;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            font-size: 13px;
-        }
-
-        .user-login-card .btn-row {
-            margin-top: 14px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .user-login-card button {
-            flex: 1;
-            padding: 9px 0;
-            border-radius: 999px;
-            border: none;
-            font-size: 12px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-
-        #userLoginBtn {
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-weight: 600;
-        }
-
-        #userSignupBtn {
-            background: #111827;
-            color: #e5e7eb;
-            border: 1px solid #4b5563;
-        }
-
-        #userLoginError {
-            font-size: 11px;
-            color: #fecaca;
-            margin-top: 8px;
-            min-height: 16px;
-        }
     </style>
 </head>
 
@@ -793,101 +345,11 @@
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
-    <!-- ハンバーガーメニュー -->
+    <!-- ハンバーガーメニューボタン（TOP右上） -->
     <div id="menuButton" class="menu-button">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
-    </div>
-    <div id="menuOverlay" class="menu-overlay">
-        <div class="menu-panel">
-            <h2>CREATOR'S MENU</h2>
-            <ul class="menu-list">
-                <li><a href="#" id="linkMarket">Creator’s Market</a></li>
-                <li><a href="#" id="linkAI">Creator’s AI Consulting</a></li>
-                <li><a href="#" id="linkGuild">Creator’s Guild Produce</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- ユーザー用ログインゲート -->
-    <div id="userLoginOverlay" class="user-login-overlay">
-        <div class="user-login-card">
-            <h2>WELCOME</h2>
-            <p>PLAY. CREATE. LIVE. を利用するには、ユーザーIDでログインしてください。</p>
-            <label for="userEmail">メールアドレス（ID）</label>
-            <input id="userEmail" type="email" placeholder="you@example.com" />
-            <label for="userPassword">パスワード</label>
-            <input id="userPassword" type="password" placeholder="パスワード" />
-            <div class="btn-row">
-                <button id="userLoginBtn">ログイン</button>
-                <button id="userSignupBtn">新規登録</button>
-            </div>
-            <div id="userLoginError"></div>
-        </div>
-    </div>
-
-    <!-- DETAIL モーダル -->
-    <div id="detailOverlay" class="modal-overlay">
-        <div class="modal" id="detailModal">
-            <div class="modal-head">
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <div class="avatar" id="detailAvatar"></div>
-                    <div>
-                        <div id="detailName" style="font-weight:700;font-size:18px;">Creator</div>
-                        <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
-                        <div id="detailUrl" class="detail-url"></div>
-                    </div>
-                </div>
-                <button class="close" id="detailClose">×</button>
-            </div>
-            <div class="modal-body">
-                <!-- 左：Main video + chat -->
-                <div class="video-panel">
-                    <video id="detailVideo" controls playsinline></video>
-                    <div class="meta-label">Main Video</div>
-                    <div class="meta-text" id="detailDesc">—</div>
-
-                    <div class="meta-label" style="margin-top:12px;">NICKNAME</div>
-                    <input id="nicknameInput" type="text" placeholder="ニックネーム（必須）"
-                        style="width:100%;padding:8px 10px;border-radius:10px;border:1px solid #1f2937;background:#020617;color:#e5e7eb;">
-
-                    <div class="meta-label">CHAT</div>
-                    <div class="comment-section">
-                        <div id="commentList" class="comment-list"></div>
-                        <div class="comment-input-row">
-                            <input id="commentInput" type="text" placeholder="メッセージを入力…" />
-                            <button id="commentSend">送信</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 右：ABOUT + WORKS -->
-                <div>
-                    <div class="meta-label">ABOUT</div>
-                    <div class="detail-about" id="detailAbout">—</div>
-
-                    <div class="meta-label" style="margin-top:12px;">WORKS</div>
-                    <div class="comment-section">
-                        <div id="worksContainer" class="comment-list"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- EDIT ログイン -->
-    <div id="editLoginOverlay" class="edit-login-overlay">
-        <div class="edit-login-card">
-            <h2>EDIT LOGIN</h2>
-            <p>コンテンツ編集には管理者IDでのサインインが必要です。</p>
-            <label for="editLoginEmail">メールアドレス</label>
-            <input id="editLoginEmail" type="email" placeholder="admin@example.com" />
-            <label for="editLoginPassword">パスワード</label>
-            <input id="editLoginPassword" type="password" placeholder="password" />
-            <button id="editLoginButton">ログイン</button>
-            <div id="editLoginError" class="edit-login-error"></div>
-        </div>
     </div>
 
     <!-- HEADER -->
@@ -920,7 +382,7 @@
         <div id="grid" class="grid"></div>
 
         <div class="edit-bottom-wrap">
-            <button id="openEditLogin" class="edit-bottom-btn">EDIT</button>
+            <button class="edit-bottom-btn" onclick="location.href='edit.html'">EDIT</button>
         </div>
     </main>
 
@@ -929,24 +391,12 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import {
-            getAuth,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import {
             getFirestore,
             collection,
             getDocs,
-            query,
-            orderBy,
             doc,
             updateDoc,
-            increment,
-            addDoc,
-            serverTimestamp,
-            onSnapshot,
-            deleteDoc
+            increment
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -960,27 +410,21 @@
             measurementId: "G-ZFHF93QQCJ"
         };
 
-        const ADMIN_EMAIL = "mjmdjr@gmail.com";
-
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
 
         const $ = (s) => document.querySelector(s);
 
+        let creators = [];
         let currentSort = "newest";
         let currentSearch = "";
         let currentCategory = "";
-        let creators = [];
-        let messagesUnsub = null;
-        let editingMessageId = null;
 
-        /* 背景パーティクル */
+        /* 背景パーティクルだけ残す */
         (function () {
             const canvas = document.getElementById("particles");
             const ctx = canvas.getContext("2d");
             let W, H, dpr = window.devicePixelRatio || 1;
-
             const palettes = [
                 "rgba(255,180,87,0.65)",
                 "rgba(72,219,251,0.65)",
@@ -989,26 +433,22 @@
                 "rgba(244,114,182,0.65)"
             ];
             const color = palettes[Math.floor(Math.random() * palettes.length)];
-
             function resize() {
-                W = canvas.width = window.innerWidth * dpr;
-                H = canvas.height = window.innerHeight * dpr;
-                canvas.style.width = window.innerWidth + "px";
-                canvas.style.height = window.innerHeight + "px";
+                W = canvas.width = innerWidth * dpr;
+                H = canvas.height = innerHeight * dpr;
+                canvas.style.width = innerWidth + "px";
+                canvas.style.height = innerHeight + "px";
             }
             resize();
-            window.addEventListener("resize", resize);
-
+            addEventListener("resize", resize);
             const parts = [];
-            for (let i = 0; i < 90; i++) {
-                parts.push({
-                    x: Math.random() * W, y: Math.random() * H,
-                    r: Math.random() * 3 * dpr + 1,
-                    a: Math.random() * Math.PI * 2,
-                    v: 0.25 + Math.random() * 0.5
-                });
-            }
-
+            for (let i = 0; i < 90; i++)parts.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: Math.random() * 3 * dpr + 1,
+                a: Math.random() * Math.PI * 2,
+                v: 0.25 + Math.random() * 0.5
+            });
             function draw() {
                 ctx.clearRect(0, 0, W, H);
                 for (const p of parts) {
@@ -1017,7 +457,6 @@
                     p.a += (Math.random() - 0.5) * 0.03;
                     if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
                     if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-
                     ctx.beginPath();
                     ctx.fillStyle = color;
                     ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
@@ -1029,28 +468,11 @@
         })();
 
         async function loadCreators() {
-            let snap;
-
-            try {
-                // まず普通に creators を全部取る
-                snap = await getDocs(collection(db, "creators"));
-            } catch (e) {
-                console.error("creators 読み込みエラー:", e);
-                return;
-            }
-
+            // とりあえず creators を全部読む（orderBy なし・createdAt も使わない）
+            const snap = await getDocs(collection(db, "creators"));
             const list = [];
             snap.forEach(docSnap => {
                 const d = docSnap.data();
-
-                // createdAt はあってもなくても OK（ソートには使わない）
-                let createdAt = 0;
-                if (d.createdAt && typeof d.createdAt.toMillis === "function") {
-                    createdAt = d.createdAt.toMillis();
-                } else if (typeof d.createdAt === "number") {
-                    createdAt = d.createdAt;
-                }
-
                 list.push({
                     id: docSnap.id,
                     name: d.name || "",
@@ -1059,97 +481,144 @@
                     videoTitle: d.videoTitle || "",
                     summary: d.summary || "",
                     profileImageUrl: d.profileImageUrl || "",
-                    videoUrl: d.videoUrl || "",
                     likes: typeof d.likes === "number" ? d.likes : 0,
-                    createdAt,
-                    categories: Array.isArray(d.categories) ? d.categories : [],
-                    works: Array.isArray(d.works) ? d.works : []
+                    categories: Array.isArray(d.categories) ? d.categories : []
                 });
             });
-
             creators = list;
             rebuildCategoryOptions();
             renderGrid();
         }
 
-
-
-        function setupSearchAndCategory() {
-            const searchInput = $("#searchInput");
-            const categorySelect = $("#categorySelect");
-            if (searchInput) {
-                searchInput.addEventListener("input", e => {
-                    currentSearch = e.target.value || ""; renderGrid();
+        function rebuildCategoryOptions() {
+            const sel = $("#categorySelect");
+            if (!sel) return;
+            const set = new Set();
+            creators.forEach(c => {
+                (c.categories || []).forEach(cat => {
+                    const t = (cat || "").trim();
+                    if (t) set.add(t);
                 });
-            }
-            if (categorySelect) {
-                categorySelect.addEventListener("change", e => {
-                    currentCategory = e.target.value || ""; renderGrid();
-                });
-            }
+            });
+            sel.innerHTML = '<option value="">すべてのカテゴリ</option>';
+            Array.from(set).sort().forEach(cat => {
+                const opt = document.createElement("option");
+                opt.value = cat; opt.textContent = cat; sel.appendChild(opt);
+            });
         }
 
-        function setupMenu() {
-            const menuButton = $("#menuButton");
-            const menuOverlay = $("#menuOverlay");
-            const linkMarket = $("#linkMarket");
-            const linkAI = $("#linkAI");
-            const linkGuild = $("#linkGuild");
-            if (!menuButton || !menuOverlay) return;
-            function toggle() {
-                menuButton.classList.toggle("active");
-                menuOverlay.classList.toggle("show");
-            }
-            menuButton.addEventListener("click", toggle);
-            menuOverlay.addEventListener("click", e => {
-                if (e.target.id === "menuOverlay") toggle();
+        function sortCreators(list) {
+            const arr = list.slice();
+            if (currentSort === "name-asc") arr.sort((a, b) => a.name.localeCompare(b.name));
+            else if (currentSort === "name-desc") arr.sort((a, b) => b.name.localeCompare(a.name));
+            // new/old は createdAt 未使用なのでそのまま（将来用）
+            return arr;
+        }
+
+        function renderGrid() {
+            const grid = $("#grid");
+            grid.innerHTML = "";
+            const s = currentSearch.toLowerCase();
+            let filtered = creators.filter(c => {
+                const name = (c.name || "").toLowerCase();
+                const cats = Array.isArray(c.categories) ? c.categories : [];
+                const okName = !s || name.includes(s);
+                const okCat = !currentCategory || cats.includes(currentCategory);
+                return okName && okCat;
             });
-            if (linkMarket) {
-                linkMarket.addEventListener("click", e => {
-                    e.preventDefault(); toggle();
-                    alert("Creator’s Market（ECモール）の仮画面イメージです。");
-                });
+            filtered = sortCreators(filtered);
+            if (!filtered.length) {
+                grid.innerHTML = '<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px;">該当するクリエイターがいません。</div>';
+                return;
             }
-            if (linkAI) {
-                linkAI.addEventListener("click", e => {
-                    e.preventDefault(); toggle();
-                    alert("Creator’s AI Consulting（AIクローン相談）の仮画面イメージです。");
+            filtered.forEach(c => {
+                const card = document.createElement("div");
+                card.className = "card";
+
+                const tw = document.createElement("div");
+                tw.className = "thumb-wrap";
+                if (c.profileImageUrl) {
+                    const img = document.createElement("img");
+                    img.src = c.profileImageUrl;
+                    img.alt = c.name || "thumbnail";
+                    img.className = "thumb";
+                    tw.appendChild(img);
+                } else {
+                    const fb = document.createElement("div");
+                    fb.className = "thumb-fallback";
+                    tw.appendChild(fb);
+                }
+                const overlay = document.createElement("div");
+                overlay.className = "thumb-title";
+                overlay.textContent = c.videoTitle || c.name || "Untitled";
+                tw.appendChild(overlay);
+
+                const body = document.createElement("div");
+                body.className = "card-body";
+                if (c.categories[0]) {
+                    const chip = document.createElement("span");
+                    chip.className = "category-chip";
+                    chip.textContent = c.categories[0];
+                    body.appendChild(chip);
+                }
+                const nameEl = document.createElement("div");
+                nameEl.className = "creator-name";
+                nameEl.textContent = c.name || "—";
+                const compEl = document.createElement("div");
+                compEl.className = "creator-company";
+                compEl.textContent = c.company || "";
+                const footer = document.createElement("div");
+                footer.className = "card-footer";
+                const likesLabel = document.createElement("span");
+                likesLabel.textContent = `${c.likes} ♥`;
+                const likeBtn = document.createElement("button");
+                likeBtn.className = "like-btn";
+                likeBtn.textContent = "いいね";
+                likeBtn.addEventListener("click", async e => {
+                    e.stopPropagation();
+                    try {
+                        await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
+                        c.likes += 1;
+                        likesLabel.textContent = `${c.likes} ♥`;
+                    } catch (err) { console.error(err); }
                 });
-            }
-            if (linkGuild) {
-                linkGuild.addEventListener("click", e => {
-                    e.preventDefault(); toggle();
-                    alert("Creator’s Guild Produce の仮画面イメージです。");
+                footer.appendChild(likesLabel);
+                footer.appendChild(likeBtn);
+
+                body.appendChild(nameEl);
+                body.appendChild(compEl);
+                body.appendChild(footer);
+
+                card.appendChild(tw);
+                card.appendChild(body);
+
+                // 詳細表示はとりあえず後回し
+                card.addEventListener("click", () => {
+                    alert(`${c.name} / ${c.company}`);
                 });
-            }
+
+                grid.appendChild(card);
+            });
+        }
+
+        function setupSearchAndSort() {
+            const sIn = $("#searchInput");
+            const cSel = $("#categorySelect");
+            const sortSel = $("#sortSelect");
+            if (sIn) sIn.addEventListener("input", e => {
+                currentSearch = e.target.value || ""; renderGrid();
+            });
+            if (cSel) cSel.addEventListener("change", e => {
+                currentCategory = e.target.value || ""; renderGrid();
+            });
+            if (sortSel) sortSel.addEventListener("change", e => {
+                currentSort = e.target.value || "newest"; renderGrid();
+            });
         }
 
         (function init() {
-            setupUserLoginGate();
-            setupEditLogin();
-            setupSearchAndCategory();
-            setupMenu();
-
-            const sortSel = $("#sortSelect");
-            if (sortSel) {
-                sortSel.addEventListener("change", e => {
-                    currentSort = e.target.value || "newest"; renderGrid();
-                });
-            }
-
-            const detailClose = $("#detailClose");
-            if (detailClose) detailClose.addEventListener("click", closeDetail);
-
-            const detailOverlay = $("#detailOverlay");
-            if (detailOverlay) {
-                detailOverlay.addEventListener("click", e => {
-                    if (e.target.id === "detailOverlay") closeDetail();
-                });
-            }
-
-            window.addEventListener("keydown", e => {
-                if (e.key === "Escape") closeDetail();
-            });
+            setupSearchAndSort();
+            loadCreators();  // ログイン無しで即読み込む
         })();
     </script>
 </body>
