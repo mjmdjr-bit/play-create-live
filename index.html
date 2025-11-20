@@ -1032,20 +1032,39 @@
             let snap;
 
             try {
-                // createdAt 付きの新しいデータ用（理想形）
-                const q = query(collection(db, "creators"), orderBy("createdAt", "desc"));
-                snap = await getDocs(q);
-            } catch (e) {
-                console.warn("orderBy(createdAt) で取得できなかったので、通常の取得にフォールバックします:", e);
-
-                // 古いデータに createdAt が無い場合はこちらで再チャレンジ
+                // まず普通に creators を全部取る
                 snap = await getDocs(collection(db, "creators"));
+            } catch (e) {
+                console.error("creators 読み込みエラー:", e);
+                return;
             }
 
             const list = [];
             snap.forEach(docSnap => {
                 const d = docSnap.data();
 
+                // createdAt はあってもなくても OK（ソートには使わない）
+                let createdAt = 0;
+                if (d.createdAt && typeof d.createdAt.toMillis === "function") {
+                    createdAt = d.createdAt.toMillis();
+                } else if (typeof d.createdAt === "number") {
+                    createdAt = d.createdAt;
+                }
+
+                list.push({
+                    id: docSnap.id,
+                    name: d.name || "",
+                    company: d.company || "",
+                    url: d.url || "",
+                    videoTitle: d.videoTitle || "",
+                    summary: d.summary || "",
+                    profileImageUrl: d.profileImageUrl || "",
+                    videoUrl: d.videoUrl || "",
+                    likes: typeof d.likes === "number" ? d.likes : 0,
+                    createdAt,
+                    categories: Array.isArray(d.categories) ? d.categories : [],
+                    works: Array.isArray(d.works) ? d.works : []
+                });
             });
 
             creators = list;
@@ -1053,368 +1072,7 @@
             renderGrid();
         }
 
-        function rebuildCategoryOptions() {
-            const sel = $("#categorySelect");
-            if (!sel) return;
-            const set = new Set();
-            creators.forEach(c => {
-                (c.categories || []).forEach(cat => {
-                    const t = (cat || "").trim();
-                    if (t) set.add(t);
-                });
-            });
-            sel.innerHTML = '<option value="">すべてのカテゴリ</option>';
-            Array.from(set).sort().forEach(cat => {
-                const opt = document.createElement("option");
-                opt.value = cat; opt.textContent = cat; sel.appendChild(opt);
-            });
-        }
 
-        function sortCreators(list) {
-            const arr = list.slice();
-            if (currentSort === "newest") arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            else if (currentSort === "oldest") arr.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-            else if (currentSort === "name-asc") arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-            else if (currentSort === "name-desc") arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-            return arr;
-        }
-
-        function renderGrid() {
-            const grid = $("#grid");
-            grid.innerHTML = "";
-            if (!creators.length) {
-                grid.style.display = "none";
-                return;
-            }
-
-            const s = currentSearch.toLowerCase();
-            let filtered = creators.filter(c => {
-                const name = (c.name || "").toLowerCase();
-                const cats = Array.isArray(c.categories) ? c.categories : [];
-                const okName = !s || name.includes(s);
-                const okCat = !currentCategory || cats.includes(currentCategory);
-                return okName && okCat;
-            });
-
-            filtered = sortCreators(filtered);
-
-            if (!filtered.length) {
-                grid.innerHTML = '<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px;">該当するクリエイターがいません。</div>';
-                return;
-            }
-
-            grid.style.display = "grid";
-
-            filtered.forEach(c => {
-                const card = document.createElement("div");
-                card.className = "card";
-
-                const tw = document.createElement("div");
-                tw.className = "thumb-wrap";
-                if (c.profileImageUrl) {
-                    const img = document.createElement("img");
-                    img.src = c.profileImageUrl;
-                    img.alt = c.name || "thumbnail";
-                    img.className = "thumb";
-                    tw.appendChild(img);
-                } else {
-                    const fb = document.createElement("div");
-                    fb.className = "thumb-fallback";
-                    tw.appendChild(fb);
-                }
-                const overlay = document.createElement("div");
-                overlay.className = "thumb-title";
-                overlay.textContent = c.videoTitle || c.name || "Untitled";
-                tw.appendChild(overlay);
-
-                const body = document.createElement("div");
-                body.className = "card-body";
-                if (c.categories[0]) {
-                    const chip = document.createElement("span");
-                    chip.className = "category-chip";
-                    chip.textContent = c.categories[0];
-                    body.appendChild(chip);
-                }
-                const nameEl = document.createElement("div");
-                nameEl.className = "creator-name";
-                nameEl.textContent = c.name || "—";
-                const compEl = document.createElement("div");
-                compEl.className = "creator-company";
-                compEl.textContent = c.company || "";
-
-                const footer = document.createElement("div");
-                footer.className = "card-footer";
-                const likeLabel = document.createElement("span");
-                likeLabel.textContent = `${c.likes} ♥`;
-                const likeBtn = document.createElement("button");
-                likeBtn.className = "like-btn";
-                likeBtn.innerHTML = '<span class="heart">👍</span> いいね';
-                likeBtn.addEventListener("click", e => {
-                    e.stopPropagation();
-                    handleLike(c, likeLabel);
-                });
-                footer.appendChild(likeLabel);
-                footer.appendChild(likeBtn);
-
-                body.appendChild(nameEl);
-                body.appendChild(compEl);
-                body.appendChild(footer);
-
-                card.appendChild(tw);
-                card.appendChild(body);
-                card.addEventListener("click", () => openDetail(c));
-                grid.appendChild(card);
-            });
-        }
-
-        async function handleLike(c, labelEl) {
-            try {
-                await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
-                c.likes += 1;
-                labelEl.textContent = `${c.likes} ♥`;
-            } catch (e) {
-                console.error(e);
-                alert("いいねの送信に失敗しました");
-            }
-        }
-
-        function setupChatRealtime(creatorId) {
-            const list = $("#commentList");
-            if (!list) return;
-            list.innerHTML = "";
-            if (messagesUnsub) messagesUnsub();
-
-            const msgsRef = collection(db, "creators", creatorId, "messages");
-            const q = query(msgsRef, orderBy("createdAt", "asc"));
-
-            messagesUnsub = onSnapshot(q, snap => {
-                list.innerHTML = "";
-                const user = auth.currentUser;
-                snap.forEach(docSnap => {
-                    const m = docSnap.data();
-                    const isMe = user && user.uid === m.authorId;
-                    const row = document.createElement("div");
-                    row.className = "comment-row " + (isMe ? "mine" : "theirs");
-                    const bubble = document.createElement("div");
-                    bubble.className = "comment-bubble";
-                    bubble.textContent = m.text || "";
-                    const meta = document.createElement("div");
-                    meta.className = "comment-meta";
-                    meta.textContent = m.authorName || "匿名";
-                    bubble.appendChild(meta);
-                    row.appendChild(bubble);
-
-                    if (user && user.email === ADMIN_EMAIL) {
-                        const del = document.createElement("button");
-                        del.className = "comment-delete";
-                        del.textContent = "削除";
-                        del.onclick = async (e) => {
-                            e.stopPropagation();
-                            await deleteDoc(doc(db, "creators", creatorId, "messages", docSnap.id));
-                        };
-                        row.appendChild(del);
-                    }
-                    if (isMe) {
-                        const edit = document.createElement("button");
-                        edit.className = "comment-delete";
-                        edit.textContent = "編集";
-                        edit.onclick = e => {
-                            e.stopPropagation();
-                            const input = $("#commentInput");
-                            if (input) { input.value = m.text || ""; input.focus(); }
-                            editingMessageId = docSnap.id;
-                        };
-                        row.appendChild(edit);
-                    }
-                    list.appendChild(row);
-                });
-            });
-        }
-
-        function setupChatInput(creatorId) {
-            const input = $("#commentInput");
-            const btn = $("#commentSend");
-            const nick = $("#nicknameInput");
-            if (!input || !btn || !nick) return;
-
-            btn.onclick = async () => {
-                const user = auth.currentUser;
-                if (!user) { alert("ログインが必要です。"); return; }
-                const text = input.value.trim();
-                if (!text) return;
-                const nickname = nick.value.trim();
-                if (!nickname) { alert("ニックネームを入力してください。"); nick.focus(); return; }
-                localStorage.setItem("pcl_nickname", nickname);
-
-                try {
-                    if (editingMessageId) {
-                        await updateDoc(doc(db, "creators", creatorId, "messages", editingMessageId), {
-                            text, authorName: nickname, updatedAt: serverTimestamp()
-                        });
-                        editingMessageId = null;
-                    } else {
-                        await addDoc(collection(db, "creators", creatorId, "messages"), {
-                            text, authorId: user.uid, authorName: nickname, createdAt: serverTimestamp()
-                        });
-                    }
-                    input.value = "";
-                } catch (e) {
-                    console.error(e);
-                    alert("メッセージ送信に失敗しました");
-                }
-            };
-
-            input.addEventListener("keydown", e => {
-                if (e.key === "Enter") { e.preventDefault(); btn.click(); }
-            });
-        }
-
-        function renderWorks(c) {
-            const container = $("#worksContainer");
-            if (!container) return;
-            container.innerHTML = "";
-            const works = Array.isArray(c.works) ? c.works : [];
-            if (!works.length) {
-                container.innerHTML = '<div style="color:#6b7280;font-size:11px;">登録された作品はまだありません。</div>';
-                return;
-            }
-            const grid = document.createElement("div");
-            grid.className = "works-grid";
-            works.forEach(w => {
-                const card = document.createElement("div");
-                card.className = "work-card";
-                const thumb = document.createElement("div");
-                thumb.className = "work-thumb";
-                if (w.type === "video") {
-                    thumb.innerHTML = `<video src="${w.url}" controls playsinline></video>`;
-                } else {
-                    thumb.innerHTML = `<img src="${w.url}" alt="${w.title || "work"}">`;
-                }
-                const title = document.createElement("div");
-                title.className = "work-title";
-                title.textContent = w.title || "";
-                const type = document.createElement("div");
-                type.className = "work-type";
-                type.textContent = w.type || "";
-                card.appendChild(thumb);
-                card.appendChild(title);
-                card.appendChild(type);
-                grid.appendChild(card);
-            });
-            container.appendChild(grid);
-        }
-
-        function openDetail(c) {
-            const avatar = $("#detailAvatar");
-            avatar.innerHTML = c.profileImageUrl ? `<img src="${c.profileImageUrl}">` : "";
-            $("#detailName").textContent = c.name || "";
-            $("#detailCompany").textContent = c.company || "";
-            const urlBox = $("#detailUrl");
-            urlBox.innerHTML = "";
-            if (c.url) {
-                urlBox.innerHTML = `<a href="${c.url}" target="_blank" rel="noopener noreferrer">${c.url.replace(/^https?:\/\//, "")}</a>`;
-            }
-            $("#detailDesc").textContent = c.videoTitle || "";
-            $("#detailAbout").textContent = c.summary || "";
-
-            const v = $("#detailVideo");
-            v.src = c.videoUrl || ""; v.load();
-
-            renderWorks(c);
-            setupChatRealtime(c.id);
-            setupChatInput(c.id);
-
-            $("#detailOverlay").classList.add("show");
-        }
-
-        function closeDetail() {
-            $("#detailOverlay").classList.remove("show");
-            const v = $("#detailVideo");
-            v.pause(); v.src = ""; v.load();
-            const list = $("#commentList"); const input = $("#commentInput");
-            if (list) list.innerHTML = ""; if (input) input.value = "";
-            editingMessageId = null;
-            if (messagesUnsub) { messagesUnsub(); messagesUnsub = null; }
-        }
-
-        function setupEditLogin() {
-            const overlay = $("#editLoginOverlay");
-            const openBtn = $("#openEditLogin");
-            const emailEl = $("#editLoginEmail");
-            const passEl = $("#editLoginPassword");
-            const btn = $("#editLoginButton");
-            const err = $("#editLoginError");
-            if (!overlay || !openBtn) return;
-
-            openBtn.addEventListener("click", () => {
-                overlay.style.display = "flex";
-                err.textContent = ""; emailEl.value = ""; passEl.value = "";
-            });
-            btn.addEventListener("click", async () => {
-                const email = emailEl.value.trim();
-                const pass = passEl.value.trim();
-                if (!email || !pass) { err.textContent = "メール/パスワードは必須です。"; return; }
-                try {
-                    const cred = await signInWithEmailAndPassword(auth, email, pass);
-                    if (cred.user.email !== ADMIN_EMAIL) throw new Error("unauthorized");
-                    window.location.href = "edit.html";
-                } catch (e) {
-                    console.error(e);
-                    err.textContent = "ログイン失敗（権限なし）";
-                }
-            });
-
-            overlay.addEventListener("click", e => {
-                if (e.target.id === "editLoginOverlay") overlay.style.display = "none";
-            });
-        }
-
-        function setupUserLoginGate() {
-            const overlay = $("#userLoginOverlay");
-            const emailEl = $("#userEmail");
-            const passEl = $("#userPassword");
-            const loginBtn = $("#userLoginBtn");
-            const signupBtn = $("#userSignupBtn");
-            const errEl = $("#userLoginError");
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    if (overlay) overlay.style.display = "none";
-                    await loadCreators();
-                    const nick = $("#nicknameInput");
-                    const stored = localStorage.getItem("pcl_nickname");
-                    if (nick && stored) nick.value = stored;
-                } else {
-                    if (overlay) overlay.style.display = "flex";
-                }
-            });
-
-            loginBtn.addEventListener("click", async () => {
-                const email = emailEl.value.trim();
-                const pass = passEl.value.trim();
-                if (!email || !pass) { errEl.textContent = "メールアドレスとパスワードを入力してください。"; return; }
-                errEl.textContent = "";
-                try { await signInWithEmailAndPassword(auth, email, pass); }
-                catch (e) { console.error(e); errEl.textContent = "ログインに失敗しました。"; }
-            });
-
-            signupBtn.addEventListener("click", async () => {
-                const email = emailEl.value.trim();
-                const pass = passEl.value.trim();
-                if (!email || !pass) { errEl.textContent = "メールアドレスとパスワードを入力してください。"; return; }
-                if (pass.length < 6) { errEl.textContent = "パスワードは6文字以上にしてください。"; return; }
-                errEl.textContent = "";
-                try { await createUserWithEmailAndPassword(auth, email, pass); }
-                catch (e) {
-                    console.error(e);
-                    if (e.code === "auth/email-already-in-use") {
-                        errEl.textContent = "このメールアドレスは既に登録されています。";
-                    } else {
-                        errEl.textContent = "ユーザー登録に失敗しました。";
-                    }
-                }
-            });
-        }
 
         function setupSearchAndCategory() {
             const searchInput = $("#searchInput");
