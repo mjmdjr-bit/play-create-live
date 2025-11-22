@@ -11,7 +11,7 @@
             --bg: #020617;
             --panel: #0b1120;
             --card: #020617;
-            --border: #1f2937;
+            --border: #111827;
             --text: #e5e7eb;
             --muted: #9ca3af;
             --accent: #ffb457;
@@ -80,7 +80,7 @@
         .panel {
             background: var(--panel);
             border-radius: var(--radius);
-            border: 1px solid #111827;
+            border: 1px solid var(--border);
             box-shadow: 0 18px 40px rgba(0, 0, 0, .6);
             padding: 12px 12px 16px;
         }
@@ -247,12 +247,6 @@
             border: 1px solid #fecaca44;
         }
 
-        .small-text {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
         .tag {
             display: inline-block;
             padding: 2px 8px;
@@ -373,7 +367,7 @@
                     <div id="videoFileRow" style="margin-top:8px;display:none;">
                         <label class="field-label">動画ファイル</label>
                         <input id="videoFile" type="file" class="field-input" accept="video/mp4,video/quicktime" />
-                        <p class="field-note">※できるだけ軽いmp4 / movにしてからアップロードしてください。</p>
+                        <p class="field-note">※できるだけ軽い mp4 / mov にしてからアップロードしてください。</p>
                     </div>
 
                     <div id="videoUrlRow" style="margin-top:8px;display:none;">
@@ -383,36 +377,26 @@
                     </div>
                 </div>
 
-                <!-- WORKS（1作品） -->
+                <!-- WORKS（複数ファイル＋複数URL） -->
                 <div class="field-group">
                     <div class="field-header">
-                        <span class="field-label">WORKS（代表作 1点）</span>
-                        <span class="tag">IMAGE / MOV / MP4 / YouTube / Vimeo</span>
+                        <span class="field-label">WORKS</span>
+                        <span class="tag">複数登録可</span>
                     </div>
 
-                    <label class="field-label">作品タイトル</label>
-                    <input id="workTitleInput" class="field-input" type="text"
-                        placeholder="例：Lighting Installation 2024" />
+                    <label class="field-label">ファイル（画像 / 動画）</label>
+                    <input id="worksFilesInput" type="file" class="field-input" multiple
+                        accept="image/*,video/mp4,video/quicktime" />
+                    <p class="field-note">
+                        ※複数選択可。画像は type:"image"、動画は type:"file" として自動登録されます。タイトルはファイル名から自動生成。
+                    </p>
 
-                    <label class="field-label" style="margin-top:8px;">作品種別</label>
-                    <select id="workTypeInput" class="field-input">
-                        <option value="">未選択</option>
-                        <option value="image">画像（jpg/pngなど）</option>
-                        <option value="file">動画ファイル（mov/mp4）</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="vimeo">Vimeo</option>
-                    </select>
-
-                    <div id="workFileRow" style="margin-top:8px;display:none;">
-                        <label class="field-label">作品ファイル</label>
-                        <input id="workFileInput" type="file" class="field-input"
-                            accept="image/*,video/mp4,video/quicktime" />
-                    </div>
-
-                    <div id="workUrlRow" style="margin-top:8px;display:none;">
-                        <label class="field-label">作品URL（YouTube / Vimeo / 画像URL）</label>
-                        <input id="workUrlInput" type="text" class="field-input" placeholder="https://..." />
-                    </div>
+                    <label class="field-label" style="margin-top:10px;">外部URL（1行1URL）</label>
+                    <textarea id="worksUrlsInput" class="field-input"
+                        placeholder="https://example.com/image.jpg&#10;https://youtu.be/...&#10;https://vimeo.com/..."></textarea>
+                    <p class="field-note">
+                        ※行ごとに1URL。ドメインから自動判定し、YouTube→youtube / Vimeo→vimeo / 画像拡張子→image / その他→file として登録します。
+                    </p>
                 </div>
 
                 <div class="btn-bar">
@@ -480,16 +464,12 @@
         const videoUrlRow = $("#videoUrlRow");
         const videoUrlInput = $("#videoUrlInput");
 
-        const workTitleInput = $("#workTitleInput");
-        const workTypeInput = $("#workTypeInput");
-        const workFileRow = $("#workFileRow");
-        const workFileInput = $("#workFileInput");
-        const workUrlRow = $("#workUrlRow");
-        const workUrlInput = $("#workUrlInput");
+        const worksFilesInput = $("#worksFilesInput");
+        const worksUrlsInput = $("#worksUrlsInput");
 
         let creators = [];
         let currentId = null;
-        let currentDoc = null; // Firestore上の既存データ
+        let currentDoc = null; // Firestore 上の既存データ
 
         /* ========= フォーム表示切り替え ========= */
 
@@ -507,22 +487,7 @@
             }
         }
 
-        function onWorkTypeChange() {
-            const type = workTypeInput.value;
-            if (type === "image" || type === "file") {
-                workFileRow.style.display = "block";
-                workUrlRow.style.display = "none";
-            } else if (type === "youtube" || type === "vimeo") {
-                workFileRow.style.display = "none";
-                workUrlRow.style.display = "block";
-            } else {
-                workFileRow.style.display = "none";
-                workUrlRow.style.display = "none";
-            }
-        }
-
         if (videoTypeSel) videoTypeSel.addEventListener("change", onVideoTypeChange);
-        if (workTypeInput) workTypeInput.addEventListener("change", onWorkTypeChange);
 
         /* ========= クリエイター一覧読み込み ========= */
 
@@ -585,11 +550,8 @@
             videoUrlInput.value = "";
             onVideoTypeChange();
 
-            workTitleInput.value = "";
-            workTypeInput.value = "";
-            workFileInput.value = "";
-            workUrlInput.value = "";
-            onWorkTypeChange();
+            worksFilesInput.value = "";
+            worksUrlsInput.value = "";
         }
 
         async function selectCreator(id) {
@@ -606,7 +568,7 @@
             summaryInput.value = c.data.summary || "";
             categoryInput.value = (Array.isArray(c.data.categories) && c.data.categories[0]) || "";
 
-            // メイン動画の復元
+            // メイン動画
             const v = c.data.video || null;
             if (v && v.type) {
                 videoTypeSel.value = v.type;
@@ -621,22 +583,9 @@
             }
             onVideoTypeChange();
 
-            // WORKS の復元（1件目のみ）
-            const works = Array.isArray(c.data.works) ? c.data.works : [];
-            if (works[0]) {
-                workTitleInput.value = works[0].title || "";
-                workTypeInput.value = works[0].type || "";
-                if (works[0].type === "image" || works[0].type === "file") {
-                    workUrlInput.value = "";
-                } else {
-                    workUrlInput.value = works[0].url || "";
-                }
-            } else {
-                workTitleInput.value = "";
-                workTypeInput.value = "";
-                workUrlInput.value = "";
-            }
-            onWorkTypeChange();
+            // WORKS は UI に復元しない（毎回全置き換え仕様）
+            worksFilesInput.value = "";
+            worksUrlsInput.value = "";
         }
 
         /* ========= アップロードヘルパー ========= */
@@ -681,42 +630,54 @@
             return null;
         }
 
-        async function buildWorksField(creatorId, previousWorks) {
-            const title = workTitleInput.value.trim();
-            const type = workTypeInput.value;
-            const previous = Array.isArray(previousWorks) ? previousWorks[0] : null;
+        function detectWorkTypeFromUrl(url) {
+            const lower = url.toLowerCase();
+            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
+            if (lower.includes("vimeo.com")) return "vimeo";
+            if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
+            return "file";
+        }
 
-            if (!title && !type) return [];
+        async function buildWorksField(creatorId) {
+            const files = worksFilesInput.files;
+            const urlsText = worksUrlsInput.value.trim();
+            const works = [];
 
-            let url = "";
+            // ファイル群をアップロード
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const isImage = file.type.startsWith("image/");
+                const isVideo = file.type.startsWith("video/");
+                const ext = file.name.split(".").pop() || (isImage ? "jpg" : "mp4");
 
-            if (type === "image" || type === "file") {
-                const file = workFileInput.files[0];
+                // ファイル名からタイトルっぽいものを生成
+                const baseName = file.name.replace(/\.[^/.]+$/, "");
 
-                if (!file && previous && previous.type === type && previous.url) {
-                    url = previous.url;
-                } else if (file) {
-                    const ext = file.name.split(".").pop() || (type === "image" ? "jpg" : "mp4");
-                    const fileRef = ref(storage, `creators/${creatorId}/work-main.${ext}`);
-                    await uploadBytes(fileRef, file);
-                    url = await getDownloadURL(fileRef);
-                } else {
-                    // fileが必須だが無い → 作品なし扱い
-                    return [];
-                }
-            } else if (type === "youtube" || type === "vimeo") {
-                const inputUrl = workUrlInput.value.trim();
-                if (!inputUrl) return [];
-                url = inputUrl;
-            } else {
-                return [];
+                const fileRef = ref(storage, `creators/${creatorId}/works/${Date.now()}_${i}.${ext}`);
+                await uploadBytes(fileRef, file);
+                const url = await getDownloadURL(fileRef);
+
+                works.push({
+                    title: baseName,
+                    type: isImage ? "image" : "file",
+                    url
+                });
             }
 
-            return [{
-                title,
-                type,
-                url
-            }];
+            // 外部URL群（1行1URL）
+            if (urlsText) {
+                const lines = urlsText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+                lines.forEach((line, idx) => {
+                    const type = detectWorkTypeFromUrl(line);
+                    works.push({
+                        title: `WORK ${idx + 1} (URL)`,
+                        type,
+                        url: line
+                    });
+                });
+            }
+
+            return works;
         }
 
         /* ========= 保存処理 ========= */
@@ -728,7 +689,7 @@
                 return;
             }
 
-            // 先に doc を用意（新規の場合は addDoc で作ってしまう）
+            // 先に doc を用意（新規の場合は addDoc）
             let creatorId = currentId;
             let docRef;
 
@@ -750,7 +711,6 @@
 
             const prev = currentDoc || {};
             const previousVideo = prev.video || null;
-            const previousWorks = prev.works || [];
             const previousProfile = prev.profileImageUrl || null;
 
             // プロフィール画像
@@ -759,8 +719,8 @@
             // メイン動画
             const video = await buildMainVideoField(creatorId, previousVideo);
 
-            // WORKS（1件分）
-            const works = await buildWorksField(creatorId, previousWorks);
+            // WORKS（毎回全置き換え）
+            const works = await buildWorksField(creatorId);
 
             const payload = {
                 name,
@@ -774,9 +734,9 @@
 
             if (profileImageUrl) payload.profileImageUrl = profileImageUrl;
             if (video) payload.video = video;
-            else payload.video = null; // 明示的に無し
+            else payload.video = null;
 
-            payload.works = works; // 配列（0件も含めて上書き）
+            payload.works = works; // 複数作品をそのまま保存
 
             await setDoc(docRef, payload, { merge: true });
 
