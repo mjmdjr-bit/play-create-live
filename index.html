@@ -37,7 +37,7 @@
             overflow-x: hidden;
         }
 
-        /* 背景アニメ */
+        /* 背景アニメーション */
         #particles {
             position: fixed;
             inset: 0;
@@ -184,6 +184,21 @@
             box-shadow: var(--shadow);
             font-size: 15.5px;
             line-height: 1.85;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: introCopy .9s ease-out .35s forwards;
+        }
+
+        @keyframes introCopy {
+            0% {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes float {
@@ -331,7 +346,7 @@
             font-size: 11px;
             letter-spacing: .12em;
             text-transform: uppercase;
-            text-shadow: 0 0 8px #ffb457;
+            text-shadow: 0 0 8px #ffb457, 0 0 16px #ec4899;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -487,12 +502,99 @@
             white-space: pre-wrap;
         }
 
-        .modal video {
+        /* グローするURLバッジ */
+        .detail-url {
+            margin-top: 4px;
+        }
+
+        .detail-url a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #facc15;
+            text-decoration: none;
+            background: radial-gradient(circle at 0 0, rgba(250, 204, 21, 0.25), transparent 60%);
+            box-shadow:
+                0 0 8px rgba(250, 204, 21, 0.6),
+                0 0 18px rgba(248, 113, 113, 0.4);
+            border: 1px solid rgba(250, 204, 21, 0.5);
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .detail-url a::before {
+            content: "↗";
+            font-size: 10px;
+            opacity: .9;
+        }
+
+        /* メイン動画コンテナ（video/iframe 用） */
+        #detailVideoContainer iframe,
+        #detailVideoContainer video {
             width: 100%;
             border-radius: 14px;
-            background: black;
-            max-height: 40vh;
-            object-fit: contain;
+            background: #000;
+        }
+
+        /* WORKS グリッド */
+        .works-section {
+            margin-top: 8px;
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+
+        .work-card {
+            background: #020617;
+            border-radius: 10px;
+            border: 1px solid #1f2937;
+            padding: 6px;
+            font-size: 11px;
+            color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .work-thumb {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #020617;
+        }
+
+        .work-thumb img,
+        .work-thumb video,
+        .work-thumb iframe {
+            width: 100%;
+            display: block;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .work-title {
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .work-type {
+            font-size: 10px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .08em;
         }
 
         .edit-bottom-wrap {
@@ -533,6 +635,7 @@
         <div class="bar"></div>
         <div class="bar"></div>
     </div>
+
     <!-- メニューオーバーレイ -->
     <div id="menuOverlay" class="menu-overlay">
         <div class="menu-panel">
@@ -554,19 +657,27 @@
                     <div>
                         <div id="detailName" style="font-size:16px;font-weight:700;">Creator</div>
                         <div id="detailCompany" style="font-size:12px;color:#9ca3af;">Company</div>
+                        <div id="detailUrl" class="detail-url"></div>
                     </div>
                 </div>
                 <button class="close" id="detailClose">×</button>
             </div>
             <div class="modal-body">
                 <div>
-                    <video id="detailVideo" controls playsinline></video>
+                    <div id="detailVideoContainer">
+                        <!-- JSで video or iframe を差し込む -->
+                    </div>
                     <div class="meta-label">MAIN VIDEO TITLE</div>
                     <div class="meta-text" id="detailVideoTitle">—</div>
                 </div>
                 <div>
                     <div class="meta-label">ABOUT</div>
                     <div class="detail-about" id="detailAbout">—</div>
+
+                    <div class="meta-label" style="margin-top:12px;">WORKS</div>
+                    <div id="worksContainer" class="works-section">
+                        <!-- JS で作品グリッドを挿入 -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -640,7 +751,7 @@
         let currentSearch = "";
         let currentCategory = "";
 
-        /* 背景パーティクルだけ */
+        /* 背景パーティクル */
         (function () {
             const canvas = document.getElementById("particles");
             const ctx = canvas.getContext("2d");
@@ -687,6 +798,7 @@
             draw();
         })();
 
+        /* Firestore から creators を読み込み */
         async function loadCreators() {
             const snap = await getDocs(collection(db, "creators"));
             const list = [];
@@ -701,7 +813,9 @@
                     summary: d.summary || "",
                     profileImageUrl: d.profileImageUrl || "",
                     likes: typeof d.likes === "number" ? d.likes : 0,
-                    categories: Array.isArray(d.categories) ? d.categories : []
+                    categories: Array.isArray(d.categories) ? d.categories : [],
+                    video: d.video || null,                             // { type, url }
+                    works: Array.isArray(d.works) ? d.works : []           // [{title,type,url},...]
                 });
             });
             creators = list;
@@ -730,6 +844,7 @@
             const arr = list.slice();
             if (currentSort === "name-asc") arr.sort((a, b) => a.name.localeCompare(b.name));
             else if (currentSort === "name-desc") arr.sort((a, b) => b.name.localeCompare(a.name));
+            // new/old は createdAt 未使用（必要なら拡張）
             return arr;
         }
 
@@ -818,25 +933,212 @@
             });
         }
 
+        /* YouTube / Vimeo 埋め込み用URLに変換 */
+        function toYouTubeEmbed(urlOrId) {
+            if (!urlOrId) return "";
+            if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
+
+            let id = urlOrId.trim();
+            const m = id.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_\-]+)/);
+            if (m) id = m[1];
+            return `https://www.youtube.com/embed/${id}`;
+        }
+
+        function toVimeoEmbed(urlOrId) {
+            if (!urlOrId) return "";
+            if (urlOrId.startsWith("https://player.vimeo.com/video/")) return urlOrId;
+
+            let id = urlOrId.trim();
+            const m = id.match(/vimeo\.com\/(\d+)/);
+            if (m) id = m[1];
+            return `https://player.vimeo.com/video/${id}`;
+        }
+
+        /* メイン動画描画：video = { type, url } */
+        function renderMainVideo(video) {
+            const container = document.getElementById("detailVideoContainer");
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            if (!video || !video.type || !video.url) {
+                const empty = document.createElement("div");
+                empty.style.width = "100%";
+                empty.style.aspectRatio = "16 / 9";
+                empty.style.borderRadius = "14px";
+                empty.style.background = "#000";
+                container.appendChild(empty);
+                return;
+            }
+
+            if (video.type === "file") {
+                const v = document.createElement("video");
+                v.src = video.url;
+                v.controls = true;
+                v.playsInline = true;
+                v.style.width = "100%";
+                v.style.borderRadius = "14px";
+                v.style.background = "#000";
+                container.appendChild(v);
+            } else if (video.type === "youtube") {
+                const iframe = document.createElement("iframe");
+                iframe.src = toYouTubeEmbed(video.url);
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                iframe.style.width = "100%";
+                iframe.style.aspectRatio = "16 / 9";
+                iframe.style.borderRadius = "14px";
+                iframe.style.background = "#000";
+                container.appendChild(iframe);
+            } else if (video.type === "vimeo") {
+                const iframe = document.createElement("iframe");
+                iframe.src = toVimeoEmbed(video.url);
+                iframe.allow = "autoplay; fullscreen; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                iframe.style.width = "100%";
+                iframe.style.aspectRatio = "16 / 9";
+                iframe.style.borderRadius = "14px";
+                iframe.style.background = "#000";
+                container.appendChild(iframe);
+            } else {
+                const empty = document.createElement("div");
+                empty.style.width = "100%";
+                empty.style.aspectRatio = "16 / 9";
+                empty.style.borderRadius = "14px";
+                empty.style.background = "#000";
+                container.appendChild(empty);
+            }
+        }
+
+        /* WORKS グリッド描画：works = [{ title, type, url }, ...] */
+        function renderWorks(works) {
+            const container = document.getElementById("worksContainer");
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            if (!Array.isArray(works) || !works.length) {
+                const msg = document.createElement("div");
+                msg.style.color = "#6b7280";
+                msg.style.fontSize = "11px";
+                msg.textContent = "登録された作品はまだありません。";
+                container.appendChild(msg);
+                return;
+            }
+
+            const grid = document.createElement("div");
+            grid.className = "works-grid";
+
+            works.forEach(w => {
+                const card = document.createElement("div");
+                card.className = "work-card";
+
+                if (w.url) {
+                    const thumb = document.createElement("div");
+                    thumb.className = "work-thumb";
+
+                    if (w.type === "image") {
+                        const img = document.createElement("img");
+                        img.src = w.url;
+                        img.alt = w.title || "work";
+                        thumb.appendChild(img);
+                    } else if (w.type === "file") {
+                        const v = document.createElement("video");
+                        v.src = w.url;
+                        v.controls = true;
+                        v.playsInline = true;
+                        thumb.appendChild(v);
+                    } else if (w.type === "youtube") {
+                        const iframe = document.createElement("iframe");
+                        iframe.src = toYouTubeEmbed(w.url);
+                        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                        iframe.allowFullscreen = true;
+                        iframe.frameBorder = "0";
+                        iframe.style.width = "100%";
+                        iframe.style.aspectRatio = "16 / 9";
+                        thumb.appendChild(iframe);
+                    } else if (w.type === "vimeo") {
+                        const iframe = document.createElement("iframe");
+                        iframe.src = toVimeoEmbed(w.url);
+                        iframe.allow = "autoplay; fullscreen; picture-in-picture";
+                        iframe.allowFullscreen = true;
+                        iframe.frameBorder = "0";
+                        iframe.style.width = "100%";
+                        iframe.style.aspectRatio = "16 / 9";
+                        thumb.appendChild(iframe);
+                    }
+
+                    card.appendChild(thumb);
+                }
+
+                if (w.title) {
+                    const titleEl = document.createElement("div");
+                    titleEl.className = "work-title";
+                    titleEl.textContent = w.title;
+                    card.appendChild(titleEl);
+                }
+
+                if (w.type) {
+                    const typeEl = document.createElement("div");
+                    typeEl.className = "work-type";
+                    typeEl.textContent = w.type;
+                    card.appendChild(typeEl);
+                }
+
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+        }
+
+        /* DETAIL 開閉 */
         function openDetail(c) {
-            const avatar = $("#detailAvatar");
-            avatar.innerHTML = c.profileImageUrl ? `<img src="${c.profileImageUrl}">` : "";
-            $("#detailName").textContent = c.name || "";
-            $("#detailCompany").textContent = c.company || "";
-            $("#detailVideoTitle").textContent = c.videoTitle || "";
-            $("#detailAbout").textContent = c.summary || "";
+            const avatar = document.getElementById("detailAvatar");
+            const nameEl = document.getElementById("detailName");
+            const compEl = document.getElementById("detailCompany");
+            const urlBox = document.getElementById("detailUrl");
+            const titleEl = document.getElementById("detailVideoTitle");
+            const aboutEl = document.getElementById("detailAbout");
+            const overlay = document.getElementById("detailOverlay");
 
-            const v = $("#detailVideo");
-            v.src = c.videoUrl || "";
-            v.load();
+            avatar.innerHTML = c.profileImageUrl
+                ? `<img src="${c.profileImageUrl}" alt="${c.name || "avatar"}">`
+                : "";
 
-            $("#detailOverlay").classList.add("show");
+            nameEl.textContent = c.name || "";
+            compEl.textContent = c.company || "";
+            titleEl.textContent = c.videoTitle || "";
+            aboutEl.textContent = c.summary || "";
+
+            // URLバッジ
+            urlBox.innerHTML = "";
+            if (c.url) {
+                const a = document.createElement("a");
+                a.href = c.url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.textContent = c.url.replace(/^https?:\/\//, "");
+                urlBox.appendChild(a);
+            }
+
+            // メイン動画
+            renderMainVideo(c.video);
+
+            // WORKS
+            renderWorks(c.works);
+
+            overlay.classList.add("show");
         }
 
         function closeDetail() {
-            $("#detailOverlay").classList.remove("show");
-            const v = $("#detailVideo");
-            v.pause(); v.src = ""; v.load();
+            const overlay = document.getElementById("detailOverlay");
+            const container = document.getElementById("detailVideoContainer");
+            const works = document.getElementById("worksContainer");
+            overlay.classList.remove("show");
+            if (container) container.innerHTML = "";
+            if (works) works.innerHTML = "";
         }
 
         function setupSearchAndSort() {
