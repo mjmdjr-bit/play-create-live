@@ -15,6 +15,7 @@
             --muted: #9aa3b2;
             --accent: #ffb457;
             --accent2: #ff8c37;
+            --danger: #ff6b6b;
             --radius: 22px;
             --shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
             --glow: 0 0 22px #ffb457aa, 0 0 46px #ff8c37aa, 0 0 80px #ff6a00aa;
@@ -243,6 +244,11 @@
             margin-bottom: 16px;
         }
 
+        .toolbar-label {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
         .toolbar select,
         .toolbar input[type="search"] {
             background: #050816;
@@ -256,11 +262,6 @@
         .toolbar input[type="search"] {
             flex: 1 1 140px;
             min-width: 120px;
-        }
-
-        .toolbar-label {
-            font-size: 12px;
-            color: #9ca3af;
         }
 
         .grid {
@@ -288,7 +289,7 @@
             }
         }
 
-        /* CARD */
+        /* カード */
         .card {
             position: relative;
             border-radius: 18px;
@@ -305,12 +306,20 @@
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
+            border-color: #ffb45788;
+        }
+
+        .card:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .7), 0 0 24px rgba(255, 180, 87, .7);
+            border-color: #ffb457cc;
         }
 
         .thumb-wrap {
             position: relative;
             padding-top: 62%;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .thumb {
@@ -319,18 +328,22 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: .5;
+            opacity: .45;
             transform: scale(1.03);
-            transition: .2s;
+            transition: .18s;
         }
 
         .thumb-fallback {
             position: absolute;
             inset: 0;
-            background: #111827;
+            background:
+                radial-gradient(circle at 0 0, #ffb45755, transparent 55%),
+                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
+                #101322;
         }
 
-        .card:hover .thumb {
+        .card:hover .thumb,
+        .card:active .thumb {
             opacity: 1;
             transform: scale(1.06);
         }
@@ -340,36 +353,24 @@
             left: 0;
             right: 0;
             bottom: 0;
-            padding: 8px 10px;
+            padding: 8px 10px 9px;
             background: linear-gradient(to top, rgba(0, 0, 0, .85), transparent);
-            color: #fef9c3;
             font-size: 11px;
             letter-spacing: .12em;
             text-transform: uppercase;
-            text-shadow: 0 0 8px #ffb457, 0 0 16px #ec4899;
+            color: #fef9c3;
+            text-shadow: 0 0 8px rgba(255, 180, 87, .9), 0 0 16px rgba(236, 72, 153, .7);
+            pointer-events: none;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .card-body {
-            padding: 12px;
+            padding: 10px 12px 8px;
             display: flex;
             flex-direction: column;
             gap: 4px;
-        }
-
-        .category-chip {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 999px;
-            border: 1px solid #3b82f6;
-            background: rgba(59, 130, 246, .15);
-            color: #dbeafe;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            margin-bottom: 4px;
         }
 
         .creator-name {
@@ -389,12 +390,12 @@
         }
 
         .card-footer {
+            margin-top: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 11px;
             color: #9ca3af;
-            margin-top: 6px;
         }
 
         .like-btn {
@@ -407,6 +408,31 @@
             background: rgba(0, 0, 0, .35);
             cursor: pointer;
             font-size: 11px;
+        }
+
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(96, 165, 250, 0.6);
+            background: radial-gradient(circle at 0 0, rgba(96, 165, 250, 0.2), transparent 60%);
+            font-size: 11px;
+            color: #dbeafe;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .category-chip::before {
+            content: "◎";
+            font-size: 9px;
         }
 
         /* DETAIL モーダル */
@@ -482,27 +508,13 @@
             }
         }
 
-        .meta-label {
-            font-size: 11px;
-            color: #cbd5e1;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-top: 6px;
-        }
-
-        .meta-text {
-            font-size: 13px;
-            color: #e5e7eb;
-        }
-
         .detail-about {
             font-size: 13px;
-            line-height: 1.7;
             color: #e5e7eb;
+            line-height: 1.7;
             white-space: pre-wrap;
         }
 
-        /* グローするURLバッジ */
         .detail-url {
             margin-top: 4px;
         }
@@ -519,9 +531,7 @@
             color: #facc15;
             text-decoration: none;
             background: radial-gradient(circle at 0 0, rgba(250, 204, 21, 0.25), transparent 60%);
-            box-shadow:
-                0 0 8px rgba(250, 204, 21, 0.6),
-                0 0 18px rgba(248, 113, 113, 0.4);
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.6), 0 0 18px rgba(248, 113, 113, 0.4);
             border: 1px solid rgba(250, 204, 21, 0.5);
             max-width: 220px;
             overflow: hidden;
@@ -535,15 +545,38 @@
             opacity: .9;
         }
 
-        /* メイン動画コンテナ（video/iframe 用） */
-        #detailVideoContainer iframe,
-        #detailVideoContainer video {
+        .video-panel {
+            background: #111827;
+            border-radius: 18px;
+            border: 1px solid #ffffff22;
+            padding: 12px 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #detailVideoContainer video,
+        #detailVideoContainer iframe {
             width: 100%;
             border-radius: 14px;
             background: #000;
+            max-height: 50vh;
+            object-fit: contain;
         }
 
-        /* WORKS グリッド */
+        .meta-label {
+            font-size: 11px;
+            color: #cbd5e1;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+
+        .meta-text {
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+
         .works-section {
             margin-top: 8px;
         }
@@ -585,6 +618,7 @@
         .work-title {
             font-size: 11px;
             font-weight: 600;
+            margin-top: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -598,12 +632,13 @@
         }
 
         .edit-bottom-wrap {
-            text-align: center;
-            margin-top: 30px;
+            margin-top: 32px;
+            display: flex;
+            justify-content: center;
         }
 
         .edit-bottom-btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: 999px;
             border: none;
             background: linear-gradient(135deg, #ffb457, #ff8c37);
@@ -613,14 +648,15 @@
             letter-spacing: .12em;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
         }
 
         footer {
+            margin: 30px 0 18px;
             text-align: center;
+            color: #b8c2d4;
             font-size: 12px;
-            color: #9ca3af;
-            margin: 30px 0;
+            opacity: .8;
         }
     </style>
 </head>
@@ -629,7 +665,7 @@
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
-    <!-- ハンバーガーメニューボタン（TOP右上） -->
+    <!-- ハンバーガーメニューボタン -->
     <div id="menuButton" class="menu-button">
         <div class="bar"></div>
         <div class="bar"></div>
@@ -650,24 +686,23 @@
 
     <!-- DETAIL モーダル -->
     <div id="detailOverlay" class="modal-overlay">
-        <div class="modal">
+        <div class="modal" id="detailModal">
             <div class="modal-head">
-                <div style="display:flex;gap:10px;align-items:center;">
+                <div style="display:flex; gap:12px; align-items:center;">
                     <div class="avatar" id="detailAvatar"></div>
                     <div>
-                        <div id="detailName" style="font-size:16px;font-weight:700;">Creator</div>
-                        <div id="detailCompany" style="font-size:12px;color:#9ca3af;">Company</div>
+                        <div id="detailName" style="font-weight:700;font-size:18px;">Creator</div>
+                        <div id="detailCompany" style="font-size:12px;color:#9aa3b2;">Company</div>
                         <div id="detailUrl" class="detail-url"></div>
                     </div>
                 </div>
                 <button class="close" id="detailClose">×</button>
             </div>
+
             <div class="modal-body">
-                <div>
-                    <div id="detailVideoContainer">
-                        <!-- JSで video or iframe を差し込む -->
-                    </div>
-                    <div class="meta-label">MAIN VIDEO TITLE</div>
+                <div class="video-panel">
+                    <div id="detailVideoContainer"></div>
+                    <div class="meta-label">MAIN VIDEO</div>
                     <div class="meta-text" id="detailVideoTitle">—</div>
                 </div>
                 <div>
@@ -675,9 +710,7 @@
                     <div class="detail-about" id="detailAbout">—</div>
 
                     <div class="meta-label" style="margin-top:12px;">WORKS</div>
-                    <div id="worksContainer" class="works-section">
-                        <!-- JS で作品グリッドを挿入 -->
-                    </div>
+                    <div id="worksContainer" class="works-section"></div>
                 </div>
             </div>
         </div>
@@ -718,7 +751,6 @@
     </main>
 
     <footer>© PLAYFUL CREATORS / Designed by Daijiro Majima</footer>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import {
@@ -772,6 +804,7 @@
             }
             resize();
             addEventListener("resize", resize);
+
             const parts = [];
             for (let i = 0; i < 80; i++)parts.push({
                 x: Math.random() * W,
@@ -780,6 +813,7 @@
                 a: Math.random() * Math.PI * 2,
                 v: 0.25 + Math.random() * 0.5
             });
+
             function draw() {
                 ctx.clearRect(0, 0, W, H);
                 for (const p of parts) {
@@ -788,6 +822,7 @@
                     p.a += (Math.random() - 0.5) * 0.03;
                     if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
                     if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
                     ctx.beginPath();
                     ctx.fillStyle = color;
                     ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
@@ -814,8 +849,8 @@
                     profileImageUrl: d.profileImageUrl || "",
                     likes: typeof d.likes === "number" ? d.likes : 0,
                     categories: Array.isArray(d.categories) ? d.categories : [],
-                    video: d.video || null,                             // { type, url }
-                    works: Array.isArray(d.works) ? d.works : []           // [{title,type,url},...]
+                    videoUrl: d.videoUrl || "",                // ★ メイン動画URL
+                    works: Array.isArray(d.works) ? d.works : [] // [{title,type,url},...]
                 });
             });
             creators = list;
@@ -836,7 +871,9 @@
             sel.innerHTML = '<option value="">すべてのカテゴリ</option>';
             Array.from(set).sort().forEach(cat => {
                 const opt = document.createElement("option");
-                opt.value = cat; opt.textContent = cat; sel.appendChild(opt);
+                opt.value = cat;
+                opt.textContent = cat;
+                sel.appendChild(opt);
             });
         }
 
@@ -844,13 +881,14 @@
             const arr = list.slice();
             if (currentSort === "name-asc") arr.sort((a, b) => a.name.localeCompare(b.name));
             else if (currentSort === "name-desc") arr.sort((a, b) => b.name.localeCompare(a.name));
-            // new/old は createdAt 未使用（必要なら拡張）
+            // new/old は createdAt があればここで拡張可能
             return arr;
         }
 
         function renderGrid() {
             const grid = $("#grid");
             grid.innerHTML = "";
+
             const s = currentSearch.toLowerCase();
             let filtered = creators.filter(c => {
                 const name = (c.name || "").toLowerCase();
@@ -859,11 +897,14 @@
                 const okCat = !currentCategory || cats.includes(currentCategory);
                 return okName && okCat;
             });
+
             filtered = sortCreators(filtered);
+
             if (!filtered.length) {
                 grid.innerHTML = '<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px;">該当するクリエイターがいません。</div>';
                 return;
             }
+
             filtered.forEach(c => {
                 const card = document.createElement("div");
                 card.className = "card";
@@ -881,6 +922,7 @@
                     fb.className = "thumb-fallback";
                     tw.appendChild(fb);
                 }
+
                 const title = document.createElement("div");
                 title.className = "thumb-title";
                 title.textContent = c.videoTitle || c.name || "Untitled";
@@ -888,33 +930,41 @@
 
                 const body = document.createElement("div");
                 body.className = "card-body";
-                if (c.categories[0]) {
-                    const chip = document.createElement("span");
+
+                if (Array.isArray(c.categories) && c.categories[0]) {
+                    const chip = document.createElement("div");
                     chip.className = "category-chip";
                     chip.textContent = c.categories[0];
                     body.appendChild(chip);
                 }
+
                 const nameEl = document.createElement("div");
                 nameEl.className = "creator-name";
                 nameEl.textContent = c.name || "—";
+
                 const compEl = document.createElement("div");
                 compEl.className = "creator-company";
                 compEl.textContent = c.company || "";
 
                 const footer = document.createElement("div");
                 footer.className = "card-footer";
+
                 const likesLabel = document.createElement("span");
                 likesLabel.textContent = `${c.likes} ♥`;
+
                 const likeBtn = document.createElement("button");
                 likeBtn.className = "like-btn";
-                likeBtn.textContent = "いいね";
+                likeBtn.innerHTML = '<span class="heart">👍</span> いいね';
                 likeBtn.addEventListener("click", async e => {
                     e.stopPropagation();
                     try {
                         await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
                         c.likes += 1;
                         likesLabel.textContent = `${c.likes} ♥`;
-                    } catch (err) { console.error(err); }
+                    } catch (err) {
+                        console.error(err);
+                        alert("いいねの送信に失敗しました");
+                    }
                 });
 
                 footer.appendChild(likesLabel);
@@ -933,14 +983,26 @@
             });
         }
 
-        /* YouTube / Vimeo 埋め込み用URLに変換 */
+        /* YouTube / Vimeo 埋め込みURL変換（Shorts対応） */
         function toYouTubeEmbed(urlOrId) {
             if (!urlOrId) return "";
-            if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
+
+            // すでに embed URL ならそのまま
+            if (urlOrId.startsWith("https://www.youtube.com/embed/")) {
+                return urlOrId;
+            }
 
             let id = urlOrId.trim();
-            const m = id.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_\-]+)/);
-            if (m) id = m[1];
+
+            // watch, youtu.be, shorts 対応
+            const m = id.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_\-]{6,})/);
+            if (m) {
+                id = m[1];
+            } else if (/^[A-Za-z0-9_\-]{6,}$/.test(id)) {
+                // すでにIDだけの場合
+            } else {
+                return ""; // 埋め込み不可
+            }
             return `https://www.youtube.com/embed/${id}`;
         }
 
@@ -954,14 +1016,13 @@
             return `https://player.vimeo.com/video/${id}`;
         }
 
-        /* メイン動画描画：video = { type, url } */
-        function renderMainVideo(video) {
+        /* メイン動画描画：videoUrl 文字列を type推定して再生 */
+        function renderMainVideo(url) {
             const container = document.getElementById("detailVideoContainer");
             if (!container) return;
-
             container.innerHTML = "";
 
-            if (!video || !video.type || !video.url) {
+            if (!url) {
                 const empty = document.createElement("div");
                 empty.style.width = "100%";
                 empty.style.aspectRatio = "16 / 9";
@@ -971,44 +1032,38 @@
                 return;
             }
 
-            if (video.type === "file") {
-                const v = document.createElement("video");
-                v.src = video.url;
-                v.controls = true;
-                v.playsInline = true;
-                v.style.width = "100%";
-                v.style.borderRadius = "14px";
-                v.style.background = "#000";
-                container.appendChild(v);
-            } else if (video.type === "youtube") {
+            const lower = url.toLowerCase();
+            const isYouTube = (lower.includes("youtu.be") || lower.includes("youtube.com"));
+            const isVimeo = lower.includes("vimeo.com");
+            const isFile = lower.endsWith(".mp4") || lower.endsWith(".mov") || lower.startsWith("https://firebasestorage.googleapis.com");
+
+            if (isYouTube) {
                 const iframe = document.createElement("iframe");
-                iframe.src = toYouTubeEmbed(video.url);
+                iframe.src = toYouTubeEmbed(url);
                 iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                 iframe.allowFullscreen = true;
                 iframe.frameBorder = "0";
-                iframe.style.width = "100%";
-                iframe.style.aspectRatio = "16 / 9";
-                iframe.style.borderRadius = "14px";
-                iframe.style.background = "#000";
                 container.appendChild(iframe);
-            } else if (video.type === "vimeo") {
+            } else if (isVimeo) {
                 const iframe = document.createElement("iframe");
-                iframe.src = toVimeoEmbed(video.url);
+                iframe.src = toVimeoEmbed(url);
                 iframe.allow = "autoplay; fullscreen; picture-in-picture";
                 iframe.allowFullscreen = true;
                 iframe.frameBorder = "0";
-                iframe.style.width = "100%";
-                iframe.style.aspectRatio = "16 / 9";
-                iframe.style.borderRadius = "14px";
-                iframe.style.background = "#000";
                 container.appendChild(iframe);
+            } else if (isFile) {
+                const v = document.createElement("video");
+                v.src = url;
+                v.controls = true;
+                v.playsInline = true;
+                container.appendChild(v);
             } else {
-                const empty = document.createElement("div");
-                empty.style.width = "100%";
-                empty.style.aspectRatio = "16 / 9";
-                empty.style.borderRadius = "14px";
-                empty.style.background = "#000";
-                container.appendChild(empty);
+                // よく分からないURL → iframeで試す
+                const iframe = document.createElement("iframe");
+                iframe.src = url;
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                container.appendChild(iframe);
             }
         }
 
@@ -1039,34 +1094,44 @@
                     const thumb = document.createElement("div");
                     thumb.className = "work-thumb";
 
-                    if (w.type === "image") {
+                    const lower = (w.url || "").toLowerCase();
+                    const isYouTube = (lower.includes("youtu.be") || lower.includes("youtube.com"));
+                    const isVimeo = lower.includes("vimeo.com");
+                    const isImage = /\.(png|jpe?g|gif|webp|avif)$/.test(lower);
+                    const isVideo = w.type === "video" || /\.(mp4|mov)$/.test(lower) || lower.startsWith("https://firebasestorage.googleapis.com");
+
+                    if (isImage || w.type === "image") {
                         const img = document.createElement("img");
                         img.src = w.url;
                         img.alt = w.title || "work";
                         thumb.appendChild(img);
-                    } else if (w.type === "file") {
-                        const v = document.createElement("video");
-                        v.src = w.url;
-                        v.controls = true;
-                        v.playsInline = true;
-                        thumb.appendChild(v);
-                    } else if (w.type === "youtube") {
+                    } else if (isYouTube) {
                         const iframe = document.createElement("iframe");
                         iframe.src = toYouTubeEmbed(w.url);
                         iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                         iframe.allowFullscreen = true;
                         iframe.frameBorder = "0";
-                        iframe.style.width = "100%";
                         iframe.style.aspectRatio = "16 / 9";
                         thumb.appendChild(iframe);
-                    } else if (w.type === "vimeo") {
+                    } else if (isVimeo) {
                         const iframe = document.createElement("iframe");
                         iframe.src = toVimeoEmbed(w.url);
                         iframe.allow = "autoplay; fullscreen; picture-in-picture";
                         iframe.allowFullscreen = true;
                         iframe.frameBorder = "0";
-                        iframe.style.width = "100%";
                         iframe.style.aspectRatio = "16 / 9";
+                        thumb.appendChild(iframe);
+                    } else if (isVideo || w.type === "file") {
+                        const v = document.createElement("video");
+                        v.src = w.url;
+                        v.controls = true;
+                        v.playsInline = true;
+                        thumb.appendChild(v);
+                    } else {
+                        const iframe = document.createElement("iframe");
+                        iframe.src = w.url;
+                        iframe.allowFullscreen = true;
+                        iframe.frameBorder = "0";
                         thumb.appendChild(iframe);
                     }
 
@@ -1124,7 +1189,7 @@
             }
 
             // メイン動画
-            renderMainVideo(c.video);
+            renderMainVideo(c.videoUrl);
 
             // WORKS
             renderWorks(c.works);
@@ -1134,35 +1199,47 @@
 
         function closeDetail() {
             const overlay = document.getElementById("detailOverlay");
-            const container = document.getElementById("detailVideoContainer");
-            const works = document.getElementById("worksContainer");
+            const videoWrap = document.getElementById("detailVideoContainer");
+            const worksWrap = document.getElementById("worksContainer");
             overlay.classList.remove("show");
-            if (container) container.innerHTML = "";
-            if (works) works.innerHTML = "";
+            if (videoWrap) videoWrap.innerHTML = "";
+            if (worksWrap) worksWrap.innerHTML = "";
         }
 
         function setupSearchAndSort() {
             const sIn = $("#searchInput");
             const cSel = $("#categorySelect");
             const sort = $("#sortSelect");
-            if (sIn) sIn.addEventListener("input", e => {
-                currentSearch = e.target.value || ""; renderGrid();
-            });
-            if (cSel) cSel.addEventListener("change", e => {
-                currentCategory = e.target.value || ""; renderGrid();
-            });
-            if (sort) sort.addEventListener("change", e => {
-                currentSort = e.target.value || "newest"; renderGrid();
-            });
+
+            if (sIn) {
+                sIn.addEventListener("input", e => {
+                    currentSearch = e.target.value || "";
+                    renderGrid();
+                });
+            }
+            if (cSel) {
+                cSel.addEventListener("change", e => {
+                    currentCategory = e.target.value || "";
+                    renderGrid();
+                });
+            }
+            if (sort) {
+                sort.addEventListener("change", e => {
+                    currentSort = e.target.value || "newest";
+                    renderGrid();
+                });
+            }
         }
 
         function setupModalClose() {
             const closeBtn = $("#detailClose");
             const overlay = $("#detailOverlay");
             if (closeBtn) closeBtn.addEventListener("click", closeDetail);
-            if (overlay) overlay.addEventListener("click", e => {
-                if (e.target.id === "detailOverlay") closeDetail();
-            });
+            if (overlay) {
+                overlay.addEventListener("click", e => {
+                    if (e.target.id === "detailOverlay") closeDetail();
+                });
+            }
             window.addEventListener("keydown", e => {
                 if (e.key === "Escape") closeDetail();
             });
@@ -1181,13 +1258,13 @@
                 if (e.target.id === "menuOverlay") toggle();
             });
             $("#linkMarket")?.addEventListener("click", e => {
-                e.preventDefault(); toggle(); alert("Creator's Market 構想ページ（仮）");
+                e.preventDefault(); toggle(); alert("Creator’s Market 構想ページ（仮）");
             });
             $("#linkAI")?.addEventListener("click", e => {
-                e.preventDefault(); toggle(); alert("Creator's AI Consulting 構想ページ（仮）");
+                e.preventDefault(); toggle(); alert("Creator’s AI Consulting 構想ページ（仮）");
             });
             $("#linkGuild")?.addEventListener("click", e => {
-                e.preventDefault(); toggle(); alert("Creator's Guild Produce 構想ページ（仮）");
+                e.preventDefault(); toggle(); alert("Creator’s Guild Produce 構想ページ（仮）");
             });
         }
 

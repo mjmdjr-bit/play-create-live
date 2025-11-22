@@ -275,9 +275,7 @@
                 <div class="panel-title">CREATORS</div>
                 <button id="newCreatorBtn" class="btn btn-ghost" type="button">新規作成</button>
             </div>
-            <div id="creatorList" class="list">
-                <!-- JSで一覧を挿入 -->
-            </div>
+            <div id="creatorList" class="list"></div>
         </section>
 
         <!-- 右：編集フォーム -->
@@ -388,14 +386,14 @@
                     <input id="worksFilesInput" type="file" class="field-input" multiple
                         accept="image/*,video/mp4,video/quicktime" />
                     <p class="field-note">
-                        ※複数選択可。画像は type:"image"、動画は type:"file" として自動登録されます。タイトルはファイル名から自動生成。
+                        ※複数選択可。画像は type:"image"、動画は type:"video" として自動登録されます。タイトルはファイル名から自動生成。
                     </p>
 
                     <label class="field-label" style="margin-top:10px;">外部URL（1行1URL）</label>
                     <textarea id="worksUrlsInput" class="field-input"
                         placeholder="https://example.com/image.jpg&#10;https://youtu.be/...&#10;https://vimeo.com/..."></textarea>
                     <p class="field-note">
-                        ※行ごとに1URL。ドメインから自動判定し、YouTube→youtube / Vimeo→vimeo / 画像拡張子→image / その他→file として登録します。
+                        ※行ごとに1URL。YouTube→youtube / Vimeo→vimeo / 画像拡張子→image / その他→video として登録します。
                     </p>
                 </div>
 
@@ -469,9 +467,9 @@
 
         let creators = [];
         let currentId = null;
-        let currentDoc = null; // Firestore 上の既存データ
+        let currentDoc = null;
 
-        /* ========= フォーム表示切り替え ========= */
+        /* ========= メイン動画フォームの表示切り替え ========= */
 
         function onVideoTypeChange() {
             const type = videoTypeSel.value;
@@ -486,10 +484,9 @@
                 videoUrlRow.style.display = "none";
             }
         }
-
         if (videoTypeSel) videoTypeSel.addEventListener("change", onVideoTypeChange);
 
-        /* ========= クリエイター一覧読み込み ========= */
+        /* ========= creators 一覧読み込み ========= */
 
         async function loadCreators() {
             const snap = await getDocs(collection(db, "creators"));
@@ -554,6 +551,15 @@
             worksUrlsInput.value = "";
         }
 
+        function detectVideoTypeFromUrl(url) {
+            if (!url) return "";
+            const lower = url.toLowerCase();
+            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
+            if (lower.includes("vimeo.com")) return "vimeo";
+            if (lower.endsWith(".mp4") || lower.endsWith(".mov") || lower.startsWith("https://firebasestorage.googleapis.com")) return "file";
+            return "";
+        }
+
         async function selectCreator(id) {
             const c = creators.find(x => x.id === id);
             if (!c) return;
@@ -568,14 +574,15 @@
             summaryInput.value = c.data.summary || "";
             categoryInput.value = (Array.isArray(c.data.categories) && c.data.categories[0]) || "";
 
-            // メイン動画
-            const v = c.data.video || null;
-            if (v && v.type) {
-                videoTypeSel.value = v.type;
-                if (v.type === "file") {
-                    videoUrlInput.value = "";
+            // メイン動画の復元
+            const vUrl = c.data.videoUrl || "";
+            if (vUrl) {
+                const type = detectVideoTypeFromUrl(vUrl);
+                videoTypeSel.value = type;
+                if (type === "file") {
+                    videoUrlInput.value = "";  // ファイルアップロード系
                 } else {
-                    videoUrlInput.value = v.url || "";
+                    videoUrlInput.value = vUrl;
                 }
             } else {
                 videoTypeSel.value = "";
@@ -583,7 +590,7 @@
             }
             onVideoTypeChange();
 
-            // WORKS は UI に復元しない（毎回全置き換え仕様）
+            // WORKS は UI に復元しない（毎回上書き仕様）
             worksFilesInput.value = "";
             worksUrlsInput.value = "";
         }
@@ -600,16 +607,20 @@
             return await getDownloadURL(fileRef);
         }
 
-        async function buildMainVideoField(creatorId, previousVideo) {
+        async function buildMainVideoUrl(creatorId, previousUrl) {
             const type = videoTypeSel.value;
 
-            if (!type) return null;
+            if (!type) {
+                // 種類未選択 → 既存URLを維持 or 無し
+                return previousUrl || null;
+            }
 
             if (type === "file") {
                 const file = videoFileInput.files[0];
 
-                if (!file && previousVideo && previousVideo.type === "file" && previousVideo.url) {
-                    return previousVideo;
+                if (!file && previousUrl) {
+                    // 編集時：ファイル未選択なら既存URLをそのまま使う
+                    return previousUrl;
                 }
                 if (!file) return null;
 
@@ -617,17 +628,16 @@
                 const fileRef = ref(storage, `creators/${creatorId}/main-video.${ext}`);
                 await uploadBytes(fileRef, file);
                 const url = await getDownloadURL(fileRef);
-
-                return { type: "file", url };
+                return url;
             }
 
             if (type === "youtube" || type === "vimeo") {
                 const url = videoUrlInput.value.trim();
                 if (!url) return null;
-                return { type, url };
+                return url;
             }
 
-            return null;
+            return previousUrl || null;
         }
 
         function detectWorkTypeFromUrl(url) {
@@ -635,7 +645,7 @@
             if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
             if (lower.includes("vimeo.com")) return "vimeo";
             if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
-            return "file";
+            return "video";
         }
 
         async function buildWorksField(creatorId) {
@@ -648,9 +658,8 @@
                 const file = files[i];
                 const isImage = file.type.startsWith("image/");
                 const isVideo = file.type.startsWith("video/");
-                const ext = file.name.split(".").pop() || (isImage ? "jpg" : "mp4");
 
-                // ファイル名からタイトルっぽいものを生成
+                const ext = file.name.split(".").pop() || (isImage ? "jpg" : "mp4");
                 const baseName = file.name.replace(/\.[^/.]+$/, "");
 
                 const fileRef = ref(storage, `creators/${creatorId}/works/${Date.now()}_${i}.${ext}`);
@@ -659,7 +668,7 @@
 
                 works.push({
                     title: baseName,
-                    type: isImage ? "image" : "file",
+                    type: isImage ? "image" : "video",
                     url
                 });
             }
@@ -689,7 +698,6 @@
                 return;
             }
 
-            // 先に doc を用意（新規の場合は addDoc）
             let creatorId = currentId;
             let docRef;
 
@@ -710,16 +718,11 @@
             }
 
             const prev = currentDoc || {};
-            const previousVideo = prev.video || null;
+            const previousVideoUrl = prev.videoUrl || null;
             const previousProfile = prev.profileImageUrl || null;
 
-            // プロフィール画像
             const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, previousProfile);
-
-            // メイン動画
-            const video = await buildMainVideoField(creatorId, previousVideo);
-
-            // WORKS（毎回全置き換え）
+            const videoUrl = await buildMainVideoUrl(creatorId, previousVideoUrl);
             const works = await buildWorksField(creatorId);
 
             const payload = {
@@ -733,10 +736,10 @@
             };
 
             if (profileImageUrl) payload.profileImageUrl = profileImageUrl;
-            if (video) payload.video = video;
-            else payload.video = null;
+            if (videoUrl) payload.videoUrl = videoUrl;
+            else payload.videoUrl = null;
 
-            payload.works = works; // 複数作品をそのまま保存
+            payload.works = works;
 
             await setDoc(docRef, payload, { merge: true });
 
