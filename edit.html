@@ -28,7 +28,7 @@
             margin: 0;
             font-family: 'Inter', system-ui, -apple-system, "Noto Sans JP", sans-serif;
             background: radial-gradient(circle at 0 0, #1f2937, transparent 60%), #020617;
-            color: var(--text);
+            color: #e5e7eb;
         }
 
         header {
@@ -37,6 +37,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
         }
 
         header h1 {
@@ -48,7 +49,7 @@
 
         header .sub {
             font-size: 11px;
-            color: var(--muted);
+            color: #9ca3af;
         }
 
         .btn-top {
@@ -62,6 +63,12 @@
             background: #111827;
             color: #e5e7eb;
             border: 1px solid #374151;
+        }
+
+        #statusText {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
         }
 
         .layout {
@@ -78,9 +85,9 @@
         }
 
         .panel {
-            background: var(--panel);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
+            background: #0b1120;
+            border-radius: 16px;
+            border: 1px solid #111827;
             box-shadow: 0 18px 40px rgba(0, 0, 0, .6);
             padding: 12px 12px 16px;
         }
@@ -89,11 +96,11 @@
             font-size: 12px;
             letter-spacing: .12em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: #9ca3af;
             margin-bottom: 8px;
         }
 
-        /* クリエイター一覧 */
+        /* クリエーター一覧 */
         .list {
             max-height: 70vh;
             overflow-y: auto;
@@ -120,7 +127,7 @@
 
         .list-item.active {
             background: #1f2937;
-            border-left: 3px solid var(--accent);
+            border-left: 3px solid #ffb457;
             padding-left: 7px;
         }
 
@@ -133,7 +140,7 @@
 
         .list-item .company {
             font-size: 11px;
-            color: var(--muted);
+            color: #9ca3af;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -147,9 +154,9 @@
         }
 
         .field-group {
-            background: var(--card);
+            background: #020617;
             border-radius: 12px;
-            border: 1px solid var(--border);
+            border: 1px solid #111827;
             padding: 10px 12px 12px;
         }
 
@@ -165,7 +172,7 @@
             font-size: 11px;
             letter-spacing: .08em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: #9ca3af;
         }
 
         .field-note {
@@ -179,15 +186,15 @@
             margin-top: 4px;
             padding: 8px 10px;
             border-radius: 10px;
-            border: 1px solid var(--border);
+            border: 1px solid #1f2937;
             background: #020617;
-            color: var(--text);
+            color: #e5e7eb;
             font-size: 13px;
             outline: none;
         }
 
         .field-input:focus {
-            border-color: var(--accent);
+            border-color: #ffb457;
             box-shadow: 0 0 0 1px rgba(255, 180, 87, .4);
         }
 
@@ -230,14 +237,19 @@
         }
 
         .btn-main {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
             color: #111827;
             font-weight: 600;
         }
 
+        .btn-main[disabled] {
+            opacity: .5;
+            cursor: default;
+        }
+
         .btn-ghost {
             background: #020617;
-            color: var(--text);
+            color: #e5e7eb;
             border: 1px solid #374151;
         }
 
@@ -264,12 +276,13 @@
         <div>
             <h1>EDIT — PLAY. CREATE. LIVE.</h1>
             <div class="sub">クリエイター情報 & メイン動画 / WORKS の編集画面</div>
+            <div id="statusText">状態: 未操作</div>
         </div>
         <button class="btn-top" onclick="location.href='index.html'">← TOPへ戻る</button>
     </header>
 
     <main class="layout">
-        <!-- 左：クリエイター一覧 -->
+        <!-- 左：クリエーター一覧 -->
         <section class="panel">
             <div class="field-header">
                 <div class="panel-title">CREATORS</div>
@@ -334,7 +347,7 @@
                     </div>
 
                     <label class="field-label" style="margin-top:10px;">ABOUT（概要）</label>
-                    <textarea id="summaryInput" class="field-input" placeholder="クリエイターのプロフィールや世界観など"></textarea>
+                    <textarea id="summaryInput" class="field-input" placeholder="クリエーターのプロフィールや世界観など"></textarea>
                 </div>
 
                 <!-- プロフィール画像 -->
@@ -365,7 +378,6 @@
                     <div id="videoFileRow" style="margin-top:8px;display:none;">
                         <label class="field-label">動画ファイル</label>
                         <input id="videoFile" type="file" class="field-input" accept="video/mp4,video/quicktime" />
-                        <p class="field-note">※できるだけ軽い mp4 / mov にしてからアップロードしてください。</p>
                     </div>
 
                     <div id="videoUrlRow" style="margin-top:8px;display:none;">
@@ -385,16 +397,12 @@
                     <label class="field-label">ファイル（画像 / 動画）</label>
                     <input id="worksFilesInput" type="file" class="field-input" multiple
                         accept="image/*,video/mp4,video/quicktime" />
-                    <p class="field-note">
-                        ※複数選択可。画像は type:"image"、動画は type:"video" として自動登録されます。タイトルはファイル名から自動生成。
-                    </p>
+                    <p class="field-note" id="worksFilesStatus">ファイル未選択</p>
 
                     <label class="field-label" style="margin-top:10px;">外部URL（1行1URL）</label>
                     <textarea id="worksUrlsInput" class="field-input"
                         placeholder="https://example.com/image.jpg&#10;https://youtu.be/...&#10;https://vimeo.com/..."></textarea>
-                    <p class="field-note">
-                        ※行ごとに1URL。YouTube→youtube / Vimeo→vimeo / 画像拡張子→image / その他→video として登録します。
-                    </p>
+                    <p class="field-note" id="worksUrlsStatus">0 行</p>
                 </div>
 
                 <div class="btn-bar">
@@ -439,9 +447,9 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        const $ = (s) => document.querySelector(s);
+        const $ = s => document.querySelector(s);
 
-        // DOM
+        const statusText = $("#statusText");
         const creatorListEl = $("#creatorList");
         const newCreatorBtn = $("#newCreatorBtn");
         const saveBtn = $("#saveBtn");
@@ -464,13 +472,20 @@
 
         const worksFilesInput = $("#worksFilesInput");
         const worksUrlsInput = $("#worksUrlsInput");
+        const worksFilesStatus = $("#worksFilesStatus");
+        const worksUrlsStatus = $("#worksUrlsStatus");
 
         let creators = [];
         let currentId = null;
         let currentDoc = null;
 
-        /* ========= メイン動画フォームの表示切り替え ========= */
+        function setStatus(msg, error = false) {
+            statusText.textContent = "状態: " + msg;
+            statusText.style.color = error ? "#fca5a5" : "#9ca3af";
+            console.log("[STATUS]", msg);
+        }
 
+        /* メイン動画 UI 切り替え */
         function onVideoTypeChange() {
             const type = videoTypeSel.value;
             if (type === "file") {
@@ -484,17 +499,26 @@
                 videoUrlRow.style.display = "none";
             }
         }
-        if (videoTypeSel) videoTypeSel.addEventListener("change", onVideoTypeChange);
+        videoTypeSel.addEventListener("change", onVideoTypeChange);
 
-        /* ========= creators 一覧読み込み ========= */
+        /* WORKS ステータス表示 */
+        worksFilesInput.addEventListener("change", () => {
+            const n = worksFilesInput.files.length;
+            worksFilesStatus.textContent = n ? `${n} ファイル選択済み` : "ファイル未選択";
+        });
+        worksUrlsInput.addEventListener("input", () => {
+            const lines = worksUrlsInput.value.split(/\r?\n/).filter(l => l.trim());
+            worksUrlsStatus.textContent = `${lines.length} 行`;
+        });
 
+        /* creators 一覧読み込み */
         async function loadCreators() {
+            setStatus("クリエイター一覧を読み込み中…");
             const snap = await getDocs(collection(db, "creators"));
             creators = [];
             creatorListEl.innerHTML = "";
             snap.forEach(docSnap => {
-                const d = docSnap.data();
-                creators.push({ id: docSnap.id, data: d });
+                creators.push({ id: docSnap.id, data: docSnap.data() });
             });
 
             creators.sort((a, b) => (a.data.name || "").localeCompare(b.data.name || ""));
@@ -502,6 +526,7 @@
             if (!creators.length) {
                 creatorListEl.innerHTML =
                     '<div class="list-item"><div class="name">まだ登録がありません</div></div>';
+                setStatus("クリエーター 0 件。新規作成できます。");
                 return;
             }
 
@@ -516,15 +541,14 @@
                 item.addEventListener("click", () => selectCreator(c.id));
                 creatorListEl.appendChild(item);
             });
+
+            setStatus(`クリエーター ${creators.length} 件`);
         }
 
         function markActive(id) {
             [...creatorListEl.children].forEach(ch => {
-                if (ch.dataset && ch.dataset.id === id) {
-                    ch.classList.add("active");
-                } else {
-                    ch.classList.remove("active");
-                }
+                if (ch.dataset && ch.dataset.id === id) ch.classList.add("active");
+                else ch.classList.remove("active");
             });
         }
 
@@ -549,6 +573,11 @@
 
             worksFilesInput.value = "";
             worksUrlsInput.value = "";
+            worksFilesStatus.textContent = "ファイル未選択";
+            worksUrlsStatus.textContent = "0 行";
+
+            setStatus("新規クリエーターを編集中");
+            alert("新規フォームを開きました");
         }
 
         function detectVideoTypeFromUrl(url) {
@@ -556,7 +585,8 @@
             const lower = url.toLowerCase();
             if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
             if (lower.includes("vimeo.com")) return "vimeo";
-            if (lower.endsWith(".mp4") || lower.endsWith(".mov") || lower.startsWith("https://firebasestorage.googleapis.com")) return "file";
+            if (lower.endsWith(".mp4") || lower.endsWith(".mov") ||
+                lower.startsWith("https://firebasestorage.googleapis.com")) return "file";
             return "";
         }
 
@@ -574,34 +604,31 @@
             summaryInput.value = c.data.summary || "";
             categoryInput.value = (Array.isArray(c.data.categories) && c.data.categories[0]) || "";
 
-            // メイン動画の復元
             const vUrl = c.data.videoUrl || "";
             if (vUrl) {
-                const type = detectVideoTypeFromUrl(vUrl);
-                videoTypeSel.value = type;
-                if (type === "file") {
-                    videoUrlInput.value = "";  // ファイルアップロード系
-                } else {
-                    videoUrlInput.value = vUrl;
-                }
+                const t = detectVideoTypeFromUrl(vUrl);
+                videoTypeSel.value = t;
+                if (t === "file") videoUrlInput.value = "";
+                else videoUrlInput.value = vUrl;
             } else {
                 videoTypeSel.value = "";
                 videoUrlInput.value = "";
             }
             onVideoTypeChange();
 
-            // WORKS は UI に復元しない（毎回上書き仕様）
             worksFilesInput.value = "";
             worksUrlsInput.value = "";
-        }
+            worksFilesStatus.textContent = "ファイル未選択";
+            worksUrlsStatus.textContent = "0 行";
 
-        /* ========= アップロードヘルパー ========= */
+            setStatus(`編集中: ${c.data.name || "(無名)"}`);
+        }
 
         async function uploadProfileImageIfNeeded(creatorId, previousUrl) {
             const file = profileImageInput.files[0];
             if (!file) return previousUrl || null;
 
-            const ext = file.name.split(".").pop() || "jpg";
+            const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
             const fileRef = ref(storage, `creators/${creatorId}/profile.${ext}`);
             await uploadBytes(fileRef, file);
             return await getDownloadURL(fileRef);
@@ -609,35 +636,22 @@
 
         async function buildMainVideoUrl(creatorId, previousUrl) {
             const type = videoTypeSel.value;
-
-            if (!type) {
-                // 種類未選択 → 既存URLを維持 or 無し
-                return previousUrl || null;
-            }
+            if (!type) return previousUrl || null;
 
             if (type === "file") {
                 const file = videoFileInput.files[0];
-
-                if (!file && previousUrl) {
-                    // 編集時：ファイル未選択なら既存URLをそのまま使う
-                    return previousUrl;
-                }
+                if (!file && previousUrl) return previousUrl;
                 if (!file) return null;
 
-                const ext = file.name.split(".").pop() || "mp4";
+                const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
                 const fileRef = ref(storage, `creators/${creatorId}/main-video.${ext}`);
                 await uploadBytes(fileRef, file);
-                const url = await getDownloadURL(fileRef);
-                return url;
+                return await getDownloadURL(fileRef);
             }
 
-            if (type === "youtube" || type === "vimeo") {
-                const url = videoUrlInput.value.trim();
-                if (!url) return null;
-                return url;
-            }
-
-            return previousUrl || null;
+            const url = videoUrlInput.value.trim();
+            if (!url) return null;
+            return url;
         }
 
         function detectWorkTypeFromUrl(url) {
@@ -653,34 +667,29 @@
             const urlsText = worksUrlsInput.value.trim();
             const works = [];
 
-            // ファイル群をアップロード
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const isImage = file.type.startsWith("image/");
-                const isVideo = file.type.startsWith("video/");
-
-                const ext = file.name.split(".").pop() || (isImage ? "jpg" : "mp4");
-                const baseName = file.name.replace(/\.[^/.]+$/, "");
+                const ext = (file.name.split(".").pop() || (isImage ? "jpg" : "mp4")).toLowerCase();
+                const base = file.name.replace(/\.[^/.]+$/, "");
 
                 const fileRef = ref(storage, `creators/${creatorId}/works/${Date.now()}_${i}.${ext}`);
                 await uploadBytes(fileRef, file);
                 const url = await getDownloadURL(fileRef);
 
                 works.push({
-                    title: baseName,
+                    title: base,
                     type: isImage ? "image" : "video",
                     url
                 });
             }
 
-            // 外部URL群（1行1URL）
             if (urlsText) {
-                const lines = urlsText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+                const lines = urlsText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
                 lines.forEach((line, idx) => {
-                    const type = detectWorkTypeFromUrl(line);
                     works.push({
                         title: `WORK ${idx + 1} (URL)`,
-                        type,
+                        type: detectWorkTypeFromUrl(line),
                         url: line
                     });
                 });
@@ -689,72 +698,88 @@
             return works;
         }
 
-        /* ========= 保存処理 ========= */
-
         async function saveCreator() {
+            console.log("🚀 saveCreator START");
             const name = nameInput.value.trim();
             if (!name) {
                 alert("名前は必須です。");
+                setStatus("名前が入力されていません", true);
                 return;
             }
 
-            let creatorId = currentId;
-            let docRef;
+            saveBtn.disabled = true;
+            deleteBtn.disabled = true;
+            saveBtn.textContent = "保存中…";
+            setStatus("保存中…");
 
-            if (!creatorId) {
-                const basePayload = {
+            try {
+                let creatorId = currentId;
+                let docRef;
+
+                if (!creatorId) {
+                    const basePayload = {
+                        name,
+                        company: companyInput.value.trim(),
+                        url: urlInput.value.trim(),
+                        videoTitle: videoTitleInput.value.trim(),
+                        summary: summaryInput.value.trim(),
+                        categories: categoryInput.value ? [categoryInput.value] : [],
+                        createdAt: serverTimestamp()
+                    };
+                    console.log("📤 addDoc payload", basePayload);
+                    docRef = await addDoc(collection(db, "creators"), basePayload);
+                    creatorId = docRef.id;
+                } else {
+                    docRef = doc(db, "creators", creatorId);
+                }
+
+                const prev = currentDoc || {};
+                const prevVideo = prev.videoUrl || null;
+                const prevProfile = prev.profileImageUrl || null;
+
+                const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, prevProfile);
+                const videoUrl = await buildMainVideoUrl(creatorId, prevVideo);
+                const works = await buildWorksField(creatorId);
+
+                const payload = {
                     name,
                     company: companyInput.value.trim(),
                     url: urlInput.value.trim(),
                     videoTitle: videoTitleInput.value.trim(),
                     summary: summaryInput.value.trim(),
                     categories: categoryInput.value ? [categoryInput.value] : [],
-                    createdAt: serverTimestamp()
+                    updatedAt: serverTimestamp(),
+                    videoUrl: videoUrl || null,
+                    works
                 };
-                docRef = await addDoc(collection(db, "creators"), basePayload);
-                creatorId = docRef.id;
-            } else {
-                docRef = doc(db, "creators", creatorId);
+                if (profileImageUrl) payload.profileImageUrl = profileImageUrl;
+
+                console.log("📤 setDoc payload", payload);
+                await setDoc(docRef, payload, { merge: true });
+
+                alert("保存しました");
+                setStatus("保存完了");
+                console.log("✅ saveCreator DONE");
+
+                currentId = creatorId;
+                const snap = await getDocs(collection(db, "creators"));
+                creators = [];
+                snap.forEach(docSnap => {
+                    creators.push({ id: docSnap.id, data: docSnap.data() });
+                });
+                currentDoc = creators.find(x => x.id === creatorId)?.data || payload;
+                await loadCreators();
+                selectCreator(creatorId);
+
+            } catch (e) {
+                console.error("❌ saveCreator error", e);
+                alert("保存中にエラーが発生しました: " + (e.message || e));
+                setStatus("保存エラー: " + (e.message || e), true);
+            } finally {
+                saveBtn.disabled = false;
+                deleteBtn.disabled = false;
+                saveBtn.textContent = "保存";
             }
-
-            const prev = currentDoc || {};
-            const previousVideoUrl = prev.videoUrl || null;
-            const previousProfile = prev.profileImageUrl || null;
-
-            const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, previousProfile);
-            const videoUrl = await buildMainVideoUrl(creatorId, previousVideoUrl);
-            const works = await buildWorksField(creatorId);
-
-            const payload = {
-                name,
-                company: companyInput.value.trim(),
-                url: urlInput.value.trim(),
-                videoTitle: videoTitleInput.value.trim(),
-                summary: summaryInput.value.trim(),
-                categories: categoryInput.value ? [categoryInput.value] : [],
-                updatedAt: serverTimestamp()
-            };
-
-            if (profileImageUrl) payload.profileImageUrl = profileImageUrl;
-            if (videoUrl) payload.videoUrl = videoUrl;
-            else payload.videoUrl = null;
-
-            payload.works = works;
-
-            await setDoc(docRef, payload, { merge: true });
-
-            alert("保存しました。");
-
-            currentId = creatorId;
-            const snap = await getDocs(collection(db, "creators"));
-            creators = [];
-            snap.forEach(docSnap => {
-                creators.push({ id: docSnap.id, data: docSnap.data() });
-            });
-            currentDoc = creators.find(x => x.id === creatorId)?.data || payload;
-
-            await loadCreators();
-            selectCreator(creatorId);
         }
 
         async function deleteCreator() {
@@ -762,20 +787,34 @@
                 alert("削除対象が選択されていません。");
                 return;
             }
-            if (!confirm("本当にこのクリエイターを削除しますか？")) return;
-            await deleteDoc(doc(db, "creators", currentId));
-            alert("削除しました。");
-            clearForm();
-            await loadCreators();
+            if (!confirm("本当にこのクリエーターを削除しますか？")) return;
+            try {
+                await deleteDoc(doc(db, "creators", currentId));
+                alert("削除しました");
+                setStatus("削除完了");
+                clearForm();
+                await loadCreators();
+            } catch (e) {
+                console.error("❌ delete error", e);
+                alert("削除中にエラーが発生しました: " + (e.message || e));
+                setStatus("削除エラー: " + (e.message || e), true);
+            }
         }
 
-        /* ========= イベント登録 & 初期化 ========= */
-
+        // イベント登録
         newCreatorBtn.addEventListener("click", clearForm);
-        saveBtn.addEventListener("click", saveCreator);
+        saveBtn.addEventListener("click", () => {
+            console.log("🔥 SAVE BUTTON CLICKED");
+            alert("保存ボタンが押されました");
+            saveCreator();
+        });
         deleteBtn.addEventListener("click", deleteCreator);
 
-        loadCreators();
+        // 初期ロード
+        loadCreators().catch(e => {
+            console.error("❌ loadCreators error", e);
+            setStatus("読み込みエラー: " + (e.message || e), true);
+        });
     </script>
 </body>
 
