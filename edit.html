@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>EDIT — PLAY. CREATE. LIVE.</title>
+    <title>EDIT — CREATORS’ GUILD COLLECTIVE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <style>
@@ -28,7 +28,7 @@
             margin: 0;
             font-family: 'Inter', system-ui, -apple-system, "Noto Sans JP", sans-serif;
             background: radial-gradient(circle at 0 0, #1f2937, transparent 60%), #020617;
-            color: #e5e7eb;
+            color: var(--text);
         }
 
         header {
@@ -37,7 +37,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
         }
 
         header h1 {
@@ -49,7 +48,7 @@
 
         header .sub {
             font-size: 11px;
-            color: #9ca3af;
+            color: var(--muted);
         }
 
         .btn-top {
@@ -65,12 +64,6 @@
             border: 1px solid #374151;
         }
 
-        #statusText {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 4px;
-        }
-
         .layout {
             display: grid;
             grid-template-columns: 260px minmax(0, 1fr);
@@ -78,16 +71,16 @@
             padding: 12px 16px 24px;
         }
 
-        @media(max-width:900px) {
+        @media (max-width:900px) {
             .layout {
                 grid-template-columns: 1fr;
             }
         }
 
         .panel {
-            background: #0b1120;
-            border-radius: 16px;
-            border: 1px solid #111827;
+            background: var(--panel);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
             box-shadow: 0 18px 40px rgba(0, 0, 0, .6);
             padding: 12px 12px 16px;
         }
@@ -96,11 +89,11 @@
             font-size: 12px;
             letter-spacing: .12em;
             text-transform: uppercase;
-            color: #9ca3af;
+            color: var(--muted);
             margin-bottom: 8px;
         }
 
-        /* クリエーター一覧 */
+        /* クリエイター一覧 */
         .list {
             max-height: 70vh;
             overflow-y: auto;
@@ -127,7 +120,7 @@
 
         .list-item.active {
             background: #1f2937;
-            border-left: 3px solid #ffb457;
+            border-left: 3px solid var(--accent);
             padding-left: 7px;
         }
 
@@ -140,7 +133,7 @@
 
         .list-item .company {
             font-size: 11px;
-            color: #9ca3af;
+            color: var(--muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -154,9 +147,9 @@
         }
 
         .field-group {
-            background: #020617;
+            background: var(--card);
             border-radius: 12px;
-            border: 1px solid #111827;
+            border: 1px solid var(--border);
             padding: 10px 12px 12px;
         }
 
@@ -172,7 +165,7 @@
             font-size: 11px;
             letter-spacing: .08em;
             text-transform: uppercase;
-            color: #9ca3af;
+            color: var(--muted);
         }
 
         .field-note {
@@ -186,15 +179,15 @@
             margin-top: 4px;
             padding: 8px 10px;
             border-radius: 10px;
-            border: 1px solid #1f2937;
+            border: 1px solid var(--border);
             background: #020617;
-            color: #e5e7eb;
+            color: var(--text);
             font-size: 13px;
             outline: none;
         }
 
         .field-input:focus {
-            border-color: #ffb457;
+            border-color: var(--accent);
             box-shadow: 0 0 0 1px rgba(255, 180, 87, .4);
         }
 
@@ -213,7 +206,7 @@
             gap: 10px;
         }
 
-        @media(max-width:800px) {
+        @media (max-width:800px) {
             .row-2 {
                 grid-template-columns: 1fr;
             }
@@ -237,19 +230,14 @@
         }
 
         .btn-main {
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
             color: #111827;
             font-weight: 600;
         }
 
-        .btn-main[disabled] {
-            opacity: .5;
-            cursor: default;
-        }
-
         .btn-ghost {
             background: #020617;
-            color: #e5e7eb;
+            color: var(--text);
             border: 1px solid #374151;
         }
 
@@ -268,21 +256,27 @@
             background: rgba(16, 185, 129, .15);
             border: 1px solid rgba(16, 185, 129, .4);
         }
+
+        .status {
+            margin-top: 4px;
+            font-size: 11px;
+            color: #9ca3af;
+            min-height: 14px;
+        }
     </style>
 </head>
 
 <body>
     <header>
         <div>
-            <h1>EDIT — PLAY. CREATE. LIVE.</h1>
+            <h1>EDIT — CREATORS’ GUILD COLLECTIVE</h1>
             <div class="sub">クリエイター情報 & メイン動画 / WORKS の編集画面</div>
-            <div id="statusText">状態: 未操作</div>
         </div>
         <button class="btn-top" onclick="location.href='index.html'">← TOPへ戻る</button>
     </header>
 
     <main class="layout">
-        <!-- 左：クリエーター一覧 -->
+        <!-- 左：クリエイター一覧 -->
         <section class="panel">
             <div class="field-header">
                 <div class="panel-title">CREATORS</div>
@@ -300,522 +294,9 @@
                 <div class="field-group">
                     <div class="field-header">
                         <span class="field-label">基本情報</span>
+                        <span id="currentIdLabel" class="field-note"></span>
                     </div>
                     <div class="row-2">
                         <div>
                             <label class="field-label">名前</label>
                             <input id="nameInput" class="field-input" type="text" placeholder="例：Masahiro Kuwamoto" />
-                        </div>
-                        <div>
-                            <label class="field-label">会社・肩書</label>
-                            <input id="companyInput" class="field-input" type="text"
-                                placeholder="例：GEOBRAIN / Creative Director" />
-                        </div>
-                    </div>
-
-                    <label class="field-label" style="margin-top:10px;">Web / SNS URL</label>
-                    <input id="urlInput" class="field-input" type="text" placeholder="https://..." />
-
-                    <div class="row-2" style="margin-top:10px;">
-                        <div>
-                            <label class="field-label">メイン動画タイトル</label>
-                            <input id="videoTitleInput" class="field-input" type="text"
-                                placeholder="例：Challenge the Unknown." />
-                        </div>
-                        <div>
-                            <label class="field-label">カテゴリ</label>
-                            <select id="categoryInput" class="field-input">
-                                <option value="">未選択</option>
-                                <option value="CXプロデューサー">CXプロデューサー</option>
-                                <option value="建築デザイナー">建築デザイナー</option>
-                                <option value="インテリアデザイナー">インテリアデザイナー</option>
-                                <option value="グラフィックデザイナー">グラフィックデザイナー</option>
-                                <option value="映像プロデューサー">映像プロデューサー</option>
-                                <option value="プロデューサー">プロデューサー</option>
-                                <option value="プランナー">プランナー</option>
-                                <option value="エンジニア">エンジニア</option>
-                                <option value="ミュージシャン">ミュージシャン</option>
-                                <option value="アーティスト">アーティスト</option>
-                                <option value="ヘアメイクアーティスト">ヘアメイクアーティスト</option>
-                                <option value="展示デザイナー">展示デザイナー</option>
-                                <option value="アスリート">アスリート</option>
-                                <option value="エンターテイナー">エンターテイナー</option>
-                                <option value="クリエイティブビルダー">クリエイティブビルダー</option>
-                                <option value="その他">その他</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <label class="field-label" style="margin-top:10px;">ABOUT（概要）</label>
-                    <textarea id="summaryInput" class="field-input" placeholder="クリエーターのプロフィールや世界観など"></textarea>
-                </div>
-
-                <!-- プロフィール画像 -->
-                <div class="field-group">
-                    <div class="field-header">
-                        <span class="field-label">プロフィール画像</span>
-                    </div>
-                    <input id="profileImageInput" class="field-input" type="file" accept="image/*" />
-                    <p class="field-note">※正方形〜横長推奨。jpg / png など。</p>
-                </div>
-
-                <!-- メイン動画設定 -->
-                <div class="field-group">
-                    <div class="field-header">
-                        <span class="field-label">メイン動画</span>
-                        <span class="tag">MOV / MP4 / YouTube / Vimeo</span>
-                    </div>
-
-                    <label class="field-label">種類</label>
-                    <select id="videoType" class="field-input">
-                        <option value="">なし</option>
-                        <option value="file">ファイル（mov / mp4）</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="vimeo">Vimeo</option>
-                    </select>
-                    <p class="field-note">※いずれか1つを選択してください。</p>
-
-                    <div id="videoFileRow" style="margin-top:8px;display:none;">
-                        <label class="field-label">動画ファイル</label>
-                        <input id="videoFile" type="file" class="field-input" accept="video/mp4,video/quicktime" />
-                    </div>
-
-                    <div id="videoUrlRow" style="margin-top:8px;display:none;">
-                        <label class="field-label">動画URL（YouTube / Vimeo）</label>
-                        <input id="videoUrlInput" type="text" class="field-input"
-                            placeholder="https://youtu.be/..., https://www.youtube.com/watch?v=..., https://vimeo.com/..." />
-                    </div>
-                </div>
-
-                <!-- WORKS（複数ファイル＋複数URL） -->
-                <div class="field-group">
-                    <div class="field-header">
-                        <span class="field-label">WORKS</span>
-                        <span class="tag">複数登録可</span>
-                    </div>
-
-                    <label class="field-label">ファイル（画像 / 動画）</label>
-                    <input id="worksFilesInput" type="file" class="field-input" multiple
-                        accept="image/*,video/mp4,video/quicktime" />
-                    <p class="field-note" id="worksFilesStatus">ファイル未選択</p>
-
-                    <label class="field-label" style="margin-top:10px;">外部URL（1行1URL）</label>
-                    <textarea id="worksUrlsInput" class="field-input"
-                        placeholder="https://example.com/image.jpg&#10;https://youtu.be/...&#10;https://vimeo.com/..."></textarea>
-                    <p class="field-note" id="worksUrlsStatus">0 行</p>
-                </div>
-
-                <div class="btn-bar">
-                    <button id="deleteBtn" class="btn btn-danger" type="button">削除</button>
-                    <button id="saveBtn" class="btn btn-main" type="button">保存</button>
-                </div>
-            </form>
-        </section>
-    </main>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import {
-            getFirestore,
-            collection,
-            getDocs,
-            doc,
-            setDoc,
-            addDoc,
-            deleteDoc,
-            serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-        import {
-            getStorage,
-            ref,
-            uploadBytes,
-            getDownloadURL
-        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
-            authDomain: "play-create-live.firebaseapp.com",
-            databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
-            projectId: "play-create-live",
-            storageBucket: "play-create-live.firebasestorage.app",
-            messagingSenderId: "143889321354",
-            appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
-            measurementId: "G-ZFHF93QQCJ"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        const $ = s => document.querySelector(s);
-
-        const statusText = $("#statusText");
-        const creatorListEl = $("#creatorList");
-        const newCreatorBtn = $("#newCreatorBtn");
-        const saveBtn = $("#saveBtn");
-        const deleteBtn = $("#deleteBtn");
-
-        const nameInput = $("#nameInput");
-        const companyInput = $("#companyInput");
-        const urlInput = $("#urlInput");
-        const videoTitleInput = $("#videoTitleInput");
-        const summaryInput = $("#summaryInput");
-        const categoryInput = $("#categoryInput");
-
-        const profileImageInput = $("#profileImageInput");
-
-        const videoTypeSel = $("#videoType");
-        const videoFileRow = $("#videoFileRow");
-        const videoFileInput = $("#videoFile");
-        const videoUrlRow = $("#videoUrlRow");
-        const videoUrlInput = $("#videoUrlInput");
-
-        const worksFilesInput = $("#worksFilesInput");
-        const worksUrlsInput = $("#worksUrlsInput");
-        const worksFilesStatus = $("#worksFilesStatus");
-        const worksUrlsStatus = $("#worksUrlsStatus");
-
-        let creators = [];
-        let currentId = null;
-        let currentDoc = null;
-
-        function setStatus(msg, error = false) {
-            statusText.textContent = "状態: " + msg;
-            statusText.style.color = error ? "#fca5a5" : "#9ca3af";
-            console.log("[STATUS]", msg);
-        }
-
-        /* メイン動画 UI 切り替え */
-        function onVideoTypeChange() {
-            const type = videoTypeSel.value;
-            if (type === "file") {
-                videoFileRow.style.display = "block";
-                videoUrlRow.style.display = "none";
-            } else if (type === "youtube" || type === "vimeo") {
-                videoFileRow.style.display = "none";
-                videoUrlRow.style.display = "block";
-            } else {
-                videoFileRow.style.display = "none";
-                videoUrlRow.style.display = "none";
-            }
-        }
-        videoTypeSel.addEventListener("change", onVideoTypeChange);
-
-        /* WORKS ステータス表示 */
-        worksFilesInput.addEventListener("change", () => {
-            const n = worksFilesInput.files.length;
-            worksFilesStatus.textContent = n ? `${n} ファイル選択済み` : "ファイル未選択";
-        });
-        worksUrlsInput.addEventListener("input", () => {
-            const lines = worksUrlsInput.value.split(/\r?\n/).filter(l => l.trim());
-            worksUrlsStatus.textContent = `${lines.length} 行`;
-        });
-
-        /* creators 一覧読み込み */
-        async function loadCreators() {
-            setStatus("クリエイター一覧を読み込み中…");
-            const snap = await getDocs(collection(db, "creators"));
-            creators = [];
-            creatorListEl.innerHTML = "";
-            snap.forEach(docSnap => {
-                creators.push({ id: docSnap.id, data: docSnap.data() });
-            });
-
-            creators.sort((a, b) => (a.data.name || "").localeCompare(b.data.name || ""));
-
-            if (!creators.length) {
-                creatorListEl.innerHTML =
-                    '<div class="list-item"><div class="name">まだ登録がありません</div></div>';
-                setStatus("クリエーター 0 件。新規作成できます。");
-                return;
-            }
-
-            creators.forEach(c => {
-                const item = document.createElement("div");
-                item.className = "list-item";
-                item.dataset.id = c.id;
-                item.innerHTML = `
-          <div class="name">${c.data.name || "(無名)"}</div>
-          <div class="company">${c.data.company || ""}</div>
-        `;
-                item.addEventListener("click", () => selectCreator(c.id));
-                creatorListEl.appendChild(item);
-            });
-
-            setStatus(`クリエーター ${creators.length} 件`);
-        }
-
-        function markActive(id) {
-            [...creatorListEl.children].forEach(ch => {
-                if (ch.dataset && ch.dataset.id === id) ch.classList.add("active");
-                else ch.classList.remove("active");
-            });
-        }
-
-        function clearForm() {
-            currentId = null;
-            currentDoc = null;
-            markActive(null);
-
-            nameInput.value = "";
-            companyInput.value = "";
-            urlInput.value = "";
-            videoTitleInput.value = "";
-            summaryInput.value = "";
-            categoryInput.value = "";
-
-            profileImageInput.value = "";
-
-            videoTypeSel.value = "";
-            videoFileInput.value = "";
-            videoUrlInput.value = "";
-            onVideoTypeChange();
-
-            worksFilesInput.value = "";
-            worksUrlsInput.value = "";
-            worksFilesStatus.textContent = "ファイル未選択";
-            worksUrlsStatus.textContent = "0 行";
-
-            setStatus("新規クリエーターを編集中");
-            alert("新規フォームを開きました");
-        }
-
-        function detectVideoTypeFromUrl(url) {
-            if (!url) return "";
-            const lower = url.toLowerCase();
-            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
-            if (lower.includes("vimeo.com")) return "vimeo";
-            if (lower.endsWith(".mp4") || lower.endsWith(".mov") ||
-                lower.startsWith("https://firebasestorage.googleapis.com")) return "file";
-            return "";
-        }
-
-        async function selectCreator(id) {
-            const c = creators.find(x => x.id === id);
-            if (!c) return;
-            currentId = id;
-            currentDoc = c.data;
-            markActive(id);
-
-            nameInput.value = c.data.name || "";
-            companyInput.value = c.data.company || "";
-            urlInput.value = c.data.url || "";
-            videoTitleInput.value = c.data.videoTitle || "";
-            summaryInput.value = c.data.summary || "";
-            categoryInput.value = (Array.isArray(c.data.categories) && c.data.categories[0]) || "";
-
-            const vUrl = c.data.videoUrl || "";
-            if (vUrl) {
-                const t = detectVideoTypeFromUrl(vUrl);
-                videoTypeSel.value = t;
-                if (t === "file") videoUrlInput.value = "";
-                else videoUrlInput.value = vUrl;
-            } else {
-                videoTypeSel.value = "";
-                videoUrlInput.value = "";
-            }
-            onVideoTypeChange();
-
-            worksFilesInput.value = "";
-            worksUrlsInput.value = "";
-            worksFilesStatus.textContent = "ファイル未選択";
-            worksUrlsStatus.textContent = "0 行";
-
-            setStatus(`編集中: ${c.data.name || "(無名)"}`);
-        }
-
-        async function uploadProfileImageIfNeeded(creatorId, previousUrl) {
-            const file = profileImageInput.files[0];
-            if (!file) return previousUrl || null;
-
-            const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-            const fileRef = ref(storage, `creators/${creatorId}/profile.${ext}`);
-            await uploadBytes(fileRef, file);
-            return await getDownloadURL(fileRef);
-        }
-
-        async function buildMainVideoUrl(creatorId, previousUrl) {
-            const type = videoTypeSel.value;
-            if (!type) return previousUrl || null;
-
-            if (type === "file") {
-                const file = videoFileInput.files[0];
-                if (!file && previousUrl) return previousUrl;
-                if (!file) return null;
-
-                const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
-                const fileRef = ref(storage, `creators/${creatorId}/main-video.${ext}`);
-                await uploadBytes(fileRef, file);
-                return await getDownloadURL(fileRef);
-            }
-
-            const url = videoUrlInput.value.trim();
-            if (!url) return null;
-            return url;
-        }
-
-        function detectWorkTypeFromUrl(url) {
-            const lower = url.toLowerCase();
-            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
-            if (lower.includes("vimeo.com")) return "vimeo";
-            if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
-            return "video";
-        }
-
-        async function buildWorksField(creatorId) {
-            const files = worksFilesInput.files;
-            const urlsText = worksUrlsInput.value.trim();
-            const works = [];
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const isImage = file.type.startsWith("image/");
-                const ext = (file.name.split(".").pop() || (isImage ? "jpg" : "mp4")).toLowerCase();
-                const base = file.name.replace(/\.[^/.]+$/, "");
-
-                const fileRef = ref(storage, `creators/${creatorId}/works/${Date.now()}_${i}.${ext}`);
-                await uploadBytes(fileRef, file);
-                const url = await getDownloadURL(fileRef);
-
-                works.push({
-                    title: base,
-                    type: isImage ? "image" : "video",
-                    url
-                });
-            }
-
-            if (urlsText) {
-                const lines = urlsText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-                lines.forEach((line, idx) => {
-                    works.push({
-                        title: `WORK ${idx + 1} (URL)`,
-                        type: detectWorkTypeFromUrl(line),
-                        url: line
-                    });
-                });
-            }
-
-            return works;
-        }
-
-        async function saveCreator() {
-            console.log("🚀 saveCreator START");
-            const name = nameInput.value.trim();
-            if (!name) {
-                alert("名前は必須です。");
-                setStatus("名前が入力されていません", true);
-                return;
-            }
-
-            saveBtn.disabled = true;
-            deleteBtn.disabled = true;
-            saveBtn.textContent = "保存中…";
-            setStatus("保存中…");
-
-            try {
-                let creatorId = currentId;
-                let docRef;
-
-                if (!creatorId) {
-                    const basePayload = {
-                        name,
-                        company: companyInput.value.trim(),
-                        url: urlInput.value.trim(),
-                        videoTitle: videoTitleInput.value.trim(),
-                        summary: summaryInput.value.trim(),
-                        categories: categoryInput.value ? [categoryInput.value] : [],
-                        createdAt: serverTimestamp()
-                    };
-                    console.log("📤 addDoc payload", basePayload);
-                    docRef = await addDoc(collection(db, "creators"), basePayload);
-                    creatorId = docRef.id;
-                } else {
-                    docRef = doc(db, "creators", creatorId);
-                }
-
-                const prev = currentDoc || {};
-                const prevVideo = prev.videoUrl || null;
-                const prevProfile = prev.profileImageUrl || null;
-
-                const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, prevProfile);
-                const videoUrl = await buildMainVideoUrl(creatorId, prevVideo);
-                const works = await buildWorksField(creatorId);
-
-                const payload = {
-                    name,
-                    company: companyInput.value.trim(),
-                    url: urlInput.value.trim(),
-                    videoTitle: videoTitleInput.value.trim(),
-                    summary: summaryInput.value.trim(),
-                    categories: categoryInput.value ? [categoryInput.value] : [],
-                    updatedAt: serverTimestamp(),
-                    videoUrl: videoUrl || null,
-                    works
-                };
-                if (profileImageUrl) payload.profileImageUrl = profileImageUrl;
-
-                console.log("📤 setDoc payload", payload);
-                await setDoc(docRef, payload, { merge: true });
-
-                alert("保存しました");
-                setStatus("保存完了");
-                console.log("✅ saveCreator DONE");
-
-                currentId = creatorId;
-                const snap = await getDocs(collection(db, "creators"));
-                creators = [];
-                snap.forEach(docSnap => {
-                    creators.push({ id: docSnap.id, data: docSnap.data() });
-                });
-                currentDoc = creators.find(x => x.id === creatorId)?.data || payload;
-                await loadCreators();
-                selectCreator(creatorId);
-
-            } catch (e) {
-                console.error("❌ saveCreator error", e);
-                alert("保存中にエラーが発生しました: " + (e.message || e));
-                setStatus("保存エラー: " + (e.message || e), true);
-            } finally {
-                saveBtn.disabled = false;
-                deleteBtn.disabled = false;
-                saveBtn.textContent = "保存";
-            }
-        }
-
-        async function deleteCreator() {
-            if (!currentId) {
-                alert("削除対象が選択されていません。");
-                return;
-            }
-            if (!confirm("本当にこのクリエーターを削除しますか？")) return;
-            try {
-                await deleteDoc(doc(db, "creators", currentId));
-                alert("削除しました");
-                setStatus("削除完了");
-                clearForm();
-                await loadCreators();
-            } catch (e) {
-                console.error("❌ delete error", e);
-                alert("削除中にエラーが発生しました: " + (e.message || e));
-                setStatus("削除エラー: " + (e.message || e), true);
-            }
-        }
-
-        // イベント登録
-        newCreatorBtn.addEventListener("click", clearForm);
-        saveBtn.addEventListener("click", () => {
-            console.log("🔥 SAVE BUTTON CLICKED");
-            alert("保存ボタンが押されました");
-            saveCreator();
-        });
-        deleteBtn.addEventListener("click", deleteCreator);
-
-        // 初期ロード
-        loadCreators().catch(e => {
-            console.error("❌ loadCreators error", e);
-            setStatus("読み込みエラー: " + (e.message || e), true);
-        });
-    </script>
-</body>
-
-</html>
