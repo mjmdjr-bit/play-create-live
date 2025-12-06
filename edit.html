@@ -762,46 +762,70 @@
         }
 
         async function selectCreator(id) {
-            const c = creators.find(x => x.id === id);
-            if (!c) return;
-            currentId = id; null;
-            currentDoc = c.data; /creators/4NNoJl9dSR8AwzcGdYQ2
+            // Firestore から1件だけ取得
+            const ref = doc(db, "creators", id);
+            const snap = await getDoc(ref);
+
+            if (!snap.exists()) {
+                console.warn("Creator not found:", id);
+                return;
+            }
+
+            const data = snap.data();
+
+            currentId = id;
+            currentDoc = data;
+
             markActive(id);
 
-            nameInput.value = c.data.name || "";
-            companyInput.value = c.data.company || "";
-            urlInput.value = c.data.url || "";
-            videoTitleInput.value = c.data.videoTitle || "";
-            summaryInput.value = c.data.summary || "";
+            // 各入力欄に反映
+            nameInput.value = data.name || "";
+            companyInput.value = data.company || "";
+            urlInput.value = data.url || "";
+            videoTitleInput.value = data.videoTitle || "";
+            summaryInput.value = data.summary || "";
 
-            // カテゴリは配列→カンマ区切り
-            if (Array.isArray(c.data.categories)) {
-                categoryInput.value = c.data.categories.join(", ");
+            // カテゴリ（配列）はカンマ区切りで表示
+            if (Array.isArray(data.categories)) {
+                categoryInput.value = data.categories.join(", ");
             } else {
                 categoryInput.value = "";
             }
+        }
+        import { initializeApp } from "https://console.firebase.google.com/project/play-create-live/firestore/databases/-default-/data/~2Fcreators?hl=ja";
+        import { getFirestore, doc, getDoc } from "/creators/4NNoJl9dSR8AwzcGdYQ2";
 
-            // メイン動画
-            const vUrl = c.data.videoUrl || "";
-            if (vUrl) {
-                const type = detectVideoTypeFromUrl(vUrl);
-                videoTypeSel.value = type;
-                if (type === "file") {
-                    videoUrlInput.value = "";
-                } else {
-                    videoUrlInput.value = vUrl;
-                }
-            } else {
-                videoTypeSel.value = "";
+        const firebaseConfig = { ... };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+
+        const firebaseConfig = { ... };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+
+        // メイン動画
+        const vUrl = c.data.videoUrl || "";
+        if (vUrl) {
+            const type = detectVideoTypeFromUrl(vUrl);
+            videoTypeSel.value = type;
+            if (type === "file") {
                 videoUrlInput.value = "";
+            } else {
+                videoUrlInput.value = vUrl;
             }
-            videoFileInput.value = "";
-            onVideoTypeChange();
+        } else {
+            videoTypeSel.value = "";
+            videoUrlInput.value = "";
+        }
+        videoFileInput.value = "";
+        onVideoTypeChange();
 
-            // WORKS
-            renderWorksEditor(c.data.works || []);
-            worksFilesInput.value = "";
-            worksUrlsInput.value = "";
+        // WORKS
+        renderWorksEditor(c.data.works || []);
+        worksFilesInput.value = "";
+        worksUrlsInput.value = "";
         }
 
         // アップロードヘルパー
