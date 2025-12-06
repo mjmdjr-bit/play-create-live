@@ -1491,26 +1491,6 @@
 
             $("#detailOverlay").classList.add("show");
         }
-
-        // WORKS 用のタイプ判定
-        function detectWorkTypeFromUrl(url) {
-            if (!url) return "video";
-            const lower = url.toLowerCase();
-            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
-            if (lower.includes("vimeo.com")) return "vimeo";
-            if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
-            if (lower.endsWith(".mp4") || lower.endsWith(".mov") ||
-                lower.startsWith("https://firebasestorage.googleapis.com")) return "video";
-            return "video";
-        }
-
-
-        renderMainVideo(c.videoUrl);
-        renderWorks(c.works);
-        listenComments(c.id);
-        setupCommentInput(c.id);
-
-        $("#detailOverlay").classList.add("show");
         }
 
         function closeDetail() {
