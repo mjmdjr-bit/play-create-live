@@ -751,9 +751,14 @@
                 const url = urlEl?.value.trim() || "";
                 const type = (typeEl?.textContent || "video").toLowerCase();
                 if (!url) return;
-                works.push({ title, url, type });
-            });
-            return works;
+                works.push({ title, url, type, description: desc,{
+                    type: "vimeo",
+                    url: "https://vimeo.com/123456",
+                    title: "Vimeo Original Title",
+                    displayName: "作品名（任意）"
+                } });
+        });
+        return works;
         }
 
         async function selectCreator(id) {
@@ -869,33 +874,39 @@
                 if (existingUrlSet.has(url)) continue;
 
                 newWorks.push({
-                    title: baseName,
-                    type: isImage ? "image" : "video",
+                    title: 'WORK ${idx + 1} (URL)',
+                    url,
+                    type,
+                    description: ""  //{
+  type: "vimeo",
+                    url: "https://vimeo.com/123456",
+                    title: "Vimeo Original Title",
+                    displayName: "作品名（任意）"
+                }
+                });
+            existingUrlSet.add(url);
+        }
+
+        // 外部URL追加
+        if (urlsText) {
+            const lines = urlsText.split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(Boolean);
+
+            lines.forEach((line, idx) => {
+                const url = line;
+                if (existingUrlSet.has(url)) return;
+                const type = detectWorkTypeFromUrl(url);
+                newWorks.push({
+                    title: `WORK ${idx + 1} (URL)`,
+                    type,
                     url
                 });
                 existingUrlSet.add(url);
-            }
+            });
+        }
 
-            // 外部URL追加
-            if (urlsText) {
-                const lines = urlsText.split(/\r?\n/)
-                    .map(l => l.trim())
-                    .filter(Boolean);
-
-                lines.forEach((line, idx) => {
-                    const url = line;
-                    if (existingUrlSet.has(url)) return;
-                    const type = detectWorkTypeFromUrl(url);
-                    newWorks.push({
-                        title: `WORK ${idx + 1} (URL)`,
-                        type,
-                        url
-                    });
-                    existingUrlSet.add(url);
-                });
-            }
-
-            return newWorks;
+        return newWorks;
         }
 
         // 保存処理
