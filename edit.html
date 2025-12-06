@@ -550,8 +550,11 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
+        // --------------------------------------------------
+        // DOM ヘルパー / 参照
+        // --------------------------------------------------
+        const $ = (s) => document.querySelector(s);
 
-        // DOM
         const creatorSearchInput = $("#creatorSearchInput");
         const creatorListEl = $("#creatorList");
         const newCreatorBtn = $("#newCreatorBtn");
@@ -579,19 +582,27 @@
         const worksFilesInput = $("#worksFilesInput");
         const worksUrlsInput = $("#worksUrlsInput");
 
+        // --------------------------------------------------
         // 状態
-        let creators = []; // { id, data } の配列
+        // --------------------------------------------------
+        let creators = []; // { id, data }
         let currentId = null;
         let currentDoc = null;
 
-        // 動画タイプ推定
+        // --------------------------------------------------
+        // ユーティリティ
+        // --------------------------------------------------
         function detectVideoTypeFromUrl(url) {
             if (!url) return "";
             const lower = url.toLowerCase();
             if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
             if (lower.includes("vimeo.com")) return "vimeo";
-            if (lower.includes("firebasestorage.googleapis.com") ||
-                lower.endsWith(".mp4") || lower.endsWith(".mov")) return "file";
+            if (
+                lower.includes("firebasestorage.googleapis.com") ||
+                lower.endsWith(".mp4") ||
+                lower.endsWith(".mov")
+            )
+                return "file";
             return "";
         }
 
@@ -610,11 +621,13 @@
         }
         if (videoTypeSel) videoTypeSel.addEventListener("change", onVideoTypeChange);
 
-        // クリエイター一覧
+        // --------------------------------------------------
+        // クリエイター一覧の読み込み・描画
+        // --------------------------------------------------
         async function loadCreators() {
             const snap = await getDocs(collection(db, "creators"));
             creators = [];
-            snap.forEach(docSnap => {
+            snap.forEach((docSnap) => {
                 creators.push({ id: docSnap.id, data: docSnap.data() });
             });
             creators.sort((a, b) => (a.data.name || "").localeCompare(b.data.name || ""));
@@ -624,7 +637,8 @@
         function renderCreatorList() {
             const term = (creatorSearchInput.value || "").toLowerCase();
             creatorListEl.innerHTML = "";
-            const list = creators.filter(c => {
+
+            const list = creators.filter((c) => {
                 if (!term) return true;
                 const name = (c.data.name || "").toLowerCase();
                 const comp = (c.data.company || "").toLowerCase();
@@ -632,22 +646,22 @@
             });
 
             if (!list.length) {
-                creatorListEl.innerHTML =
-                    '<div class="list-item">
-                    < div class="name" > 該当するクリエイターがいません
-    </div >
-    </div > ';
+                creatorListEl.innerHTML = `
+          <div class="list-item">
+            <div class="name">該当するクリエイターがいません</div>
+          </div>
+        `;
                 return;
             }
 
-            list.forEach(c => {
+            list.forEach((c) => {
                 const item = document.createElement("div");
                 item.className = "list-item";
                 item.dataset.id = c.id;
                 item.innerHTML = `
-    <div class="name">${c.data.name || "(無名)"}</div>
-    <div class="company">${c.data.company || ""}</div>
-    `;
+          <div class="name">${c.data.name || "(無名)"}</div>
+          <div class="company">${c.data.company || ""}</div>
+        `;
                 item.addEventListener("click", () => selectCreator(c.id));
                 creatorListEl.appendChild(item);
             });
@@ -656,8 +670,8 @@
         }
 
         function markActive(id) {
-            [...creatorListEl.children].forEach(ch => {
-                if (ch.dataset && ch.dataset.id === id) {
+            [...creatorListEl.children].forEach((ch) => {
+                if (id && ch.dataset.id === id) {
                     ch.classList.add("active");
                 } else {
                     ch.classList.remove("active");
@@ -665,6 +679,9 @@
             });
         }
 
+        // --------------------------------------------------
+        // フォームクリア / WORKS 描画
+        // --------------------------------------------------
         function clearForm() {
             currentId = null;
             currentDoc = null;
@@ -689,7 +706,6 @@
             renderWorksEditor([]);
         }
 
-        // WORKS 編集 UI
         function renderWorksEditor(works) {
             const list = Array.isArray(works) ? works : [];
             worksListBox.classList.remove("empty");
@@ -716,11 +732,11 @@
                 typeLabel.className = "work-type-label";
                 typeLabel.textContent = (w.type || "video").toUpperCase();
 
-                const urlInput = document.createElement("input");
-                urlInput.type = "text";
-                urlInput.className = "work-url-input";
-                urlInput.value = w.url || "";
-                urlInput.placeholder = "https://...";
+                const urlInputEl = document.createElement("input");
+                urlInputEl.type = "text";
+                urlInputEl.className = "work-url-input";
+                urlInputEl.value = w.url || "";
+                urlInputEl.placeholder = "https://...";
 
                 const delBtn = document.createElement("button");
                 delBtn.type = "button";
@@ -732,7 +748,7 @@
 
                 row.appendChild(titleInput);
                 row.appendChild(typeLabel);
-                row.appendChild(urlInput);
+                row.appendChild(urlInputEl);
                 row.appendChild(delBtn);
 
                 worksListBox.appendChild(row);
@@ -742,28 +758,25 @@
         function readWorksFromEditor() {
             const rows = worksListBox.querySelectorAll(".work-row");
             const works = [];
-            rows.forEach(row => {
+            rows.forEach((row) => {
                 const titleEl = row.querySelector(".work-title-input");
                 const urlEl = row.querySelector(".work-url-input");
                 const typeEl = row.querySelector(".work-type-label");
-                const title = titleEl?.value.trim() || "";
-                const url = urlEl?.value.trim() || "";
+                const title = (titleEl?.value || "").trim();
+                const url = (urlEl?.value || "").trim();
                 const type = (typeEl?.textContent || "video").toLowerCase();
                 if (!url) return;
-                works.push({ title, url, type, description: desc,{
-                    type: "vimeo",
-                    url: "https://vimeo.com/123456",
-                    title: "Vimeo Original Title",
-                    displayName: "作品名（任意）"
-                } });
-        });
-        return works;
-    }
+                works.push({ title, url, type });
+            });
+            return works;
+        }
 
+        // --------------------------------------------------
+        // クリエイター選択（Firestore から1件取得）
+        // --------------------------------------------------
         async function selectCreator(id) {
-            // Firestore から1件だけ取得
-            const ref = doc(db, "creators", id);
-            const snap = await getDoc(ref);
+            const refDoc = doc(db, "creators", id);
+            const snap = await getDoc(refDoc);
 
             if (!snap.exists()) {
                 console.warn("Creator not found:", id);
@@ -774,48 +787,47 @@
 
             currentId = id;
             currentDoc = data;
-
             markActive(id);
 
-            // 各入力欄に反映
+            // 基本情報
             nameInput.value = data.name || "";
             companyInput.value = data.company || "";
             urlInput.value = data.url || "";
             videoTitleInput.value = data.videoTitle || "";
             summaryInput.value = data.summary || "";
 
-            // カテゴリ（配列）はカンマ区切りで表示
             if (Array.isArray(data.categories)) {
                 categoryInput.value = data.categories.join(", ");
             } else {
                 categoryInput.value = "";
             }
-        }
 
-        // メイン動画
-        const vUrl = c.data.videoUrl || "";
-        if (vUrl) {
-            const type = detectVideoTypeFromUrl(vUrl);
-            videoTypeSel.value = type;
-            if (type === "file") {
-                videoUrlInput.value = "";
+            // メイン動画
+            const vUrl = data.videoUrl || "";
+            if (vUrl) {
+                const type = detectVideoTypeFromUrl(vUrl);
+                videoTypeSel.value = type;
+                if (type === "file") {
+                    videoUrlInput.value = "";
+                } else {
+                    videoUrlInput.value = vUrl;
+                }
             } else {
-                videoUrlInput.value = vUrl;
+                videoTypeSel.value = "";
+                videoUrlInput.value = "";
             }
-        } else {
-            videoTypeSel.value = "";
-            videoUrlInput.value = "";
+            videoFileInput.value = "";
+            onVideoTypeChange();
+
+            // WORKS
+            renderWorksEditor(data.works || []);
+            worksFilesInput.value = "";
+            worksUrlsInput.value = "";
         }
-        videoFileInput.value = "";
-        onVideoTypeChange();
 
-        // WORKS
-        renderWorksEditor(c.data.works || []);
-        worksFilesInput.value = "";
-        worksUrlsInput.value = "";
-    }
-
-        // アップロードヘルパー
+        // --------------------------------------------------
+        // アップロード系ヘルパー
+        // --------------------------------------------------
         async function uploadProfileImageIfNeeded(creatorId, previousUrl) {
             const file = profileImageInput.files[0];
             if (!file) return previousUrl || null;
@@ -829,20 +841,15 @@
         async function buildMainVideoUrl(creatorId, previousUrl) {
             const type = videoTypeSel.value;
 
-            if (!type) {
-                return null;
-            }
+            if (!type) return previousUrl || null;
 
             if (type === "file") {
                 const file = videoFileInput.files[0];
-                if (!file) {
-                    return previousUrl || null;
-                }
+                if (!file) return previousUrl || null;
                 const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
                 const fileRef = ref(storage, `creators/${creatorId}/main-video.${ext}`);
                 await uploadBytes(fileRef, file);
-                const url = await getDownloadURL(fileRef);
-                return url;
+                return await getDownloadURL(fileRef);
             }
 
             if (type === "youtube" || type === "vimeo") {
@@ -868,41 +875,52 @@
             const newWorks = [];
 
             const existingUrlSet = new Set(
-                (existingWorks || []).map(w => (w.url || "").trim()).filter(Boolean)
+                (existingWorks || []).map((w) => (w.url || "").trim()).filter(Boolean)
             );
 
-            // ファイル追加
+            // ファイルから追加
             for (let i = 0; i < files.length; i++) {
-                const file = files[i]; const isImage = file.type.startsWith("image/"); const
-                    ext = (file.name.split(".").pop() || (isImage ? "jpg" : "mp4")).toLowerCase(); const
-                        baseName = file.name.replace(/\.[^/.]+$/, ""); const fileRef = ref(storage,
-                            `creators/${creatorId}/works/${Date.now()}_${i}.${ext}`); await uploadBytes(fileRef, file); const url = await
-                                getDownloadURL(fileRef); if (existingUrlSet.has(url)) continue; newWorks.push({
-                                    title: 'WORK ${idx + 1} (URL)',
-                                    url, type, description: "" //{ type: "vimeo" , url: "https://vimeo.com/123456" , title: "Vimeo Original Title" ,
-        displayName: "作品名（任意）"
-                                } }); existingUrlSet.add(url);
-        } // 外部URL追加 if (urlsText) { const
-        lines = urlsText.split(/\r?\n/).map(l => l.trim())
-            .filter(Boolean);
+                const file = files[i];
+                const isImage = file.type.startsWith("image/");
+                const ext = (
+                    file.name.split(".").pop() || (isImage ? "jpg" : "mp4")
+                ).toLowerCase();
+                const baseName = file.name.replace(/\.[^/.]+$/, "");
+                const fileRef = ref(storage, `creators/${creatorId}/works/${Date.now()}_${i}.${ext}`);
+                await uploadBytes(fileRef, file);
+                const url = await getDownloadURL(fileRef);
+                if (existingUrlSet.has(url)) continue;
+                const type = isImage ? "image" : "video";
+                newWorks.push({ title: baseName, url, type });
+                existingUrlSet.add(url);
+            }
 
-        lines.forEach((line, idx) => {
-            const url = line;
-            if (existingUrlSet.has(url)) return;
-            const type = detectWorkTypeFromUrl(url);
-            newWorks.push({
-                title: `WORK ${idx + 1} (URL)`,
-                type,
-                url
-            });
-            existingUrlSet.add(url);
-        });
+            // 外部URLから追加
+            if (urlsText) {
+                const lines = urlsText
+                    .split(/\r?\n/)
+                    .map((l) => l.trim())
+                    .filter(Boolean);
+
+                lines.forEach((line, idx) => {
+                    const url = line;
+                    if (existingUrlSet.has(url)) return;
+                    const type = detectWorkTypeFromUrl(url);
+                    newWorks.push({
+                        title: `WORK ${idx + 1} (URL)`,
+                        url,
+                        type
+                    });
+                    existingUrlSet.add(url);
+                });
+            }
+
+            return newWorks;
         }
 
-        return newWorks;
-        }
-
-        // 保存処理
+        // --------------------------------------------------
+        // 保存 / 削除 / チャット削除 / プレビュー
+        // --------------------------------------------------
         async function saveCreator() {
             const name = nameInput.value.trim();
             if (!name) {
@@ -913,10 +931,9 @@
             let creatorId = currentId;
             let docRef;
 
-            // カテゴリは配列化（カンマ区切り）
             const cats = (categoryInput.value || "")
                 .split(",")
-                .map(v => v.trim())
+                .map((v) => v.trim())
                 .filter(Boolean);
 
             if (!creatorId) {
@@ -944,7 +961,6 @@
             const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, previousProfileUrl);
             const videoUrl = await buildMainVideoUrl(creatorId, previousVideoUrl);
 
-            // WORKS: まず UI 上の編集結果、次に追加分
             const worksFromUI = readWorksFromEditor();
             const newWorks = await buildNewWorksFromInputs(creatorId, worksFromUI);
             const finalWorks = worksFromUI.concat(newWorks);
@@ -969,7 +985,7 @@
 
             currentId = creatorId;
             await loadCreators();
-            const found = creators.find(x => x.id === creatorId);
+            const found = creators.find((x) => x.id === creatorId);
             currentDoc = found ? found.data : payload;
             if (currentId) selectCreator(currentId);
         }
@@ -986,18 +1002,18 @@
             await loadCreators();
         }
 
-        // チャット全削除
         async function clearAllChatForCurrentCreator() {
             if (!currentId) {
                 alert("まず左の一覧からクリエイターを選択してください。");
                 return;
             }
             if (!confirm("このクリエイターのチャットを全て削除しますか？")) return;
+
             try {
                 const colRef = collection(db, "creators", currentId, "messages");
                 const snap = await getDocs(colRef);
                 const tasks = [];
-                snap.forEach(docSnap => {
+                snap.forEach((docSnap) => {
                     tasks.push(deleteDoc(doc(db, "creators", currentId, "messages", docSnap.id)));
                 });
                 await Promise.all(tasks);
@@ -1008,7 +1024,6 @@
             }
         }
 
-        // プレビュー（index.html?id=xxx を開く）
         function previewCreator() {
             if (!currentId) {
                 alert("まず左の一覧からクリエイターを選択・保存してください。");
@@ -1017,7 +1032,9 @@
             window.open(`index.html?id=${encodeURIComponent(currentId)}`, "_blank");
         }
 
-        // イベント登録 & 初期化
+        // --------------------------------------------------
+        // イベント登録 & 初期ロード
+        // --------------------------------------------------
         newCreatorBtn.addEventListener("click", clearForm);
         saveBtn.addEventListener("click", saveCreator);
         deleteBtn.addEventListener("click", deleteCreator);
@@ -1025,11 +1042,12 @@
         previewBtn.addEventListener("click", previewCreator);
         creatorSearchInput.addEventListener("input", renderCreatorList);
 
-        loadCreators().catch(err => {
+        loadCreators().catch((err) => {
             console.error("loadCreators error", err);
             alert("クリエイター一覧の読み込みに失敗しました。コンソールを確認してください。");
         });
     </script>
+
 </body>
 
 </html>
