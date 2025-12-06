@@ -781,8 +781,52 @@
             font-size: 12px;
             opacity: .8;
         }
+
+        .work-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .work-modal.is-open {
+            display: flex;
+        }
+
+        .work-modal__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .work-modal__content {
+            position: relative;
+            max-width: 80vw;
+            max-height: 80vh;
+            background: #020617;
+            border-radius: 16px;
+            border: 1px solid #374151;
+            padding: 12px;
+        }
+
+        .work-modal__body img,
+        .work-modal__body video {
+            max-width: 78vw;
+            max-height: 70vh;
+            border-radius: 12px;
+        }
     </style>
 </head>
+<!-- WORKS プレビュー用モーダル -->
+<div id="workModal" class="work-modal" aria-hidden="true">
+    <div class="work-modal__backdrop"></div>
+    <div class="work-modal__content">
+        <button class="work-modal__close" type="button">×</button>
+        <div class="work-modal__body"></div>
+    </div>
+</div>
 
 <body>
     <canvas id="particles"></canvas>

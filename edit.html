@@ -360,8 +360,52 @@
             justify-content: flex-end;
             margin-top: 8px;
         }
+
+        .work-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .work-modal.is-open {
+            display: flex;
+        }
+
+        .work-modal__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .work-modal__content {
+            position: relative;
+            max-width: 80vw;
+            max-height: 80vh;
+            background: #020617;
+            border-radius: 16px;
+            border: 1px solid #374151;
+            padding: 12px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .work-modal__body img,
+        .work-modal__body video {
+            max-width: 78vw;
+            max-height: 70vh;
+            border-radius: 12px;
+        }
     </style>
 </head>
+<div id="workModal" class="work-modal">
+    <div class="work-modal__backdrop"></div>
+    <div class="work-modal__content">
+        <button class="work-modal__close" type="button">×</button>
+        <div class="work-modal__body"></div>
+    </div>
+</div>
 
 <body>
     <header>
@@ -1046,6 +1090,50 @@
             console.error("loadCreators error", err);
             alert("クリエイター一覧の読み込みに失敗しました。コンソールを確認してください。");
         });
+        // ----------------- WORKS プレビュー（edit用簡易版） -----------------
+
+        const workModal = document.querySelector("#workModal");
+        const workModalBody = workModal.querySelector(".work-modal__body");
+        const workModalClose = workModal.querySelector(".work-modal__close");
+        const workModalBackdrop = workModal.querySelector(".work-modal__backdrop");
+
+        function openWorkModal(type, url) {
+            workModalBody.innerHTML = "";
+
+            if (type === "image") {
+                const img = document.createElement("img");
+                img.src = url;
+                workModalBody.appendChild(img);
+            }
+            else if (type === "video" || type === "file") {
+                const video = document.createElement("video");
+                video.src = url;
+                video.controls = true;
+                video.autoplay = true;
+                workModalBody.appendChild(video);
+            }
+            else if (type === "youtube" || type === "vimeo") {
+                const iframe = document.createElement("iframe");
+                iframe.src = url;
+                iframe.allow =
+                    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.width = "100%";
+                iframe.height = "100%";
+                workModalBody.appendChild(iframe);
+            }
+
+            workModal.classList.add("is-open");
+        }
+
+        function closeWorkModal() {
+            workModal.classList.remove("is-open");
+            workModalBody.innerHTML = "";
+        }
+
+        workModalClose.addEventListener("click", closeWorkModal);
+        workModalBackdrop.addEventListener("click", closeWorkModal);
+
     </script>
 
 </body>
