@@ -7,6 +7,9 @@
     <title>CREATORS’ GUILD COLLECTIVE — Creator's Voice</title>
 
     <style>
+        /* ============================================================
+       GLOBAL THEME
+    ============================================================ */
         :root {
             --bg: #0b0c10;
             --card: #11131aee;
@@ -22,6 +25,11 @@
             --glow: 0 0 22px #ffb457aa,
                 0 0 46px #ff8c37aa,
                 0 0 80px #ff6a00aa;
+
+            /* Aurora 用バックグラウンド */
+            --bg-aurora-1: radial-gradient(circle at 0 0, #1e293b 0%, transparent 55%),
+                radial-gradient(circle at 80% 0, #7c3aed 0%, transparent 60%),
+                radial-gradient(circle at 50% 100%, #22d3ee 0%, #020617 70%);
         }
 
         * {
@@ -31,17 +39,25 @@
         html,
         body {
             height: 100%;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             margin: 0;
+            padding: 0;
             font-family: 'Inter', system-ui, -apple-system, "Noto Sans JP", sans-serif;
             color: var(--text);
             background: var(--bg);
             overflow-x: hidden;
+            transition: background 0.7s ease;
         }
 
-        /* 背景レイヤー */
+        body.aurora {
+            background: var(--bg-aurora-1);
+        }
+
+        /* 背景パターン */
         #particles {
             position: fixed;
             inset: 0;
@@ -51,6 +67,12 @@
                 radial-gradient(1000px 900px at 90% 20%, #3b1a4b 0%, transparent 65%),
                 radial-gradient(900px 1000px at 50% 100%, #093a47 0%, transparent 55%),
                 var(--bg);
+            transition: opacity .6s ease;
+        }
+
+        body.aurora #particles {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .grain {
@@ -58,11 +80,13 @@
             inset: 0;
             pointer-events: none;
             opacity: .09;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.6"/></svg>');
             mix-blend-mode: overlay;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.6"/></svg>');
         }
 
-        /* ハンバーガーメニュー */
+        /* ============================================================
+       HAMBURGER MENU
+    ============================================================ */
         .menu-button {
             position: fixed;
             top: 16px;
@@ -73,7 +97,7 @@
             flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
-            z-index: 1000;
+            z-index: 1200;
         }
 
         .menu-button .bar {
@@ -104,7 +128,7 @@
             justify-content: center;
             background: rgba(0, 0, 0, .88);
             backdrop-filter: blur(18px);
-            z-index: 900;
+            z-index: 1100;
         }
 
         .menu-overlay.show {
@@ -112,35 +136,36 @@
         }
 
         .menu-panel {
-            width: min(360px, 90vw);
+            width: min(380px, 90vw);
             border-radius: 24px;
             background: rgba(15, 23, 42, .96);
             border: 1px solid #ffffff22;
-            padding: 20px 20px 18px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
+            padding: 22px 22px 18px;
+            box-shadow: 0 28px 60px rgba(0, 0, 0, .9);
         }
 
         .menu-panel h2 {
             margin: 0 0 12px;
-            font-size: 16px;
+            font-size: 17px;
             letter-spacing: .16em;
             text-transform: uppercase;
             color: #e5e7eb;
+            text-align: center;
         }
 
         .menu-list {
             list-style: none;
             padding: 0;
-            margin: 0;
+            margin: 0 0 12px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .menu-list li a {
+        .menu-list a {
             display: block;
-            padding: 10px 12px;
-            border-radius: 12px;
+            padding: 10px 14px;
+            border-radius: 14px;
             border: 1px solid #1f2937;
             background: radial-gradient(circle at 0% 0%, rgba(251, 191, 36, 0.15), transparent 60%);
             color: #e5e7eb;
@@ -150,62 +175,44 @@
             transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
         }
 
-        .menu-list li a:hover {
-            background: radial-gradient(circle at 0% 0%, rgba(251, 191, 36, 0.25), transparent 70%);
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
+        .menu-list a:hover {
+            background: radical-gradient(circle at 0% 0%, rgba(251, 191, 36, 0.25), transparent 70%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .6);
         }
 
-        /* HEADER */
-        header {
-            padding: 40px 24px 10px;
+        .theme-toggle {
+            margin-top: 10px;
             text-align: center;
-            position: relative;
+        }
+
+        .theme-toggle button {
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid #374151;
+            background: #020617;
+            color: #e5e7eb;
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        /* ============================================================
+       HEADER / HERO
+    ============================================================ */
+        header {
+            padding: 42px 24px 16px;
+            text-align: center;
         }
 
         .title {
             font-weight: 900;
             letter-spacing: .18em;
-            font-size: clamp(26px, 5vw, 54px);
+            font-size: clamp(28px, 5vw, 54px);
             text-transform: uppercase;
-            filter: drop-shadow(0 6px 26px rgba(0, 0, 0, .5));
-            animation: float 6.8s ease-in-out infinite,
-                glow 2.6s ease-in-out infinite;
-        }
-
-        .subtitle {
-            margin-top: 6px;
-            font-weight: 300;
-            letter-spacing: .14em;
-            color: var(--muted);
-        }
-
-        .jpcopy {
-            max-width: 860px;
-            margin: 18px auto 30px;
-            padding: 18px;
-            border-radius: var(--radius);
-            backdrop-filter: blur(14px);
-            background: var(--card);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            font-size: 15.5px;
-            line-height: 1.85;
-            opacity: 0;
-            transform: translateY(14px);
-            animation: introCopy .9s ease-out .35s forwards;
-        }
-
-        @keyframes introCopy {
-            0% {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            animation: float 6.5s ease-in-out infinite,
+                glow 2.8s ease-in-out infinite;
         }
 
         @keyframes float {
@@ -230,572 +237,90 @@
             }
 
             50% {
-                text-shadow: 0 0 10px #ffb45755,
-                    0 0 20px #ff8c3755;
+                text-shadow: 0 0 16px #facc1555;
             }
         }
 
-        /* MAIN layout */
-        .container {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 8px;
-        }
-
-        .toolbar-label {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .toolbar select,
-        .toolbar input[type="search"] {
-            background: #050816;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 6px 10px;
-            font-size: 12px;
-            outline: none;
-        }
-
-        .toolbar input[type="search"] {
-            flex: 1 1 140px;
-            min-width: 120px;
-        }
-
-        .grid {
-            margin-top: 4px;
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 18px;
-        }
-
-        @media (max-width:1024px) {
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width:768px) {
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width:520px) {
-            .grid {
-                grid-template-columns: repeat(1, 1fr);
-            }
-        }
-
-        /* CARD */
-        .card {
-            position: relative;
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            background: linear-gradient(145deg, #151926dd, #0b101bdd);
-            overflow: hidden;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            min-height: 170px;
-            transition: transform .18s, box-shadow .18s, border-color .18s;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
-            border-color: #ffb45788;
-        }
-
-        .card:active {
-            transform: translateY(-1px) scale(0.98);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .7),
-                0 0 24px rgba(255, 180, 87, .7);
-            border-color: #ffb457cc;
-        }
-
-        .thumb-wrap {
-            position: relative;
-            padding-top: 62%;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .thumb {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: .45;
-            transform: scale(1.03);
-            transition: opacity .18s, transform .18s;
-        }
-
-        .thumb-fallback {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 0% 0%, #ffb45755, transparent 55%),
-                radial-gradient(circle at 100% 100%, #8b5cf655, transparent 55%),
-                #101322;
-        }
-
-        .card:hover .thumb,
-        .card:active .thumb {
-            opacity: 1;
-            transform: scale(1.06);
-        }
-
-        .thumb-title {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 8px 10px 9px;
-            background: linear-gradient(to top, rgba(0, 0, 0, .85), transparent);
-            font-size: 11px;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            color: #fef9c3;
-            text-shadow:
-                0 0 8px rgba(255, 180, 87, .9),
-                0 0 16px rgba(236, 72, 153, .7);
-            pointer-events: none;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-body {
-            padding: 10px 12px 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .creator-name {
-            font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .creator-company {
-            font-size: 11px;
-            color: var(--muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-footer {
+        .subtitle {
             margin-top: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: #9ca3af;
+            font-weight: 300;
+            letter-spacing: .14em;
+            color: var(--muted);
+            font-size: 15px;
         }
 
-        .like-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            border-radius: 999px;
+        .jpcopy {
+            max-width: 860px;
+            margin: 20px auto 26px;
+            padding: 20px;
+            border-radius: var(--radius);
+            background: var(--card);
             border: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.35);
-            cursor: pointer;
-            font-size: 11px;
+            box-shadow: var(--shadow);
+            font-size: 15.5px;
+            line-height: 1.9;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: introCopy .9s ease-out .25s forwards;
         }
 
-        .like-btn .heart {
-            color: #fb7185;
-            font-size: 12px;
-        }
+        @keyframes introCopy {
+            0% {
+                opacity: 0;
+                transform: translateY(14px);
+            }
 
-        .category-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(96, 165, 250, 0.6);
-            background: radial-gradient(circle at 0 0, rgba(96, 165, 250, 0.2), transparent 60%);
-            font-size: 11px;
-            color: #dbeafe;
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 4px;
-        }
-
-        .category-chip::before {
-            content: "◎";
-            font-size: 9px;
-        }
-
-        /* DETAIL モーダル */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            background: rgba(0, 0, 0, .78);
-            backdrop-filter: blur(18px);
-            z-index: 800;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal {
-            width: min(900px, 96vw);
-            background: #111622f2;
-            border-radius: 24px;
-            border: 1px solid #ffffff22;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .modal-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px 10px;
-            gap: 10px;
-        }
-
-        .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #222;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .close {
-            background: transparent;
-            border: 0;
-            cursor: pointer;
-            font-size: 22px;
-            color: #fff;
-        }
-
-        .modal-body {
-            padding: 12px 18px 18px;
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 12px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        @media(max-width:720px) {
-            .modal-body {
-                grid-template-columns: 1fr;
+            100% {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        .modal-left {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .meta-label {
-            font-size: 11px;
-            color: #cfd6e6;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-top: 8px;
-        }
-
-        .meta-text {
-            font-size: 13px;
-            color: #dde3f6;
-        }
-
-        .detail-about {
-            font-size: 13px;
-            color: #dde3f6;
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-
-        .detail-url {
-            margin-top: 4px;
-        }
-
-        .detail-url a {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: #facc15;
-            text-decoration: none;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.25), transparent 60%);
-            box-shadow:
-                0 0 8px rgba(250, 204, 21, 0.6),
-                0 0 18px rgba(248, 113, 113, 0.4);
-            border: 1px solid rgba(250, 204, 21, 0.5);
-            max-width: 220px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .detail-url a::before {
-            content: "↗";
-            font-size: 10px;
-            opacity: .9;
-        }
-
-        /* メイン動画コンテナ */
-        #detailVideoContainer {
-            width: 100%;
-            border-radius: 14px;
-            overflow: hidden;
-            background: #020617;
-            aspect-ratio: 16 / 9;
-        }
-
-        #detailVideoContainer iframe,
-        #detailVideoContainer video {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-
-        /* WORKS */
-        .works-section {
-            margin-top: 4px;
-        }
-
-        .works-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 8px;
-        }
-
-        .work-card {
-            background: #020617;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            padding: 6px;
-            font-size: 11px;
-            color: #e5e7eb;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .work-thumb {
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #020617;
-        }
-
-        .work-thumb img,
-        .work-thumb video,
-        .work-thumb iframe {
-            width: 100%;
-            display: block;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        .work-title {
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .work-type {
-            font-size: 10px;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        /* CHAT（LINE風） */
-        .comment-section {
-            margin-top: 4px;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid #1f2937;
-            background: rgba(15, 23, 42, 0.9);
-            max-height: 260px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .comment-list {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .comment-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .comment-row.mine {
-            justify-content: flex-end;
-        }
-
-        .comment-row.theirs {
-            justify-content: flex-start;
-        }
-
-        .comment-bubble {
-            max-width: 80%;
-            padding: 6px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-
-        .comment-row.theirs .comment-bubble {
-            background: #0f172a;
-            border: 1px solid #1f2937;
-            color: #e5e7eb;
-        }
-
-        .comment-row.mine .comment-bubble {
-            background: #1d4ed8;
-            border: 1px solid #60a5fa;
-            color: #e5f0ff;
-        }
-
-        .comment-meta {
-            font-size: 10px;
-            color: #9ca3af;
-            margin-top: 2px;
-        }
-
-        .comment-delete {
-            border: none;
-            background: transparent;
-            color: #fca5a5;
-            font-size: 10px;
-            cursor: pointer;
-            padding: 2px 4px;
-            align-self: center;
-        }
-
-        .comment-input-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .comment-input-row input {
-            flex: 1;
-            font-size: 12px;
-            border-radius: 999px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            padding: 6px 10px;
-        }
-
-        .comment-input-row button {
-            border-radius: 999px;
-            border: none;
-            padding: 6px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-        }
-
-        /* EDITボタン・フッター */
-        .edit-bottom-wrap {
-            margin-top: 32px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .edit-bottom-btn {
-            padding: 10px 18px;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        footer {
-            margin: 30px 0 18px;
+        /* CTA: Creator’s Guild Produce */
+        .cgp-cta {
             text-align: center;
-            color: #b8c2d4;
-            font-size: 12px;
-            opacity: .8;
+            margin-bottom: 40px;
+        }
+
+        .cgp-btn {
+            padding: 14px 26px;
+            border: none;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #facc15, #f97316);
+            color: #111827;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            box-shadow: 0 0 18px #facc18aa;
+            transition: .25s;
+        }
+
+        .cgp-btn:hover {
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 0 22px #facc18cc;
         }
     </style>
 </head>
 
 <body>
+    <!-- 背景 -->
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
-    <!-- ハンバーガーメニューボタン -->
+    <!-- =========================
+       HAMBURGER MENU BUTTON
+  ========================== -->
     <div id="menuButton" class="menu-button">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
     </div>
 
-    <!-- メニューオーバーレイ -->
+    <!-- =========================
+       MENU OVERLAY
+  ========================== -->
     <div id="menuOverlay" class="menu-overlay">
         <div class="menu-panel">
             <h2>CREATOR'S MENU</h2>
@@ -804,10 +329,15 @@
                 <li><a href="#" id="linkAI">Creator’s AI Consulting</a></li>
                 <li><a href="#" id="linkGuild">Creator’s Guild Produce</a></li>
             </ul>
+            <div class="theme-toggle">
+                <button id="themeToggleBtn">背景: PARTICLES / AURORA 切替</button>
+            </div>
         </div>
     </div>
 
-    <!-- DETAIL モーダル -->
+    <!-- =========================
+       DETAIL MODAL
+  ========================== -->
     <div id="detailOverlay" class="modal-overlay">
         <div class="modal" id="detailModal">
             <div class="modal-head">
@@ -823,21 +353,22 @@
             </div>
 
             <div class="modal-body">
-                <!-- 左：Main Video + WORKS + CHAT -->
+                <!-- LEFT: Main Video + WORKS + CHAT -->
                 <div class="modal-left">
+                    <!-- メイン動画 -->
                     <div id="detailVideoContainer"></div>
 
                     <div class="meta-label">MAIN VIDEO TITLE</div>
                     <div class="meta-text" id="detailVideoTitle">—</div>
 
+                    <!-- WORKS -->
                     <div class="meta-label" style="margin-top:12px;">WORKS</div>
                     <div id="worksContainer" class="works-section"></div>
 
+                    <!-- CHAT -->
                     <div class="meta-label" style="margin-top:12px;">CHAT</div>
                     <div class="comment-section">
-                        <input id="nicknameInput" type="text" placeholder="ニックネーム（必須）" style="width:100%;padding:8px 10px;margin-bottom:6px;
-                     border-radius:10px;border:1px solid #1f2937;
-                     background:#020617;color:#e5e7eb;" />
+                        <input id="nicknameInput" type="text" placeholder="ニックネーム（必須）" />
                         <div id="commentList" class="comment-list"></div>
                         <div class="comment-input-row">
                             <input id="commentInput" type="text" placeholder="メッセージを入力…" />
@@ -846,7 +377,7 @@
                     </div>
                 </div>
 
-                <!-- 右：ABOUT -->
+                <!-- RIGHT: ABOUT -->
                 <div class="modal-right">
                     <div class="meta-label">ABOUT</div>
                     <div class="detail-about" id="detailAbout">—</div>
@@ -855,18 +386,46 @@
         </div>
     </div>
 
-    <!-- HEADER -->
+    <!-- =========================
+       WORKS LIGHTBOX
+  ========================== -->
+    <div id="lightboxOverlay" class="lightbox-overlay">
+        <div class="lightbox-content">
+            <div id="lightboxMedia" class="lightbox-media"></div>
+            <div id="lightboxTitle" class="lightbox-title"></div>
+            <div class="lightbox-nav">
+                <button id="lightboxPrev">◀</button>
+                <button id="lightboxNext">▶</button>
+            </div>
+            <button id="lightboxClose" class="lightbox-close">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- =========================
+       HEADER / HERO
+  ========================== -->
     <header>
         <div class="title">CREATORS’ GUILD COLLECTIVE</div>
         <div class="subtitle">Creeds of the Playful Creators.</div>
         <div class="jpcopy">
-            遊ぶように発想し、創るように生きる。<br />
-            様々な才能がゆるやかにつながり、未来のカルチャーを紡いでいく。<br />
-            CREATIVE を遊びに変え、世界をちょっと面白くするコレクティブ。
+            　　交差する才能を Creaters' Guild Collective（CGC）が束ね、<br />
+            　　Space Design・Visual Art・AI・Data Intelligence・Robotics が<br />
+            　　溶け合う最先端の表現基盤に、深い美学と確かな戦略を重ねながら、<br />
+            未来の事業価値と文化の“まだ形を持たない輪郭”を静かに立ち上げていく。<br />
+            CREATIVE を確かな力へ変え、世界の質感そのものを更新するコレクティブ。
+        </div>
+
+        <!-- Creator’s Guild Produce CTA -->
+        <div class="cgp-cta">
+            <button id="cgpBtn" class="cgp-btn">
+                CREATOR’S GUILD PRODUCE
+            </button>
         </div>
     </header>
 
-    <!-- MAIN -->
+    <!-- =========================
+       MAIN / GRID
+  ========================== -->
     <main class="container">
         <div class="toolbar">
             <input id="searchInput" type="search" placeholder="名前で検索…" />
@@ -883,11 +442,12 @@
         </div>
 
         <div id="grid" class="grid"></div>
-
-        <div class="edit-bottom-wrap">
-            <button class="edit-bottom-btn" onclick="location.href='edit.html'">EDIT</button>
-        </div>
     </main>
+
+    <!-- Scroll-to-bottom ボタン -->
+    <button id="scrollBottomBtn" class="scroll-bottom-btn" aria-label="scroll-bottom">
+        ↓
+    </button>
 
     <footer>© CREATORS’ GUILD COLLECTIVE / Designed by Daijiro Majima</footer>
 
@@ -908,7 +468,9 @@
             orderBy
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-        // Firebase 設定
+        /* ============================================================
+           Firebase 初期化
+        ============================================================ */
         const firebaseConfig = {
             apiKey: "AIzaSyAA97KPsLsnHUg5G8Rtb7-3CwMJ1oynkVs",
             authDomain: "play-create-live.firebaseapp.com",
@@ -922,39 +484,43 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
         const $ = (s) => document.querySelector(s);
 
-        // 状態
+        /* ============================================================
+           グローバル状態
+        ============================================================ */
         let creators = [];
         let currentSort = "newest";
         let currentSearch = "";
         let currentCategory = "";
+
+        // WORKS ライトボックス用
+        let modalWorks = [];
+        let currentWorkIndex = 0;
+
+        // コメント購読解除用
         let messagesUnsub = null;
 
-        // クライアントID（投稿者識別）
-        let clientId = localStorage.getItem("pcl_client_id");
+        // クライアント ID（コメント識別）
+        let clientId = localStorage.getItem("cgc_client_id");
         if (!clientId) {
-            clientId = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now());
-            localStorage.setItem("pcl_client_id", clientId);
+            clientId = crypto.randomUUID?.() || String(Date.now());
+            localStorage.setItem("cgc_client_id", clientId);
         }
+
         const ADMIN_SECRET = "pcl-admin-2024";
         let isAdmin = false;
 
-        // 背景パーティクル
-        (function () {
+        /* ============================================================
+           背景パーティクル
+        ============================================================ */
+        (function setupParticles() {
             const canvas = document.getElementById("particles");
             if (!canvas) return;
+
             const ctx = canvas.getContext("2d");
             let W, H, dpr = window.devicePixelRatio || 1;
-
-            const palettes = [
-                "rgba(255,180,87,0.65)",
-                "rgba(72,219,251,0.65)",
-                "rgba(129,140,248,0.65)",
-                "rgba(45,212,191,0.65)",
-                "rgba(244,114,182,0.65)"
-            ];
-            const color = palettes[Math.floor(Math.random() * palettes.length)];
 
             function resize() {
                 W = canvas.width = innerWidth * dpr;
@@ -965,14 +531,23 @@
             resize();
             window.addEventListener("resize", resize);
 
+            const colors = [
+                "rgba(255,180,87,0.65)",
+                "rgba(72,219,251,0.65)",
+                "rgba(129,140,248,0.65)",
+                "rgba(45,212,191,0.65)",
+                "rgba(244,114,182,0.65)"
+            ];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
             const parts = [];
-            for (let i = 0; i < 80; i++) {
+            for (let i = 0; i < 70; i++) {
                 parts.push({
                     x: Math.random() * W,
                     y: Math.random() * H,
                     r: Math.random() * 3 * dpr + 1,
                     a: Math.random() * Math.PI * 2,
-                    v: 0.25 + Math.random() * 0.5
+                    v: 0.3 + Math.random() * 0.5,
                 });
             }
 
@@ -982,6 +557,7 @@
                     p.x += Math.cos(p.a) * p.v;
                     p.y += Math.sin(p.a) * p.v;
                     p.a += (Math.random() - 0.5) * 0.03;
+
                     if (p.x < 0) p.x = W;
                     if (p.x > W) p.x = 0;
                     if (p.y < 0) p.y = H;
@@ -989,7 +565,7 @@
 
                     ctx.beginPath();
                     ctx.fillStyle = color;
-                    ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+                    ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
                     ctx.fill();
                 }
                 requestAnimationFrame(draw);
@@ -997,10 +573,64 @@
             draw();
         })();
 
-        // Creators取得
+        /* ============================================================
+           Aurora ランダムカラー（CSS変数を上書き）
+        ============================================================ */
+        function applyRandomAuroraColors() {
+            const root = document.documentElement;
+
+            // 適当にバランスの良い 4パターンからランダム
+            const palettes = [
+                { a1: "#7c3aed", a2: "#22d3ee", a3: "#020617" },
+                { a1: "#f97316", a2: "#22c55e", a3: "#0f172a" },
+                { a1: "#ec4899", a2: "#38bdf8", a3: "#020617" },
+                { a1: "#a855f7", a2: "#facc15", a3: "#020617" },
+            ];
+            const p = palettes[Math.floor(Math.random() * palettes.length)];
+
+            root.style.setProperty("--aurora-1", p.a1);
+            root.style.setProperty("--aurora-2", p.a2);
+            root.style.setProperty("--aurora-3", p.a3);
+        }
+
+        /* ============================================================
+           Aurora / Particles テーマ切替
+        ============================================================ */
+        function setupThemeToggle() {
+            const btn = document.getElementById("themeToggleBtn");
+            const body = document.body;
+            if (!btn) return;
+
+            function apply(theme) {
+                if (theme === "aurora") {
+                    applyRandomAuroraColors();          // ランダム色を適用
+                    body.classList.add("aurora");
+                    btn.textContent = "BACKGROUND: AURORA";
+                } else {
+                    body.classList.remove("aurora");
+                    btn.textContent = "BACKGROUND: PARTICLES";
+                }
+                localStorage.setItem("cgc_theme", theme);
+            }
+
+            const saved = localStorage.getItem("cgc_theme");
+            apply(saved === "aurora" ? "aurora" : "particles");
+
+            btn.addEventListener("click", () => {
+                const next = (localStorage.getItem("cgc_theme") === "aurora")
+                    ? "particles"
+                    : "aurora";
+                apply(next);
+            });
+        }
+
+        /* ============================================================
+           Creators 読み込み
+        ============================================================ */
         async function loadCreators() {
             const snap = await getDocs(collection(db, "creators"));
             const list = [];
+
             snap.forEach(docSnap => {
                 const d = docSnap.data();
                 list.push({
@@ -1008,7 +638,7 @@
                     name: d.name || "",
                     company: d.company || "",
                     url: d.url || "",
-                    videoTitle: d.videoTitle || "",
+                    videoTitle: d.assetTitle || d.videoTitle || "",
                     summary: d.summary || "",
                     profileImageUrl: d.profileImageUrl || "",
                     videoUrl: d.videoUrl || "",
@@ -1018,14 +648,16 @@
                     createdAt: d.createdAt || null
                 });
             });
+
             creators = list;
             rebuildCategoryOptions();
             renderGrid();
         }
 
         function rebuildCategoryOptions() {
-            const sel = $("#categorySelect");
+            const sel = document.getElementById("categorySelect");
             if (!sel) return;
+
             const set = new Set();
             creators.forEach(c => {
                 (c.categories || []).forEach(cat => {
@@ -1033,6 +665,7 @@
                     if (t) set.add(t);
                 });
             });
+
             sel.innerHTML = '<option value="">すべてのカテゴリ</option>';
             [...set].sort().forEach(cat => {
                 const opt = document.createElement("option");
@@ -1044,17 +677,21 @@
 
         function sortCreators(list) {
             const arr = list.slice();
+
             if (currentSort === "name-asc") {
                 arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-            } else if (currentSort === "name-desc") {
+            }
+            else if (currentSort === "name-desc") {
                 arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-            } else if (currentSort === "oldest") {
+            }
+            else if (currentSort === "oldest") {
                 arr.sort((a, b) => {
                     const ta = a.createdAt?.toMillis?.() || 0;
                     const tb = b.createdAt?.toMillis?.() || 0;
                     return ta - tb;
                 });
-            } else { // newest
+            }
+            else { // newest
                 arr.sort((a, b) => {
                     const ta = a.createdAt?.toMillis?.() || 0;
                     const tb = b.createdAt?.toMillis?.() || 0;
@@ -1064,12 +701,16 @@
             return arr;
         }
 
-        // Grid 描画
+        /* ============================================================
+           GRID 描画
+        ============================================================ */
         function renderGrid() {
-            const grid = $("#grid");
+            const grid = document.getElementById("grid");
+            if (!grid) return;
             grid.innerHTML = "";
 
             const s = (currentSearch || "").toLowerCase();
+
             let filtered = creators.filter(c => {
                 const name = (c.name || "").toLowerCase();
                 const cats = Array.isArray(c.categories) ? c.categories : [];
@@ -1129,12 +770,14 @@
 
                 const footer = document.createElement("div");
                 footer.className = "card-footer";
+
                 const likesLabel = document.createElement("span");
                 likesLabel.textContent = `${c.likes} ♥`;
 
                 const likeBtn = document.createElement("button");
                 likeBtn.className = "like-btn";
                 likeBtn.innerHTML = '<span class="heart">👍</span> いいね';
+
                 likeBtn.addEventListener("click", async (e) => {
                     e.stopPropagation();
                     try {
@@ -1149,7 +792,6 @@
 
                 footer.appendChild(likesLabel);
                 footer.appendChild(likeBtn);
-
                 body.appendChild(nameEl);
                 body.appendChild(compEl);
                 body.appendChild(footer);
@@ -1163,10 +805,13 @@
             });
         }
 
-        // 埋め込みURL変換
+        /* ============================================================
+           埋め込み URL ヘルパー
+        ============================================================ */
         function toYoutubeEmbed(urlOrId) {
             if (!urlOrId) return "";
             if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
+
             let s = urlOrId.trim();
             const m = s.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_\-]{6,})/);
             if (m) {
@@ -1191,7 +836,9 @@
             return `https://player.vimeo.com/video/${s}`;
         }
 
-        // メイン動画
+        /* ============================================================
+           DETAIL：メイン動画
+        ============================================================ */
         function renderMainVideo(videoUrl) {
             const container = document.getElementById("detailVideoContainer");
             if (!container) return;
@@ -1200,18 +847,18 @@
             if (!videoUrl) {
                 const box = document.createElement("div");
                 box.style.width = "100%";
-                box.style.aspectRatio = "16/9";
                 box.style.borderRadius = "14px";
                 box.style.background = "#020617";
+                box.style.aspectRatio = "16/9";
                 container.appendChild(box);
                 return;
             }
 
-            const url = (videoUrl || "").toLowerCase();
-            const isYouTube = url.includes("youtu.be") || url.includes("youtube.com");
-            const isVimeo = url.includes("vimeo.com");
-            const isFile = url.endsWith(".mp4") || url.endsWith(".mov") ||
-                url.startsWith("https://firebasestorage.googleapis.com");
+            const u = videoUrl.toLowerCase();
+            const isYouTube = u.includes("youtu.be") || u.includes("youtube.com");
+            const isVimeo = u.includes("vimeo.com");
+            const isFile = u.endsWith(".mp4") || u.endsWith(".mov") ||
+                u.startsWith("https://firebasestorage.googleapis.com");
 
             if (isYouTube) {
                 const iframe = document.createElement("iframe");
@@ -1219,8 +866,7 @@
                 iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                 iframe.allowFullscreen = true;
                 iframe.frameBorder = "0";
-                const vertical = isVerticalYoutube(videoUrl);
-                container.style.aspectRatio = vertical ? "9/16" : "16/9";
+                container.style.aspectRatio = isVerticalYoutube(videoUrl) ? "9/16" : "16/9";
                 container.appendChild(iframe);
             } else if (isVimeo) {
                 const iframe = document.createElement("iframe");
@@ -1247,14 +893,17 @@
             }
         }
 
-        // WORKS 描画
+        /* ============================================================
+           WORKS 一覧 & ライトボックス
+        ============================================================ */
         function renderWorks(works) {
             const container = document.getElementById("worksContainer");
             if (!container) return;
 
             container.innerHTML = "";
-
             const list = Array.isArray(works) ? works : [];
+            modalWorks = list;
+
             if (!list.length) {
                 const msg = document.createElement("div");
                 msg.className = "meta-text";
@@ -1268,9 +917,10 @@
             const grid = document.createElement("div");
             grid.className = "works-grid";
 
-            list.forEach(w => {
+            list.forEach((w, index) => {
                 const card = document.createElement("div");
                 card.className = "work-card";
+                card.dataset.index = String(index);
 
                 const thumb = document.createElement("div");
                 thumb.className = "work-thumb";
@@ -1320,13 +970,84 @@
                     card.appendChild(typeEl);
                 }
 
+                card.addEventListener("click", () => openLightbox(index));
                 grid.appendChild(card);
             });
 
             container.appendChild(grid);
         }
 
-        // CHAT（Firestoreサブコレクション）
+        // Lightbox 開く
+        function openLightbox(index) {
+            const overlay = document.getElementById("lightboxOverlay");
+            const media = document.getElementById("lightboxMedia");
+            const titleEl = document.getElementById("lightboxTitle");
+            if (!overlay || !media || !titleEl) return;
+
+            currentWorkIndex = index;
+            media.innerHTML = "";
+
+            const w = modalWorks[index];
+            if (!w) return;
+
+            const type = (w.type || "").toLowerCase();
+            const url = w.url;
+
+            if (type === "image") {
+                const img = document.createElement("img");
+                img.src = url;
+                img.alt = w.title || "";
+                media.appendChild(img);
+            } else if (type === "youtube") {
+                const iframe = document.createElement("iframe");
+                iframe.src = toYoutubeEmbed(url);
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                media.appendChild(iframe);
+            } else if (type === "vimeo") {
+                const iframe = document.createElement("iframe");
+                iframe.src = toVimeoEmbed(url);
+                iframe.allow = "autoplay; fullscreen; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                media.appendChild(iframe);
+            } else {
+                const v = document.createElement("video");
+                v.src = url;
+                v.controls = true;
+                v.autoplay = true;
+                v.playsInline = true;
+                media.appendChild(v);
+            }
+
+            titleEl.textContent = w.title || "";
+            overlay.classList.add("show");
+        }
+
+        function closeLightbox() {
+            const overlay = document.getElementById("lightboxOverlay");
+            const media = document.getElementById("lightboxMedia");
+            if (overlay) overlay.classList.remove("show");
+            if (media) media.innerHTML = "";
+        }
+
+        function lightboxPrev() {
+            if (!modalWorks.length) return;
+            currentWorkIndex =
+                (currentWorkIndex - 1 + modalWorks.length) % modalWorks.length;
+            openLightbox(currentWorkIndex);
+        }
+
+        function lightboxNext() {
+            if (!modalWorks.length) return;
+            currentWorkIndex = (currentWorkIndex + 1) % modalWorks.length;
+            openLightbox(currentWorkIndex);
+        }
+
+        /* ============================================================
+           CHAT：読み込み & 送信
+        ============================================================ */
         function listenComments(creatorId) {
             const list = document.getElementById("commentList");
             if (!list) return;
@@ -1338,35 +1059,35 @@
             }
 
             const colRef = collection(db, "creators", creatorId, "messages");
-            const q = query(colRef, orderBy("createdAt", "asc"));
+            const qRef = query(colRef, orderBy("createdAt", "asc"));
 
-            messagesUnsub = onSnapshot(q, snapshot => {
+            messagesUnsub = onSnapshot(qRef, (snap) => {
                 list.innerHTML = "";
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const isMine = data.clientId === clientId;
+                snap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    const isMine = d.clientId === clientId;
 
                     const row = document.createElement("div");
                     row.className = "comment-row " + (isMine ? "mine" : "theirs");
 
                     const bubble = document.createElement("div");
                     bubble.className = "comment-bubble";
-                    bubble.textContent = data.text || "";
+                    bubble.textContent = d.text || "";
 
                     const meta = document.createElement("div");
                     meta.className = "comment-meta";
 
                     let dateStr = "";
-                    if (data.createdAt?.toDate) {
-                        const d = data.createdAt.toDate();
-                        dateStr = d.toLocaleString("ja-JP", {
+                    if (d.createdAt?.toDate) {
+                        const dt = d.createdAt.toDate();
+                        dateStr = dt.toLocaleString("ja-JP", {
                             month: "short",
                             day: "numeric",
                             hour: "2-digit",
                             minute: "2-digit"
                         });
                     }
-                    meta.textContent = (data.nickname || "匿名") + (dateStr ? ` · ${dateStr}` : "");
+                    meta.textContent = (d.nickname || "匿名") + (dateStr ? ` · ${dateStr}` : "");
                     bubble.appendChild(meta);
 
                     row.appendChild(bubble);
@@ -1397,15 +1118,13 @@
         }
 
         function setupCommentInput(creatorId) {
-            const input = $("#commentInput");
-            const send = $("#commentSend");
-            const nickIn = $("#nicknameInput");
+            const input = document.getElementById("commentInput");
+            const send = document.getElementById("commentSend");
+            const nickIn = document.getElementById("nicknameInput");
             if (!input || !send || !nickIn) return;
 
-            const storedNick = localStorage.getItem("pcl_nickname");
-            if (storedNick && !nickIn.value) {
-                nickIn.value = storedNick;
-            }
+            const savedNick = localStorage.getItem("pcl_nickname");
+            if (savedNick && !nickIn.value) nickIn.value = savedNick;
 
             async function doSend() {
                 const text = input.value.trim();
@@ -1417,6 +1136,7 @@
                 }
                 if (!text) return;
 
+                // 管理者モード
                 if (text.startsWith("/admin ")) {
                     const code = text.replace("/admin ", "").trim();
                     if (code === ADMIN_SECRET) {
@@ -1445,41 +1165,47 @@
                 }
             }
 
-            send.onclick = () => { doSend(); };
-            input.onkeydown = (e) => {
+            send.addEventListener("click", doSend);
+            input.addEventListener("keydown", (e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     doSend();
                 }
-            };
+            });
         }
 
-        // DETAIL 開閉
+        /* ============================================================
+           DETAIL モーダル開閉
+        ============================================================ */
         function openDetail(c) {
-            const avatar = $("#detailAvatar");
-            const nameEl = $("#detailName");
-            const compEl = $("#detailCompany");
-            const urlBox = $("#detailUrl");
-            const titleEl = $("#detailVideoTitle");
-            const aboutEl = $("#detailAbout");
+            const avatar = document.getElementById("detailAvatar");
+            const nameEl = document.getElementById("detailName");
+            const compEl = document.getElementById("detailCompany");
+            const urlBox = document.getElementById("detailUrl");
+            const titleEl = document.getElementById("detailVideoTitle");
+            const aboutEl = document.getElementById("detailAbout");
+            const overlay = document.getElementById("detailOverlay");
 
-            avatar.innerHTML = c.profileImageUrl
-                ? `<img src="${c.profileImageUrl}" alt="${c.name || "avatar"}">`
-                : "";
+            if (avatar) {
+                avatar.innerHTML = c.profileImageUrl
+                    ? `<img src="${c.profileImageUrl}" alt="${c.name || "avatar"}">`
+                    : "";
+            }
+            if (nameEl) nameEl.textContent = c.name || "";
+            if (compEl) compEl.textContent = c.company || "";
+            if (titleEl) titleEl.textContent = c.videoTitle || "";
+            if (aboutEl) aboutEl.textContent = c.summary || "";
 
-            nameEl.textContent = c.name || "";
-            compEl.textContent = c.company || "";
-            titleEl.textContent = c.videoTitle || "";
-            aboutEl.textContent = c.summary || "";
-
-            urlBox.innerHTML = "";
-            if (c.url) {
-                const a = document.createElement("a");
-                a.href = c.url;
-                a.target = "_blank";
-                a.rel = "noopener noreferrer";
-                a.textContent = c.url.replace(/^https?:\/\//, "");
-                urlBox.appendChild(a);
+            if (urlBox) {
+                urlBox.innerHTML = "";
+                if (c.url) {
+                    const a = document.createElement("a");
+                    a.href = c.url;
+                    a.target = "_blank";
+                    a.rel = "noopener noreferrer";
+                    a.textContent = c.url.replace(/^https?:\/\//, "");
+                    urlBox.appendChild(a);
+                }
             }
 
             renderMainVideo(c.videoUrl);
@@ -1487,16 +1213,16 @@
             listenComments(c.id);
             setupCommentInput(c.id);
 
-            $("#detailOverlay").classList.add("show");
+            if (overlay) overlay.classList.add("show");
         }
 
         function closeDetail() {
-            const overlay = $("#detailOverlay");
-            const videoWrap = $("#detailVideoContainer");
-            const worksWrap = $("#worksContainer");
-            const list = $("#commentList");
+            const overlay = document.getElementById("detailOverlay");
+            const videoWrap = document.getElementById("detailVideoContainer");
+            const worksWrap = document.getElementById("worksContainer");
+            const list = document.getElementById("commentList");
 
-            overlay.classList.remove("show");
+            if (overlay) overlay.classList.remove("show");
             if (messagesUnsub) {
                 messagesUnsub();
                 messagesUnsub = null;
@@ -1506,52 +1232,42 @@
             if (list) list.innerHTML = "";
         }
 
-        // 検索 & ソート
+        /* ============================================================
+           Search / Sort / Menu / Scroll / CTA / init
+        ============================================================ */
         function setupSearchAndSort() {
-            const sIn = $("#searchInput");
-            const cSel = $("#categorySelect");
-            const sort = $("#sortSelect");
+            const sIn = document.getElementById("searchInput");
+            const cSel = document.getElementById("categorySelect");
+            const sort = document.getElementById("sortSelect");
 
             if (sIn) {
-                sIn.addEventListener("input", e => {
+                sIn.addEventListener("input", (e) => {
                     currentSearch = e.target.value || "";
                     renderGrid();
                 });
             }
+
             if (cSel) {
-                cSel.addEventListener("change", e => {
+                cSel.addEventListener("change", (e) => {
                     currentCategory = e.target.value || "";
                     renderGrid();
                 });
             }
+
             if (sort) {
-                sort.addEventListener("change", e => {
+                sort.addEventListener("change", (e) => {
                     currentSort = e.target.value || "newest";
                     renderGrid();
                 });
             }
         }
 
-        // メニュー & モーダル クローズ
-        function setupModalClose() {
-            const closeBtn = $("#detailClose");
-            const overlay = $("#detailOverlay");
-            if (closeBtn) {
-                closeBtn.addEventListener("click", closeDetail);
-            }
-            if (overlay) {
-                overlay.addEventListener("click", e => {
-                    if (e.target.id === "detailOverlay") closeDetail();
-                });
-            }
-            window.addEventListener("keydown", e => {
-                if (e.key === "Escape") closeDetail();
-            });
-        }
-
+        /* ============================================================
+           メニュー（ハンバーガー）
+        ============================================================ */
         function setupMenu() {
-            const btn = $("#menuButton");
-            const ov = $("#menuOverlay");
+            const btn = document.getElementById("menuButton");
+            const ov = document.getElementById("menuOverlay");
             if (!btn || !ov) return;
 
             function toggle() {
@@ -1560,37 +1276,163 @@
             }
 
             btn.addEventListener("click", toggle);
-            ov.addEventListener("click", e => {
+            ov.addEventListener("click", (e) => {
                 if (e.target.id === "menuOverlay") toggle();
             });
 
-            $("#linkMarket")?.addEventListener("click", e => {
+            const linkMarket = document.getElementById("linkMarket");
+            const linkAI = document.getElementById("linkAI");
+            const linkGuild = document.getElementById("linkGuild");
+
+            linkMarket?.addEventListener("click", (e) => {
                 e.preventDefault();
                 toggle();
                 alert("Creator’s Market（ECモール構想）の仮画面です。");
             });
-            $("#linkAI")?.addEventListener("click", e => {
+
+            linkAI?.addEventListener("click", (e) => {
                 e.preventDefault();
                 toggle();
                 alert("Creator’s AI Consulting（AIクローン相談）の仮画面です。");
             });
-            $("#linkGuild")?.addEventListener("click", e => {
+
+            linkGuild?.addEventListener("click", (e) => {
                 e.preventDefault();
                 toggle();
                 alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面です。");
             });
         }
 
-        // 初期化
-        (function init() {
-            setupSearchAndSort();
-            setupModalClose();
-            setupMenu();
-            loadCreators().catch(err => {
-                console.error("loadCreators error", err);
+        /* ============================================================
+           Aurora / Particles テーマ切り替え
+        ============================================================ */
+        function setupThemeToggle() {
+            const btn = document.getElementById("themeToggleBtn");
+            const body = document.body;
+            if (!btn) return;
+
+            // Aurora のランダムカラーを生成
+            function randomAuroraColors() {
+                const palettes = [
+                    ["#7c3aed", "#22d3ee", "#0f172a"],
+                    ["#ec4899", "#22c55e", "#020617"],
+                    ["#0ea5e9", "#a855f7", "#020617"],
+                    ["#f97316", "#22c55e", "#111827"],
+                ];
+                const [c1, c2, c3] = palettes[Math.floor(Math.random() * palettes.length)];
+                document.documentElement.style.setProperty("--aurora-1", c1);
+                document.documentElement.style.setProperty("--aurora-2", c2);
+                document.documentElement.style.setProperty("--aurora-3", c3);
+            }
+
+            function apply(theme) {
+                if (theme === "aurora") {
+                    randomAuroraColors();
+                    body.classList.add("aurora");
+                    btn.textContent = "BACKGROUND: AURORA";
+                } else {
+                    body.classList.remove("aurora");
+                    btn.textContent = "BACKGROUND: PARTICLES";
+                }
+                localStorage.setItem("cgc_theme", theme);
+            }
+
+            const saved = localStorage.getItem("cgc_theme");
+            apply(saved === "aurora" ? "aurora" : "particles");
+
+            btn.addEventListener("click", () => {
+                const next = localStorage.getItem("cgc_theme") === "aurora"
+                    ? "particles"
+                    : "aurora";
+                apply(next);
             });
+        }
+
+        /* ============================================================
+           Scroll-to-bottom ボタン
+        ============================================================ */
+        function setupScrollBottomButton() {
+            const btn = document.getElementById("scrollBottomBtn");
+            if (!btn) return;
+
+            function onScroll() {
+                const scrolled = window.scrollY || document.documentElement.scrollTop || 0;
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                if (scrolled < maxScroll - 300) {
+                    btn.classList.add("show");
+                } else {
+                    btn.classList.remove("show");
+                }
+            }
+
+            btn.addEventListener("click", () => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+            });
+
+            window.addEventListener("scroll", onScroll);
+            onScroll();
+        }
+
+        /* ============================================================
+           CGP CTA → Googleフォーム
+        ============================================================ */
+        function setupCgpButton() {
+            const btn = document.getElementById("cgpBtn");
+            if (!btn) return;
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSehqZ3zKjNf6MrN0iiSRIR4436lmn-44UoHG2gDiiJxpWi1AA/viewform?usp=send_form";
+            btn.addEventListener("click", () => {
+                window.open(formUrl, "_blank");
+            });
+        }
+
+        /* ============================================================
+           モーダル / ライトボックスのクローズ系
+        ============================================================ */
+        function setupModalAndLightboxClose() {
+            const closeBtn = document.getElementById("detailClose");
+            const overlay = document.getElementById("detailOverlay");
+
+            if (closeBtn) {
+                closeBtn.addEventListener("click", closeDetail);
+            }
+            if (overlay) {
+                overlay.addEventListener("click", (e) => {
+                    if (e.target.id === "detailOverlay") closeDetail();
+                });
+            }
+
+            const lbOverlay = document.getElementById("lightboxOverlay");
+            const lbClose = document.getElementById("lightboxClose");
+            const lbPrev = document.getElementById("lightboxPrev");
+            const lbNext = document.getElementById("lightboxNext");
+
+            if (lbOverlay) {
+                lbOverlay.addEventListener("click", (e) => {
+                    if (e.target === lbOverlay) closeLightbox();
+                });
+            }
+            if (lbClose) lbClose.addEventListener("click", closeLightbox);
+            if (lbPrev) lbPrev.addEventListener("click", lightboxPrev);
+            if (lbNext) lbNext.addEventListener("click", lightboxNext);
+
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    closeDetail();
+                    closeLightbox();
+                }
+            });
+        }
+
+        /* ============================================================
+           INIT（初期化）
+        ============================================================ */
+        (function init() {
+            setupThemeToggle();
+            setupMenu();
+            setupSearchAndSort();
+            setupScrollBottomButton();
+            setupModalAndLightboxClose();
+            setupCgpButton();
+            loadCreators().catch(err => console.error("loadCreators error", err));
         })();
     </script>
-</body>
-
-</html>
