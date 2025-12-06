@@ -1487,9 +1487,64 @@
             renderMainVideo(c.videoUrl);
             renderWorks(c.works);  // ← ここで上の renderWorks を呼ぶ
             listenComments(c.id);
-            setupCommentInput(c.id);
+            const list = document.getElementById("commentList");
+            if (!list) return;
 
-            $("#detailOverlay").classList.add("show");
+            const colRef = collection(db, "creators", creatorId, "messages");
+            const q = query(colRef, orderBy("createdAt", "asc"));
+
+            onSnapshot(q, (snapshot) => {
+                list.innerHTML = ""; // コメントリストをクリア
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const isMine = data.clientId === clientId;
+
+                    const row = document.createElement("div");
+                    row.className = "comment-row " + (isMine ? "mine" : "theirs");
+
+                    const bubble = document.createElement("div");
+                    bubble.className = "comment-bubble";
+                    bubble.textContent = data.text || "";
+
+                    const meta = document.createElement("div");
+                    meta.className = "comment-meta";
+                    let dateStr = "";
+                    if (data.createdAt?.toDate) {
+                        const d = data.createdAt.toDate();
+                        dateStr = d.toLocaleString("ja-JP", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+                    }
+                    meta.textContent = (data.nickname || "匿名") + (dateStr ? ` · ${dateStr}` : "");
+                    bubble.appendChild(meta);
+                    row.appendChild(bubble);
+
+                    const canDelete = isMine || isAdmin;
+                    if (canDelete) {
+                        const delBtn = document.createElement("button");
+                        delBtn.className = "comment-delete";
+                        delBtn.textContent = "削除";
+                        delBtn.onclick = async (e) => {
+                            e.stopPropagation();
+                            if (!confirm("このメッセージを削除しますか？")) return;
+                            try {
+                                await deleteDoc(doc(db, "creators", creatorId, "messages", docSnap.id));
+                            } catch (err) {
+                                console.error(err);
+                                alert("削除に失敗しました");
+                            }
+                        };
+                        row.appendChild(delBtn);
+                    }
+
+                    list.appendChild(row);
+                });
+
+                list.scrollTop = list.scrollHeight; // 新しいメッセージを下にスクロール
+            });
+        }
+
+        setupCommentInput(c.id);
+
+        $("#detailOverlay").classList.add("show");
         }
 
         function closeDetail() {
