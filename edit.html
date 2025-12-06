@@ -552,6 +552,14 @@
             </form>
         </section>
     </main>
+    <div id="workModal" class="work-modal">
+        <div class="work-modal__backdrop"></div>
+        <div class="work-modal__content">
+            <button class="work-modal__close" type="button">×</button>
+            <div class="work-modal__body"></div>
+        </div>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1146,13 +1154,6 @@
         workModalBackdrop.addEventListener("click", closeWorkModal);
 
     </script>
-    <div id="workModal" class="work-modal">
-        <div class="work-modal__backdrop"></div>
-        <div class="work-modal__content">
-            <button class="work-modal__close" type="button">×</button>
-            <div class="work-modal__body"></div>
-        </div>
-    </div>
 
 </body>
 

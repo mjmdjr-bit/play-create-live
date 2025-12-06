@@ -929,6 +929,14 @@
     </main>
 
     <footer>© CREATORS’ GUILD COLLECTIVE / Designed by Daijiro Majima</footer>
+    <!-- WORKS プレビュー用モーダル -->
+    <div id="workModal" class="work-modal" aria-hidden="true">
+        <div class="work-modal__backdrop"></div>
+        <div class="work-modal__content">
+            <button class="work-modal__close" type="button">×</button>
+            <div class="work-modal__body"></div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1359,11 +1367,83 @@
                     card.appendChild(typeEl);
                 }
 
+                // ★ ここを追加：カードクリックでポップアップ
+                const t = (w.type || detectWorkTypeFromUrl(url)).toLowerCase();
+                card.addEventListener("click", () => {
+                    openWorkModal(t, url);
+                });
+
                 grid.appendChild(card);
             });
 
             container.appendChild(grid);
         }
+
+    }
+
+        }
+        // ================= WORKS モーダル表示 =================
+        const workModal = document.querySelector("#workModal");
+        const workModalBody = workModal?.querySelector(".work-modal__body");
+        const workModalClose = workModal?.querySelector(".work-modal__close");
+        const workModalBackdrop = workModal?.querySelector(".work-modal__backdrop");
+
+        function openWorkModal(type, url) {
+            if (!workModal || !workModalBody) return;
+            workModalBody.innerHTML = "";
+            if (!url) return;
+
+            const t = (type || "").toLowerCase();
+
+            if (t === "image") {
+                const img = document.createElement("img");
+                img.src = url;
+                workModalBody.appendChild(img);
+            } else if (t === "video" || t === "file") {
+                const video = document.createElement("video");
+                video.src = url;
+                video.controls = true;
+                video.autoplay = true;
+                video.playsInline = true;
+                workModalBody.appendChild(video);
+            } else if (t === "youtube") {
+                const iframe = document.createElement("iframe");
+                iframe.src = toYoutubeEmbed(url);
+                iframe.allow =
+                    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                workModalBody.appendChild(iframe);
+            } else if (t === "vimeo") {
+                const iframe = document.createElement("iframe");
+                iframe.src = toVimeoEmbed(url);
+                iframe.allow = "autoplay; fullscreen; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                workModalBody.appendChild(iframe);
+            } else {
+                const iframe = document.createElement("iframe");
+                iframe.src = url;
+                iframe.allowFullscreen = true;
+                iframe.frameBorder = "0";
+                workModalBody.appendChild(iframe);
+            }
+
+            workModal.classList.add("is-open");
+        }
+
+        function closeWorkModal() {
+            if (!workModal || !workModalBody) return;
+            workModal.classList.remove("is-open");
+            workModalBody.innerHTML = "";
+        }
+
+        workModalClose?.addEventListener("click", closeWorkModal);
+        workModalBackdrop?.addEventListener("click", closeWorkModal);
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeWorkModal();
+        });
+
 
         // CHAT（Firestoreサブコレクション）
         function listenComments(creatorId) {
@@ -1520,6 +1600,18 @@
                 a.textContent = c.url.replace(/^https?:\/\//, "");
                 urlBox.appendChild(a);
             }
+            // WORKS 用のタイプ判定
+            function detectWorkTypeFromUrl(url) {
+                if (!url) return "video";
+                const lower = url.toLowerCase();
+                if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
+                if (lower.includes("vimeo.com")) return "vimeo";
+                if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
+                if (lower.endsWith(".mp4") || lower.endsWith(".mov") ||
+                    lower.startsWith("https://firebasestorage.googleapis.com")) return "video";
+                return "video";
+            }
+
 
             renderMainVideo(c.videoUrl);
             renderWorks(c.works);
@@ -1630,14 +1722,7 @@
             });
         })();
     </script>
-    <!-- WORKS プレビュー用モーダル -->
-    <div id="workModal" class="work-modal" aria-hidden="true">
-        <div class="work-modal__backdrop"></div>
-        <div class="work-modal__content">
-            <button class="work-modal__close" type="button">×</button>
-            <div class="work-modal__body"></div>
-        </div>
-    </div>
+
 </body>
 
 </html>
