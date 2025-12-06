@@ -1293,6 +1293,20 @@
                 container.appendChild(iframe);
             }
         }
+        // WORKS 用のタイプ判定（グローバル）
+        function detectWorkTypeFromUrl(url) {
+            if (!url) return "video";
+            const lower = url.toLowerCase();
+            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
+            if (lower.includes("vimeo.com")) return "vimeo";
+            if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
+            if (
+                lower.endsWith(".mp4") ||
+                lower.endsWith(".mov") ||
+                lower.startsWith("https://firebasestorage.googleapis.com")
+            ) return "video";
+            return "video";
+        }
 
         // WORKS 描画
         function renderWorks(works) {
@@ -1322,8 +1336,8 @@
                 const thumb = document.createElement("div");
                 thumb.className = "work-thumb";
 
-                const type = (w.type || "").toLowerCase();
                 const url = w.url;
+                const type = (w.type || detectWorkTypeFromUrl(url)).toLowerCase();
 
                 if (type === "image") {
                     const img = document.createElement("img");
@@ -1367,10 +1381,9 @@
                     card.appendChild(typeEl);
                 }
 
-                // ★ ここを追加：カードクリックでポップアップ
-                const t = (w.type || detectWorkTypeFromUrl(url)).toLowerCase();
+                // ★ カードクリックでポップアップ
                 card.addEventListener("click", () => {
-                    openWorkModal(t, url);
+                    openWorkModal(type, url);
                 });
 
                 grid.appendChild(card);
@@ -1379,9 +1392,6 @@
             container.appendChild(grid);
         }
 
-    }
-
-        }
         // ================= WORKS モーダル表示 =================
         const workModal = document.querySelector("#workModal");
         const workModalBody = workModal?.querySelector(".work-modal__body");
@@ -1445,133 +1455,6 @@
         });
 
 
-        // CHAT（Firestoreサブコレクション）
-        function listenComments(creatorId) {
-            const list = document.getElementById("commentList");
-            if (!list) return;
-            list.innerHTML = "";
-
-            if (messagesUnsub) {
-                messagesUnsub();
-                messagesUnsub = null;
-            }
-
-            const colRef = collection(db, "creators", creatorId, "messages");
-            const q = query(colRef, orderBy("createdAt", "asc"));
-
-            messagesUnsub = onSnapshot(q, snapshot => {
-                list.innerHTML = "";
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const isMine = data.clientId === clientId;
-
-                    const row = document.createElement("div");
-                    row.className = "comment-row " + (isMine ? "mine" : "theirs");
-
-                    const bubble = document.createElement("div");
-                    bubble.className = "comment-bubble";
-                    bubble.textContent = data.text || "";
-
-                    const meta = document.createElement("div");
-                    meta.className = "comment-meta";
-
-                    let dateStr = "";
-                    if (data.createdAt?.toDate) {
-                        const d = data.createdAt.toDate();
-                        dateStr = d.toLocaleString("ja-JP", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        });
-                    }
-                    meta.textContent = (data.nickname || "匿名") + (dateStr ? ` · ${dateStr}` : "");
-                    bubble.appendChild(meta);
-
-                    row.appendChild(bubble);
-
-                    const canDelete = isMine || isAdmin;
-                    if (canDelete) {
-                        const del = document.createElement("button");
-                        del.className = "comment-delete";
-                        del.textContent = "削除";
-                        del.onclick = async (e) => {
-                            e.stopPropagation();
-                            if (!confirm("このメッセージを削除しますか？")) return;
-                            try {
-                                await deleteDoc(doc(db, "creators", creatorId, "messages", docSnap.id));
-                            } catch (err) {
-                                console.error(err);
-                                alert("削除に失敗しました");
-                            }
-                        };
-                        row.appendChild(del);
-                    }
-
-                    list.appendChild(row);
-                });
-
-                list.scrollTop = list.scrollHeight;
-            });
-        }
-
-        function setupCommentInput(creatorId) {
-            const input = $("#commentInput");
-            const send = $("#commentSend");
-            const nickIn = $("#nicknameInput");
-            if (!input || !send || !nickIn) return;
-
-            const storedNick = localStorage.getItem("pcl_nickname");
-            if (storedNick && !nickIn.value) {
-                nickIn.value = storedNick;
-            }
-
-            async function doSend() {
-                const text = input.value.trim();
-                const nick = nickIn.value.trim();
-                if (!nick) {
-                    alert("ニックネームを入力してください。");
-                    nickIn.focus();
-                    return;
-                }
-                if (!text) return;
-
-                if (text.startsWith("/admin ")) {
-                    const code = text.replace("/admin ", "").trim();
-                    if (code === ADMIN_SECRET) {
-                        isAdmin = true;
-                        alert("管理者モードになりました（このブラウザのみ）");
-                    } else {
-                        alert("管理者コードが違います");
-                    }
-                    input.value = "";
-                    return;
-                }
-
-                localStorage.setItem("pcl_nickname", nick);
-
-                try {
-                    await addDoc(collection(db, "creators", creatorId, "messages"), {
-                        text,
-                        nickname: nick,
-                        clientId,
-                        createdAt: serverTimestamp()
-                    });
-                    input.value = "";
-                } catch (err) {
-                    console.error(err);
-                    alert("メッセージ送信に失敗しました");
-                }
-            }
-
-            send.onclick = () => { doSend(); };
-            input.onkeydown = (e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    doSend();
-                }
-            };
-        }
 
         // DETAIL 開閉
         function openDetail(c) {
@@ -1600,25 +1483,34 @@
                 a.textContent = c.url.replace(/^https?:\/\//, "");
                 urlBox.appendChild(a);
             }
-            // WORKS 用のタイプ判定
-            function detectWorkTypeFromUrl(url) {
-                if (!url) return "video";
-                const lower = url.toLowerCase();
-                if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
-                if (lower.includes("vimeo.com")) return "vimeo";
-                if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
-                if (lower.endsWith(".mp4") || lower.endsWith(".mov") ||
-                    lower.startsWith("https://firebasestorage.googleapis.com")) return "video";
-                return "video";
-            }
-
 
             renderMainVideo(c.videoUrl);
-            renderWorks(c.works);
+            renderWorks(c.works);  // ← ここで上の renderWorks を呼ぶ
             listenComments(c.id);
             setupCommentInput(c.id);
 
             $("#detailOverlay").classList.add("show");
+        }
+
+        // WORKS 用のタイプ判定
+        function detectWorkTypeFromUrl(url) {
+            if (!url) return "video";
+            const lower = url.toLowerCase();
+            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
+            if (lower.includes("vimeo.com")) return "vimeo";
+            if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
+            if (lower.endsWith(".mp4") || lower.endsWith(".mov") ||
+                lower.startsWith("https://firebasestorage.googleapis.com")) return "video";
+            return "video";
+        }
+
+
+        renderMainVideo(c.videoUrl);
+        renderWorks(c.works);
+        listenComments(c.id);
+        setupCommentInput(c.id);
+
+        $("#detailOverlay").classList.add("show");
         }
 
         function closeDetail() {
