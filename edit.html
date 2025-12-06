@@ -399,13 +399,6 @@
         }
     </style>
 </head>
-<div id="workModal" class="work-modal">
-    <div class="work-modal__backdrop"></div>
-    <div class="work-modal__content">
-        <button class="work-modal__close" type="button">×</button>
-        <div class="work-modal__body"></div>
-    </div>
-</div>
 
 <body>
     <header>
@@ -790,13 +783,31 @@
                     row.remove();
                 });
 
+                // ★ プレビューボタンをここで作る（forEach の中）
+                const previewBtn = document.createElement("button");
+                previewBtn.type = "button";
+                previewBtn.textContent = "プレビュー";
+                previewBtn.className = "work-delete-btn"; // 見た目変えたければ別クラスでOK
+
+                previewBtn.addEventListener("click", () => {
+                    const url = urlInputEl.value.trim();
+                    if (!url) {
+                        alert("URL が空です");
+                        return;
+                    }
+                    const type = (w.type || detectWorkTypeFromUrl(url)).toLowerCase();
+                    openWorkModal(type, url);
+                });
+
                 row.appendChild(titleInput);
                 row.appendChild(typeLabel);
                 row.appendChild(urlInputEl);
                 row.appendChild(delBtn);
+                row.appendChild(previewBtn); // ★ 行に追加
 
                 worksListBox.appendChild(row);
             });
+        }
         }
 
         function readWorksFromEditor() {
@@ -1135,6 +1146,13 @@
         workModalBackdrop.addEventListener("click", closeWorkModal);
 
     </script>
+    <div id="workModal" class="work-modal">
+        <div class="work-modal__backdrop"></div>
+        <div class="work-modal__content">
+            <button class="work-modal__close" type="button">×</button>
+            <div class="work-modal__body"></div>
+        </div>
+    </div>
 
 </body>
 
