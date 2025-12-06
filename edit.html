@@ -764,8 +764,8 @@
         async function selectCreator(id) {
             const c = creators.find(x => x.id === id);
             if (!c) return;
-            currentId = id;
-            currentDoc = c.data;
+            currentId = id; null;
+            currentDoc = c.data; /creators/4NNoJl9dSR8AwzcGdYQ2
             markActive(id);
 
             nameInput.value = c.data.name || "";
