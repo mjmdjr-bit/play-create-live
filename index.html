@@ -1486,10 +1486,8 @@
 
             renderMainVideo(c.videoUrl);
             renderWorks(c.works);  // ← ここで上の renderWorks を呼ぶ
-            listenComments(c.id);
-            const list = document.getElementById("commentList");
+            listenComments(c.id); const list = document.getElementById("commentList");
             if (!list) return;
-
             const colRef = collection(db, "creators", creatorId, "messages");
             const q = query(colRef, orderBy("createdAt", "asc"));
 
