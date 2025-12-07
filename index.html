@@ -819,6 +819,14 @@
         }
     </style>
 </head>
+<!-- WORKS プレビュー用モーダル -->
+<div id="workModal" class="work-modal" aria-hidden="true">
+    <div class="work-modal__backdrop"></div>
+    <div class="work-modal__content">
+        <button class="work-modal__close" type="button">×</button>
+        <div class="work-modal__body"></div>
+    </div>
+</div>
 
 <body>
     <canvas id="particles"></canvas>
@@ -929,14 +937,6 @@
     </main>
 
     <footer>© CREATORS’ GUILD COLLECTIVE / Designed by Daijiro Majima</footer>
-    <!-- WORKS プレビュー用モーダル -->
-    <div id="workModal" class="work-modal" aria-hidden="true">
-        <div class="work-modal__backdrop"></div>
-        <div class="work-modal__content">
-            <button class="work-modal__close" type="button">×</button>
-            <div class="work-modal__body"></div>
-        </div>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1293,20 +1293,6 @@
                 container.appendChild(iframe);
             }
         }
-        // WORKS 用のタイプ判定（グローバル）
-        function detectWorkTypeFromUrl(url) {
-            if (!url) return "video";
-            const lower = url.toLowerCase();
-            if (lower.includes("youtu.be") || lower.includes("youtube.com")) return "youtube";
-            if (lower.includes("vimeo.com")) return "vimeo";
-            if (/\.(png|jpe?g|gif|webp|avif)$/.test(lower)) return "image";
-            if (
-                lower.endsWith(".mp4") ||
-                lower.endsWith(".mov") ||
-                lower.startsWith("https://firebasestorage.googleapis.com")
-            ) return "video";
-            return "video";
-        }
 
         // WORKS 描画
         function renderWorks(works) {
@@ -1336,8 +1322,8 @@
                 const thumb = document.createElement("div");
                 thumb.className = "work-thumb";
 
+                const type = (w.type || "").toLowerCase();
                 const url = w.url;
-                const type = (w.type || detectWorkTypeFromUrl(url)).toLowerCase();
 
                 if (type === "image") {
                     const img = document.createElement("img");
@@ -1381,80 +1367,139 @@
                     card.appendChild(typeEl);
                 }
 
-                // ★ カードクリックでポップアップ
-                card.addEventListener("click", () => {
-                    openWorkModal(type, url);
-                });
-
                 grid.appendChild(card);
             });
 
             container.appendChild(grid);
         }
 
-        // ================= WORKS モーダル表示 =================
-        const workModal = document.querySelector("#workModal");
-        const workModalBody = workModal?.querySelector(".work-modal__body");
-        const workModalClose = workModal?.querySelector(".work-modal__close");
-        const workModalBackdrop = workModal?.querySelector(".work-modal__backdrop");
+        // CHAT（Firestoreサブコレクション）
+        function listenComments(creatorId) {
+            const list = document.getElementById("commentList");
+            if (!list) return;
+            list.innerHTML = "";
 
-        function openWorkModal(type, url) {
-            if (!workModal || !workModalBody) return;
-            workModalBody.innerHTML = "";
-            if (!url) return;
-
-            const t = (type || "").toLowerCase();
-
-            if (t === "image") {
-                const img = document.createElement("img");
-                img.src = url;
-                workModalBody.appendChild(img);
-            } else if (t === "video" || t === "file") {
-                const video = document.createElement("video");
-                video.src = url;
-                video.controls = true;
-                video.autoplay = true;
-                video.playsInline = true;
-                workModalBody.appendChild(video);
-            } else if (t === "youtube") {
-                const iframe = document.createElement("iframe");
-                iframe.src = toYoutubeEmbed(url);
-                iframe.allow =
-                    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.allowFullscreen = true;
-                iframe.frameBorder = "0";
-                workModalBody.appendChild(iframe);
-            } else if (t === "vimeo") {
-                const iframe = document.createElement("iframe");
-                iframe.src = toVimeoEmbed(url);
-                iframe.allow = "autoplay; fullscreen; picture-in-picture";
-                iframe.allowFullscreen = true;
-                iframe.frameBorder = "0";
-                workModalBody.appendChild(iframe);
-            } else {
-                const iframe = document.createElement("iframe");
-                iframe.src = url;
-                iframe.allowFullscreen = true;
-                iframe.frameBorder = "0";
-                workModalBody.appendChild(iframe);
+            if (messagesUnsub) {
+                messagesUnsub();
+                messagesUnsub = null;
             }
 
-            workModal.classList.add("is-open");
+            const colRef = collection(db, "creators", creatorId, "messages");
+            const q = query(colRef, orderBy("createdAt", "asc"));
+
+            messagesUnsub = onSnapshot(q, snapshot => {
+                list.innerHTML = "";
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const isMine = data.clientId === clientId;
+
+                    const row = document.createElement("div");
+                    row.className = "comment-row " + (isMine ? "mine" : "theirs");
+
+                    const bubble = document.createElement("div");
+                    bubble.className = "comment-bubble";
+                    bubble.textContent = data.text || "";
+
+                    const meta = document.createElement("div");
+                    meta.className = "comment-meta";
+
+                    let dateStr = "";
+                    if (data.createdAt?.toDate) {
+                        const d = data.createdAt.toDate();
+                        dateStr = d.toLocaleString("ja-JP", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        });
+                    }
+                    meta.textContent = (data.nickname || "匿名") + (dateStr ? ` · ${dateStr}` : "");
+                    bubble.appendChild(meta);
+
+                    row.appendChild(bubble);
+
+                    const canDelete = isMine || isAdmin;
+                    if (canDelete) {
+                        const del = document.createElement("button");
+                        del.className = "comment-delete";
+                        del.textContent = "削除";
+                        del.onclick = async (e) => {
+                            e.stopPropagation();
+                            if (!confirm("このメッセージを削除しますか？")) return;
+                            try {
+                                await deleteDoc(doc(db, "creators", creatorId, "messages", docSnap.id));
+                            } catch (err) {
+                                console.error(err);
+                                alert("削除に失敗しました");
+                            }
+                        };
+                        row.appendChild(del);
+                    }
+
+                    list.appendChild(row);
+                });
+
+                list.scrollTop = list.scrollHeight;
+            });
         }
 
-        function closeWorkModal() {
-            if (!workModal || !workModalBody) return;
-            workModal.classList.remove("is-open");
-            workModalBody.innerHTML = "";
+        function setupCommentInput(creatorId) {
+            const input = $("#commentInput");
+            const send = $("#commentSend");
+            const nickIn = $("#nicknameInput");
+            if (!input || !send || !nickIn) return;
+
+            const storedNick = localStorage.getItem("pcl_nickname");
+            if (storedNick && !nickIn.value) {
+                nickIn.value = storedNick;
+            }
+
+            async function doSend() {
+                const text = input.value.trim();
+                const nick = nickIn.value.trim();
+                if (!nick) {
+                    alert("ニックネームを入力してください。");
+                    nickIn.focus();
+                    return;
+                }
+                if (!text) return;
+
+                if (text.startsWith("/admin ")) {
+                    const code = text.replace("/admin ", "").trim();
+                    if (code === ADMIN_SECRET) {
+                        isAdmin = true;
+                        alert("管理者モードになりました（このブラウザのみ）");
+                    } else {
+                        alert("管理者コードが違います");
+                    }
+                    input.value = "";
+                    return;
+                }
+
+                localStorage.setItem("pcl_nickname", nick);
+
+                try {
+                    await addDoc(collection(db, "creators", creatorId, "messages"), {
+                        text,
+                        nickname: nick,
+                        clientId,
+                        createdAt: serverTimestamp()
+                    });
+                    input.value = "";
+                } catch (err) {
+                    console.error(err);
+                    alert("メッセージ送信に失敗しました");
+                }
+            }
+
+            send.onclick = () => { doSend(); };
+            input.onkeydown = (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    doSend();
+                }
+            };
         }
-
-        workModalClose?.addEventListener("click", closeWorkModal);
-        workModalBackdrop?.addEventListener("click", closeWorkModal);
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closeWorkModal();
-        });
-
-
 
         // DETAIL 開閉
         function openDetail(c) {
@@ -1485,12 +1530,11 @@
             }
 
             renderMainVideo(c.videoUrl);
-            renderWorks(c.works);  // ← ここで上の renderWorks を呼ぶ
+            renderWorks(c.works);
             listenComments(c.id);
             setupCommentInput(c.id);
 
             $("#detailOverlay").classList.add("show");
-        }
         }
 
         function closeDetail() {
@@ -1594,7 +1638,6 @@
             });
         })();
     </script>
-
 </body>
 
 </html>
