@@ -1089,6 +1089,28 @@
                     '<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px;">該当するクリエーターがいません。</div>';
                 return;
             }
+            function getThumbnailUrl(c) {
+                if (!c) return "";
+
+                // 1) プロフィール画像を最優先
+                if (c.profileImage) return c.profileImage;
+                if (c.profileImageUrl) return c.profileImageUrl;
+
+                // 2) WORKS の中に type:"image" があれば、その最初の1枚
+                if (Array.isArray(c.works)) {
+                    const imgWork = c.works.find(w => (w.type || "").toLowerCase() === "image" && w.url);
+                    if (imgWork) return imgWork.url;
+
+                    // image 指定がなくても、最初の WORK を使う（保険）
+                    if (c.works[0] && c.works[0].url) {
+                        return c.works[0].url;
+                    }
+                }
+
+                // 3) 何もなければ空（背景グラデだけ）
+                return "";
+            }
+
 
             filtered.forEach(c => {
                 const card = document.createElement("div");
@@ -1096,9 +1118,13 @@
 
                 const tw = document.createElement("div");
                 tw.className = "thumb-wrap";
-                if (c.profileImageUrl) {
+
+                // ★ ここで共通ロジックからサムネURLを取得
+                const thumbUrl = getThumbnailUrl(c);
+
+                if (thumbUrl) {
                     const img = document.createElement("img");
-                    img.src = c.profileImageUrl;
+                    img.src = thumbUrl;
                     img.alt = c.name || "thumbnail";
                     img.className = "thumb";
                     tw.appendChild(img);
@@ -1165,6 +1191,64 @@
 
                 grid.appendChild(card);
             });
+
+            const title = document.createElement("div");
+            title.className = "thumb-title";
+            title.textContent = c.videoTitle || c.name || "Untitled";
+            tw.appendChild(title);
+
+            const body = document.createElement("div");
+            body.className = "card-body";
+
+            if (Array.isArray(c.categories) && c.categories[0]) {
+                const chip = document.createElement("div");
+                chip.className = "category-chip";
+                chip.textContent = c.categories[0];
+                body.appendChild(chip);
+            }
+
+            const nameEl = document.createElement("div");
+            nameEl.className = "creator-name";
+            nameEl.textContent = c.name || "—";
+
+            const compEl = document.createElement("div");
+            compEl.className = "creator-company";
+            compEl.textContent = c.company || "";
+
+            const footer = document.createElement("div");
+            footer.className = "card-footer";
+            const likesLabel = document.createElement("span");
+            likesLabel.textContent = `${c.likes} ♥`;
+
+            const likeBtn = document.createElement("button");
+            likeBtn.className = "like-btn";
+            likeBtn.innerHTML = '<span class="heart">👍</span> いいね';
+            likeBtn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                try {
+                    await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
+                    c.likes += 1;
+                    likesLabel.textContent = `${c.likes} ♥`;
+                } catch (err) {
+                    console.error(err);
+                    alert("いいねの送信に失敗しました");
+                }
+            });
+
+            footer.appendChild(likesLabel);
+            footer.appendChild(likeBtn);
+
+            body.appendChild(nameEl);
+            body.appendChild(compEl);
+            body.appendChild(footer);
+
+            card.appendChild(tw);
+            card.appendChild(body);
+
+            card.addEventListener("click", () => openDetail(c));
+
+            grid.appendChild(card);
+        });
         }
 
         // 埋め込みURL変換
