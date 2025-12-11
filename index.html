@@ -918,7 +918,7 @@
             authDomain: "play-create-live.firebaseapp.com",
             databaseURL: "https://play-create-live-default-rtdb.firebaseio.com",
             projectId: "play-create-live",
-            storageBucket: "play-create-live.appspot.com",
+            storageBucket: "play-create-live.firebasestorage.app",
             messagingSenderId: "143889321354",
             appId: "1:143889321354:web:3c2d16f5fd928ba10e0c73",
             measurementId: "G-ZFHF93QQCJ"
@@ -1003,38 +1003,29 @@
 
         // Creators取得
         async function loadCreators() {
-            try {
-                const snap = await getDocs(collection(db, "creators"));
-                const list = [];
-                snap.forEach(docSnap => {
-                    const d = docSnap.data();
-                    list.push({
-                        id: docSnap.id,
-                        name: d.name || "",
-                        company: d.company || "",
-                        url: d.url || "",
-                        videoTitle: d.videoTitle || "",
-                        summary: d.summary || "",
-                        // profileImage / profileImageUrl 両方に対応
-                        profileImageUrl: d.profileImage || d.profileImageUrl || "",
-                        videoUrl: d.videoUrl || "",
-                        categories: Array.isArray(d.categories) ? d.categories : [],
-                        likes: typeof d.likes === "number" ? d.likes : 0,
-                        works: Array.isArray(d.works) ? d.works : [],
-                        createdAt: d.createdAt || null
-                    });
+            const snap = await getDocs(collection(db, "creators"));
+            const list = [];
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                list.push({
+                    id: docSnap.id,
+                    name: d.name || "",
+                    company: d.company || "",
+                    url: d.url || "",
+                    videoTitle: d.videoTitle || "",
+                    summary: d.summary || "",
+                    profileImageUrl: d.profileImageUrl || "",
+                    videoUrl: d.videoUrl || "",
+                    categories: Array.isArray(d.categories) ? d.categories : [],
+                    likes: typeof d.likes === "number" ? d.likes : 0,
+                    works: Array.isArray(d.works) ? d.works : [],
+                    createdAt: d.createdAt || null
                 });
-
-                console.log("creators loaded:", list.length, list);  // ★ 追加
-
-                creators = list;
-                rebuildCategoryOptions();
-                renderGrid();
-            } catch (err) {
-                console.error("loadCreators error:", err);           // ★ ここでエラーも見える
-            }
+            });
+            creators = list;
+            rebuildCategoryOptions();
+            renderGrid();
         }
-
 
         function rebuildCategoryOptions() {
             const sel = $("#categorySelect");
@@ -1063,28 +1054,23 @@
                 arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
             } else if (currentSort === "oldest") {
                 arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis() || 0;
-                    const tb = b.createdAt?.toMillis() || 0;
+                    const ta = a.createdAt?.toMillis?.() || 0;
+                    const tb = b.createdAt?.toMillis?.() || 0;
                     return ta - tb;
                 });
             } else { // newest
                 arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis() || 0;
-                    const tb = b.createdAt?.toMillis() || 0;
+                    const ta = a.createdAt?.toMillis?.() || 0;
+                    const tb = b.createdAt?.toMillis?.() || 0;
                     return tb - ta;
                 });
             }
             return arr;
         }
 
-        // サムネURL取得（共通ロジック）
         // Grid 描画
         function renderGrid() {
             const grid = $("#grid");
-            if (!grid) return;
-
-            console.log("renderGrid: creators =", creators.length);
-
             grid.innerHTML = "";
 
             const s = (currentSearch || "").toLowerCase();
@@ -1110,12 +1096,9 @@
 
                 const tw = document.createElement("div");
                 tw.className = "thumb-wrap";
-
-                const thumbUrl = getThumbnailUrl(c);
-
-                if (thumbUrl) {
+                if (c.profileImageUrl) {
                     const img = document.createElement("img");
-                    img.src = thumbUrl;
+                    img.src = c.profileImageUrl;
                     img.alt = c.name || "thumbnail";
                     img.className = "thumb";
                     tw.appendChild(img);
@@ -1184,9 +1167,7 @@
             });
         }
 
-        }
-
-        // 埋め込みURL変換（ここから下は元のまま）
+        // 埋め込みURL変換
         function toYoutubeEmbed(urlOrId) {
             if (!urlOrId) return "";
             if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
@@ -1270,7 +1251,7 @@
             }
         }
 
-        // WORKS 描画（元のまま）
+        // WORKS 描画
         function renderWorks(works) {
             const container = document.getElementById("worksContainer");
             if (!container) return;
@@ -1349,7 +1330,7 @@
             container.appendChild(grid);
         }
 
-        // CHAT（元のまま）
+        // CHAT（Firestoreサブコレクション）
         function listenComments(creatorId) {
             const list = document.getElementById("commentList");
             if (!list) return;
@@ -1486,9 +1467,8 @@
             const titleEl = $("#detailVideoTitle");
             const aboutEl = $("#detailAbout");
 
-            const avatarUrl = getThumbnailUrl(c);
-            avatar.innerHTML = avatarUrl
-                ? `<img src="${avatarUrl}" alt="${c.name || "avatar"}">`
+            avatar.innerHTML = c.profileImageUrl
+                ? `<img src="${c.profileImageUrl}" alt="${c.name || "avatar"}">`
                 : "";
 
             nameEl.textContent = c.name || "";
