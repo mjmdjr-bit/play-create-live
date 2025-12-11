@@ -955,7 +955,7 @@
             }
 
             const prev = currentDoc || {};
-            const previousProfileUrl = prev.profileImageUrl || null;
+            const previousProfileUrl = prev.profileImageUrl || prev.profileImage || null;
             const previousVideoUrl = prev.videoUrl || null;
 
             const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, previousProfileUrl);
@@ -976,7 +976,12 @@
                 works: finalWorks
             };
 
-            if (profileImageUrl) payload.profileImageUrl = profileImageUrl;
+            if (profileImageUrl) {
+                // index.html が profileImage を見ていても動くように両方に書く
+                payload.profileImageUrl = profileImageUrl;
+                payload.profileImage = profileImageUrl;
+            }
+
             payload.videoUrl = videoUrl;
 
             await setDoc(docRef, payload, { merge: true });
