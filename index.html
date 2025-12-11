@@ -1054,19 +1054,45 @@
                 arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
             } else if (currentSort === "oldest") {
                 arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis?.() || 0;
-                    const tb = b.createdAt?.toMillis?.() || 0;
+                    const ta = a.createdAt?.toMillis() || 0;
+                    const tb = b.createdAt?.toMillis() || 0;
+
                     return ta - tb;
                 });
             } else { // newest
                 arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis?.() || 0;
-                    const tb = b.createdAt?.toMillis?.() || 0;
+                    const ta = a.createdAt?.toMillis() || 0;
+                    const tb = b.createdAt?.toMillis() || 0;
+
                     return tb - ta;
                 });
             }
             return arr;
         }
+        function getThumbnailUrl(c) {
+            if (!c) return "";
+
+            // 1) プロフィール画像を最優先
+            if (c.profileImage) return c.profileImage;
+            if (c.profileImageUrl) return c.profileImageUrl;
+
+            // 2) WORKS の中に type:"image" があれば、その最初の1枚
+            if (Array.isArray(c.works)) {
+                const imgWork = c.works.find(
+                    w => (w.type || "").toLowerCase() === "image" && w.url
+                );
+                if (imgWork) return imgWork.url;
+
+                // image 指定がなくても、最初の WORK を保険で使う
+                if (c.works[0] && c.works[0].url) {
+                    return c.works[0].url;
+                }
+            }
+
+            // 3) 何もなければ空（グラデ背景だけ）
+            return "";
+        }
+
 
         // Grid 描画
         function renderGrid() {
