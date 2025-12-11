@@ -1003,30 +1003,38 @@
 
         // Creators取得
         async function loadCreators() {
-            const snap = await getDocs(collection(db, "creators"));
-            const list = [];
-            snap.forEach(docSnap => {
-                const d = docSnap.data();
-                list.push({
-                    id: docSnap.id,
-                    name: d.name || "",
-                    company: d.company || "",
-                    url: d.url || "",
-                    videoTitle: d.videoTitle || "",
-                    summary: d.summary || "",
-                    // profileImage / profileImageUrl 両方に対応
-                    profileImageUrl: d.profileImage || d.profileImageUrl || "",
-                    videoUrl: d.videoUrl || "",
-                    categories: Array.isArray(d.categories) ? d.categories : [],
-                    likes: typeof d.likes === "number" ? d.likes : 0,
-                    works: Array.isArray(d.works) ? d.works : [],
-                    createdAt: d.createdAt || null
+            try {
+                const snap = await getDocs(collection(db, "creators"));
+                const list = [];
+                snap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    list.push({
+                        id: docSnap.id,
+                        name: d.name || "",
+                        company: d.company || "",
+                        url: d.url || "",
+                        videoTitle: d.videoTitle || "",
+                        summary: d.summary || "",
+                        // profileImage / profileImageUrl 両方に対応
+                        profileImageUrl: d.profileImage || d.profileImageUrl || "",
+                        videoUrl: d.videoUrl || "",
+                        categories: Array.isArray(d.categories) ? d.categories : [],
+                        likes: typeof d.likes === "number" ? d.likes : 0,
+                        works: Array.isArray(d.works) ? d.works : [],
+                        createdAt: d.createdAt || null
+                    });
                 });
-            });
-            creators = list;
-            rebuildCategoryOptions();
-            renderGrid();
+
+                console.log("creators loaded:", list.length, list);  // ★ 追加
+
+                creators = list;
+                rebuildCategoryOptions();
+                renderGrid();
+            } catch (err) {
+                console.error("loadCreators error:", err);           // ★ ここでエラーも見える
+            }
         }
+
 
         function rebuildCategoryOptions() {
             const sel = $("#categorySelect");
@@ -1099,103 +1107,108 @@
             const grid = $("#grid");
             if (!grid) return;
 
+            console.log("renderGrid: creators =", creators.length);
+
             grid.innerHTML = "";
+    ...
+        }
 
-            const s = (currentSearch || "").toLowerCase();
-            let filtered = creators.filter(c => {
-                const name = (c.name || "").toLowerCase();
-                const cats = Array.isArray(c.categories) ? c.categories : [];
-                const okName = !s || name.includes(s);
-                const okCat = !currentCategory || cats.includes(currentCategory);
-                return okName && okCat;
-            });
 
-            filtered = sortCreators(filtered);
+        const s = (currentSearch || "").toLowerCase();
+        let filtered = creators.filter(c => {
+            const name = (c.name || "").toLowerCase();
+            const cats = Array.isArray(c.categories) ? c.categories : [];
+            const okName = !s || name.includes(s);
+            const okCat = !currentCategory || cats.includes(currentCategory);
+            return okName && okCat;
+        });
 
-            if (!filtered.length) {
-                grid.innerHTML =
-                    '<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px;">該当するクリエーターがいません。</div>';
-                return;
+        filtered = sortCreators(filtered);
+
+        if (!filtered.length) {
+            grid.innerHTML =
+                '<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px;">該当するクリエーターがいません。</div>';
+            return;
+        }
+
+        filtered.forEach(c => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const tw = document.createElement("div");
+            tw.className = "thumb-wrap";
+
+            const thumbUrl = getThumbnailUrl(c);
+
+            if (thumbUrl) {
+                const img = document.createElement("img");
+                img.src = thumbUrl;
+                img.alt = c.name || "thumbnail";
+                img.className = "thumb";
+                tw.appendChild(img);
+            } else {
+                const fb = document.createElement("div");
+                fb.className = "thumb-fallback";
+                tw.appendChild(fb);
             }
 
-            filtered.forEach(c => {
-                const card = document.createElement("div");
-                card.className = "card";
+            const title = document.createElement("div");
+            title.className = "thumb-title";
+            title.textContent = c.videoTitle || c.name || "Untitled";
+            tw.appendChild(title);
 
-                const tw = document.createElement("div");
-                tw.className = "thumb-wrap";
+            const body = document.createElement("div");
+            body.className = "card-body";
 
-                const thumbUrl = getThumbnailUrl(c);
+            if (Array.isArray(c.categories) && c.categories[0]) {
+                const chip = document.createElement("div");
+                chip.className = "category-chip";
+                chip.textContent = c.categories[0];
+                body.appendChild(chip);
+            }
 
-                if (thumbUrl) {
-                    const img = document.createElement("img");
-                    img.src = thumbUrl;
-                    img.alt = c.name || "thumbnail";
-                    img.className = "thumb";
-                    tw.appendChild(img);
-                } else {
-                    const fb = document.createElement("div");
-                    fb.className = "thumb-fallback";
-                    tw.appendChild(fb);
+            const nameEl = document.createElement("div");
+            nameEl.className = "creator-name";
+            nameEl.textContent = c.name || "—";
+
+            const compEl = document.createElement("div");
+            compEl.className = "creator-company";
+            compEl.textContent = c.company || "";
+
+            const footer = document.createElement("div");
+            footer.className = "card-footer";
+            const likesLabel = document.createElement("span");
+            likesLabel.textContent = `${c.likes} ♥`;
+
+            const likeBtn = document.createElement("button");
+            likeBtn.className = "like-btn";
+            likeBtn.innerHTML = '<span class="heart">👍</span> いいね';
+            likeBtn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                try {
+                    await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
+                    c.likes += 1;
+                    likesLabel.textContent = `${c.likes} ♥`;
+                } catch (err) {
+                    console.error(err);
+                    alert("いいねの送信に失敗しました");
                 }
-
-                const title = document.createElement("div");
-                title.className = "thumb-title";
-                title.textContent = c.videoTitle || c.name || "Untitled";
-                tw.appendChild(title);
-
-                const body = document.createElement("div");
-                body.className = "card-body";
-
-                if (Array.isArray(c.categories) && c.categories[0]) {
-                    const chip = document.createElement("div");
-                    chip.className = "category-chip";
-                    chip.textContent = c.categories[0];
-                    body.appendChild(chip);
-                }
-
-                const nameEl = document.createElement("div");
-                nameEl.className = "creator-name";
-                nameEl.textContent = c.name || "—";
-
-                const compEl = document.createElement("div");
-                compEl.className = "creator-company";
-                compEl.textContent = c.company || "";
-
-                const footer = document.createElement("div");
-                footer.className = "card-footer";
-                const likesLabel = document.createElement("span");
-                likesLabel.textContent = `${c.likes} ♥`;
-
-                const likeBtn = document.createElement("button");
-                likeBtn.className = "like-btn";
-                likeBtn.innerHTML = '<span class="heart">👍</span> いいね';
-                likeBtn.addEventListener("click", async (e) => {
-                    e.stopPropagation();
-                    try {
-                        await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
-                        c.likes += 1;
-                        likesLabel.textContent = `${c.likes} ♥`;
-                    } catch (err) {
-                        console.error(err);
-                        alert("いいねの送信に失敗しました");
-                    }
-                });
-
-                footer.appendChild(likesLabel);
-                footer.appendChild(likeBtn);
-
-                body.appendChild(nameEl);
-                body.appendChild(compEl);
-                body.appendChild(footer);
-
-                card.appendChild(tw);
-                card.appendChild(body);
-
-                card.addEventListener("click", () => openDetail(c));
-
-                grid.appendChild(card);
             });
+
+            footer.appendChild(likesLabel);
+            footer.appendChild(likeBtn);
+
+            body.appendChild(nameEl);
+            body.appendChild(compEl);
+            body.appendChild(footer);
+
+            card.appendChild(tw);
+            card.appendChild(body);
+
+            card.addEventListener("click", () => openDetail(c));
+
+            grid.appendChild(card);
+        });
         }
 
         // 埋め込みURL変換（ここから下は元のまま）
