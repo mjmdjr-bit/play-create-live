@@ -1030,6 +1030,7 @@
                 console.log("✅ creators loaded:", list.length, list); // ★追加
 
                 creators = list;
+                console.log("first profile url:", creators[0]?.profileImageUrl);
                 rebuildCategoryOptions();
                 renderGrid();
 
@@ -1057,27 +1058,48 @@
                 sel.appendChild(opt);
             });
         }
+        function toMillisSafe(v) {
+            if (!v) return 0;
+
+            // Firestore Timestamp
+            if (typeof v.toMillis === "function") return v.toMillis();
+
+            // JS Date
+            if (v instanceof Date) return v.getTime();
+
+            // number (already ms)
+            if (typeof v === "number") return v;
+
+            // string -> Date.parse
+            if (typeof v === "string") {
+                const t = Date.parse(v);
+                return Number.isFinite(t) ? t : 0;
+            }
+
+            return 0;
+        }
+
 
         function sortCreators(list) {
             const arr = list.slice();
 
             if (currentSort === "name-asc") {
                 arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-            } else if (currentSort === "name-desc") {
-                arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-            } else if (currentSort === "oldest") {
-                arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis() || 0;
-                    const tb = b.createdAt?.toMillis() || 0;
-                    return ta - tb;
-                });
-            } else { // newest
-                arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis() || 0;
-                    const tb = b.createdAt?.toMillis() || 0;
-                    return tb - ta;
-                });
+                return arr;
             }
+
+            if (currentSort === "name-desc") {
+                arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+                return arr;
+            }
+
+            if (currentSort === "oldest") {
+                arr.sort((a, b) => toMillisSafe(a.createdAt) - toMillisSafe(b.createdAt));
+                return arr;
+            }
+
+            // newest
+            arr.sort((a, b) => toMillisSafe(b.createdAt) - toMillisSafe(a.createdAt));
             return arr;
         }
 
