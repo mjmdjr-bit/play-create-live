@@ -1002,30 +1002,42 @@
         })();
 
         // Creators取得
+        // Creators取得
         async function loadCreators() {
-            const snap = await getDocs(collection(db, "creators"));
-            const list = [];
-            snap.forEach(docSnap => {
-                const d = docSnap.data();
-                list.push({
-                    id: docSnap.id,
-                    name: d.name || "",
-                    company: d.company || "",
-                    url: d.url || "",
-                    videoTitle: d.videoTitle || "",
-                    summary: d.summary || "",
-                    profileImageUrl: d.profileImageUrl || "",
-                    videoUrl: d.videoUrl || "",
-                    categories: Array.isArray(d.categories) ? d.categories : [],
-                    likes: typeof d.likes === "number" ? d.likes : 0,
-                    works: Array.isArray(d.works) ? d.works : [],
-                    createdAt: d.createdAt || null
+            try {
+                const snap = await getDocs(collection(db, "creators"));
+                const list = [];
+
+                snap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    list.push({
+                        id: docSnap.id,
+                        name: d.name || "",
+                        company: d.company || "",
+                        url: d.url || "",
+                        videoTitle: d.videoTitle || "",
+                        summary: d.summary || "",
+                        // ★ profileImage / profileImageUrl 両対応
+                        profileImageUrl: d.profileImageUrl || d.profileImage || "",
+                        videoUrl: d.videoUrl || "",
+                        categories: Array.isArray(d.categories) ? d.categories : [],
+                        likes: typeof d.likes === "number" ? d.likes : 0,
+                        works: Array.isArray(d.works) ? d.works : [],
+                        createdAt: d.createdAt || null
+                    });
                 });
-            });
-            creators = list;
-            rebuildCategoryOptions();
-            renderGrid();
+
+                console.log("✅ creators loaded:", list.length, list); // ★追加
+
+                creators = list;
+                rebuildCategoryOptions();
+                renderGrid();
+
+            } catch (err) {
+                console.error("❌ loadCreators error:", err); // ★追加
+            }
         }
+
 
         function rebuildCategoryOptions() {
             const sel = $("#categorySelect");
@@ -1048,29 +1060,33 @@
 
         function sortCreators(list) {
             const arr = list.slice();
+
             if (currentSort === "name-asc") {
                 arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
             } else if (currentSort === "name-desc") {
                 arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
             } else if (currentSort === "oldest") {
                 arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis?.() || 0;
-                    const tb = b.createdAt?.toMillis?.() || 0;
+                    const ta = a.createdAt?.toMillis() || 0;
+                    const tb = b.createdAt?.toMillis() || 0;
                     return ta - tb;
                 });
             } else { // newest
                 arr.sort((a, b) => {
-                    const ta = a.createdAt?.toMillis?.() || 0;
-                    const tb = b.createdAt?.toMillis?.() || 0;
+                    const ta = a.createdAt?.toMillis() || 0;
+                    const tb = b.createdAt?.toMillis() || 0;
                     return tb - ta;
                 });
             }
             return arr;
         }
 
+
         // Grid 描画
         function renderGrid() {
             const grid = $("#grid");
+            if (!grid) return;
+
             grid.innerHTML = "";
 
             const s = (currentSearch || "").toLowerCase();
@@ -1096,10 +1112,11 @@
 
                 const tw = document.createElement("div");
                 tw.className = "thumb-wrap";
+
                 if (c.profileImageUrl) {
                     const img = document.createElement("img");
                     img.src = c.profileImageUrl;
-                    img.alt = c.name || "thumbnail";
+                    img.alt = c.name || "profile";
                     img.className = "thumb";
                     tw.appendChild(img);
                 } else {
@@ -1161,7 +1178,8 @@
                 card.appendChild(tw);
                 card.appendChild(body);
 
-                card.addEventListener("click", () => openDetail(c));
+                // openDetail がまだ無いなら一旦コメントアウトでもOK
+                // card.addEventListener("click", () => openDetail(c));
 
                 grid.appendChild(card);
             });
@@ -1590,9 +1608,8 @@
             setupSearchAndSort();
             setupModalClose();
             setupMenu();
-            loadCreators().catch(err => {
-                console.error("loadCreators error", err);
-            });
+            loadCreators();
+
         })();
     </script>
 </body>
