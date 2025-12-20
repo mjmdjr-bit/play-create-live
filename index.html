@@ -1200,7 +1200,12 @@
                 card.appendChild(tw);
                 card.appendChild(body);
 
-                // card.addEventListener("pointerdown", () => openDetail(c));
+                card.dataset.creatorId = c.id;
+
+                card.addEventListener("pointerdown", (e) => {
+                    console.log("✅ card pointerdown:", c.id, c.name);
+                    openDetailById(c.id);
+                }, { passive: true });
 
                 grid.appendChild(card);
             });
@@ -1497,6 +1502,19 @@
             };
         }
 
+        function openDetailById(id) {
+            try {
+                const c = creators.find(x => x.id === id);
+                console.log("✅ openDetailById found:", !!c, id);
+                if (!c) return;
+
+                openDetail(c);
+                console.log("✅ after openDetail, overlay classes:", document.getElementById("detailOverlay")?.className);
+            } catch (err) {
+                console.error("❌ openDetailById error:", err);
+                alert("openDetailでエラー: " + err.message);
+            }
+        }
         // DETAIL 開閉
         function openDetail(c) {
             const avatar = $("#detailAvatar");
@@ -1531,6 +1549,15 @@
             setupCommentInput(c.id);
 
             $("#detailOverlay").classList.add("show");
+
+            onst ov = document.getElementById("detailOverlay");
+            console.log("detailOverlay exists:", !!ov);
+            ov?.classList.add("show");
+
+            ov.style.zIndex = "2000";
+
+            document.body.style.overflow = "hidden";
+            console.log("✅ overlay show added");
         }
 
         function closeDetail() {
@@ -1547,6 +1574,7 @@
             if (videoWrap) videoWrap.innerHTML = "";
             if (worksWrap) worksWrap.innerHTML = "";
             if (list) list.innerHTML = "";
+            document.body.style.overflow = "";
         }
 
         // 検索 & ソート
