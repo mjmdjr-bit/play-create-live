@@ -547,11 +547,9 @@
             measurementId: "G-ZFHF93QQCJ"
         };
 
-        const storage = getStorage(app, "gs://play-create-live.firebasestorage.app");
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
+        const storage = getStorage(app, "gs://play-create-live.firebasestorage.app");
 
         // --------------------------------------------------
         // DOM ヘルパー / 参照
@@ -926,82 +924,81 @@
         // --------------------------------------------------
         async function saveCreator() {
             try {
+                const name = nameInput.value.trim();
+                if (!name) {
+                    alert("名前は必須です。");
+                    return;
+                }
+
+                let creatorId = currentId;
+                let docRef;
+
+                const cats = (categoryInput.value || "")
+                    .split(",")
+                    .map((v) => v.trim())
+                    .filter(Boolean);
+
+                if (!creatorId) {
+                    const basePayload = {
+                        name,
+                        company: companyInput.value.trim(),
+                        url: urlInput.value.trim(),
+                        videoTitle: videoTitleInput.value.trim(),
+                        summary: summaryInput.value.trim(),
+                        categories: cats,
+                        likes: 0,
+                        createdAt: serverTimestamp()
+                    };
+                    const created = await addDoc(collection(db, "creators"), basePayload);
+                    creatorId = created.id;
+                    docRef = doc(db, "creators", creatorId);
+                } else {
+                    docRef = doc(db, "creators", creatorId);
+                }
+
+                const prev = currentDoc || {};
+                const previousProfileUrl = prev.profileImageUrl || prev.profileImage || null;
+                const previousVideoUrl = prev.videoUrl || null;
+
+                const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, previousProfileUrl);
+                const videoUrl = await buildMainVideoUrl(creatorId, previousVideoUrl);
+
+                const worksFromUI = readWorksFromEditor();
+                const newWorks = await buildNewWorksFromInputs(creatorId, worksFromUI);
+                const finalWorks = worksFromUI.concat(newWorks);
+
+                const payload = {
+                    name,
+                    company: companyInput.value.trim(),
+                    url: urlInput.value.trim(),
+                    videoTitle: videoTitleInput.value.trim(),
+                    summary: summaryInput.value.trim(),
+                    categories: cats,
+                    updatedAt: serverTimestamp(),
+                    works: finalWorks,
+                    videoUrl: videoUrl || null
+                };
+
+                if (profileImageUrl) {
+                    payload.profileImageUrl = profileImageUrl;
+                    payload.profileImage = profileImageUrl;
+                }
+
+                await setDoc(docRef, payload, { merge: true });
+
+                alert("保存しました。");
+
+                currentId = creatorId;
+                await loadCreators();
+                const found = creators.find((x) => x.id === creatorId);
+                currentDoc = found ? found.data : payload;
+                if (currentId) selectCreator(currentId);
+
             } catch (err) {
                 console.error("❌ saveCreator failed:", err);
                 alert("保存/アップロード失敗: " + (err?.message || err));
             }
         }
-        const name = nameInput.value.trim();
-        if (!name) {
-            alert("名前は必須です。");
-            return;
-        }
-
-        let creatorId = currentId;
-        let docRef;
-
-        const cats = (categoryInput.value || "")
-            .split(",")
-            .map((v) => v.trim())
-            .filter(Boolean);
-
-        if (!creatorId) {
-            const basePayload = {
-                name,
-                company: companyInput.value.trim(),
-                url: urlInput.value.trim(),
-                videoTitle: videoTitleInput.value.trim(),
-                summary: summaryInput.value.trim(),
-                categories: cats,
-                likes: 0,
-                createdAt: serverTimestamp()
-            };
-            const created = await addDoc(collection(db, "creators"), basePayload);
-            creatorId = created.id;
-            docRef = doc(db, "creators", creatorId);
-        } else {
-            docRef = doc(db, "creators", creatorId);
-        }
-
-        const prev = currentDoc || {};
-        const previousProfileUrl = prev.profileImageUrl || prev.profileImage || null;
-        const previousVideoUrl = prev.videoUrl || null;
-
-        const profileImageUrl = await uploadProfileImageIfNeeded(creatorId, previousProfileUrl);
-        const videoUrl = await buildMainVideoUrl(creatorId, previousVideoUrl);
-
-        const worksFromUI = readWorksFromEditor();
-        const newWorks = await buildNewWorksFromInputs(creatorId, worksFromUI);
-        const finalWorks = worksFromUI.concat(newWorks);
-
-        const payload = {
-            name,
-            company: companyInput.value.trim(),
-            url: urlInput.value.trim(),
-            videoTitle: videoTitleInput.value.trim(),
-            summary: summaryInput.value.trim(),
-            categories: cats,
-            updatedAt: serverTimestamp(),
-            works: finalWorks
-        };
-
-        if (profileImageUrl) {
-            // index.html が profileImage を見ていても動くように両方に書く
-            payload.profileImageUrl = profileImageUrl;
-            payload.profileImage = profileImageUrl;
-        }
-
-        payload.videoUrl = videoUrl;
-
-        await setDoc(docRef, payload, { merge: true });
-
-        alert("保存しました。");
-
-        currentId = creatorId;
-        await loadCreators();
-        const found = creators.find((x) => x.id === creatorId);
-        currentDoc = found ? found.data : payload;
-        if (currentId) selectCreator(currentId);
         }
 
         async function deleteCreator() {
