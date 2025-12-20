@@ -1548,9 +1548,8 @@
             listenComments(c.id);
             setupCommentInput(c.id);
 
-            $("#detailOverlay").classList.add("show");
 
-            onst ov = document.getElementById("detailOverlay");
+            const ov = document.getElementById("detailOverlay");
             console.log("detailOverlay exists:", !!ov);
             ov?.classList.add("show");
 
@@ -1650,6 +1649,7 @@
                 toggle();
                 alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面です。");
             });
+            document.body.style.overflow = "";
         }
 
         // 初期化
