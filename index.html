@@ -1202,8 +1202,8 @@
 
                 card.dataset.creatorId = c.id;
 
-                card.addEventListener("pointerdown", (e) => {
-                    console.log("✅ card pointerdown:", c.id, c.name);
+                card.addEventListener("click", (e) => {
+                    console.log("✅ card click:", c.id, c.name);
                     openDetailById(c.id);
                 }, { passive: true });
 
@@ -1551,115 +1551,115 @@
 
             const ov = document.getElementById("detailOverlay");
             console.log("detailOverlay exists:", !!ov);
-            ov?.classList.add("show");
+            if (ov) {
+                ov?.classList.add("show");
 
-            ov.style.zIndex = "2000";
+                ov.style.zIndex = "2000";
 
-            document.body.style.overflow = "hidden";
-            console.log("✅ overlay show added");
-        }
-
-        function closeDetail() {
-            const overlay = $("#detailOverlay");
-            const videoWrap = $("#detailVideoContainer");
-            const worksWrap = $("#worksContainer");
-            const list = $("#commentList");
-
-            overlay.classList.remove("show");
-            if (messagesUnsub) {
-                messagesUnsub();
-                messagesUnsub = null;
+                document.body.style.overflow = "hidden";
+                console.log("✅ overlay show added");
             }
-            if (videoWrap) videoWrap.innerHTML = "";
-            if (worksWrap) worksWrap.innerHTML = "";
-            if (list) list.innerHTML = "";
-            document.body.style.overflow = "";
-        }
 
-        // 検索 & ソート
-        function setupSearchAndSort() {
-            const sIn = $("#searchInput");
-            const cSel = $("#categorySelect");
-            const sort = $("#sortSelect");
+            function closeDetail() {
+                const overlay = $("#detailOverlay");
+                const videoWrap = $("#detailVideoContainer");
+                const worksWrap = $("#worksContainer");
+                const list = $("#commentList");
 
-            if (sIn) {
-                sIn.addEventListener("input", e => {
-                    currentSearch = e.target.value || "";
-                    renderGrid();
+                overlay.classList.remove("show");
+                if (messagesUnsub) {
+                    messagesUnsub();
+                    messagesUnsub = null;
+                }
+                if (videoWrap) videoWrap.innerHTML = "";
+                if (worksWrap) worksWrap.innerHTML = "";
+                if (list) list.innerHTML = "";
+            }
+
+            // 検索 & ソート
+            function setupSearchAndSort() {
+                const sIn = $("#searchInput");
+                const cSel = $("#categorySelect");
+                const sort = $("#sortSelect");
+
+                if (sIn) {
+                    sIn.addEventListener("input", e => {
+                        currentSearch = e.target.value || "";
+                        renderGrid();
+                    });
+                }
+                if (cSel) {
+                    cSel.addEventListener("change", e => {
+                        currentCategory = e.target.value || "";
+                        renderGrid();
+                    });
+                }
+                if (sort) {
+                    sort.addEventListener("change", e => {
+                        currentSort = e.target.value || "newest";
+                        renderGrid();
+                    });
+                }
+            }
+
+            // メニュー & モーダル クローズ
+            function setupModalClose() {
+                const closeBtn = $("#detailClose");
+                const overlay = $("#detailOverlay");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", closeDetail);
+                }
+                if (overlay) {
+                    overlay.addEventListener("click", e => {
+                        if (e.target.id === "detailOverlay") closeDetail();
+                    });
+                }
+                window.addEventListener("keydown", e => {
+                    if (e.key === "Escape") closeDetail();
                 });
             }
-            if (cSel) {
-                cSel.addEventListener("change", e => {
-                    currentCategory = e.target.value || "";
-                    renderGrid();
+
+            function setupMenu() {
+                const btn = $("#menuButton");
+                const ov = $("#menuOverlay");
+                if (!btn || !ov) return;
+
+                function toggle() {
+                    btn.classList.toggle("active");
+                    ov.classList.toggle("show");
+                }
+
+                btn.addEventListener("click", toggle);
+                ov.addEventListener("click", e => {
+                    if (e.target.id === "menuOverlay") toggle();
                 });
-            }
-            if (sort) {
-                sort.addEventListener("change", e => {
-                    currentSort = e.target.value || "newest";
-                    renderGrid();
+
+                $("#linkMarket")?.addEventListener("click", e => {
+                    e.preventDefault();
+                    toggle();
+                    alert("Creator’s Market（ECモール構想）の仮画面です。");
                 });
-            }
-        }
-
-        // メニュー & モーダル クローズ
-        function setupModalClose() {
-            const closeBtn = $("#detailClose");
-            const overlay = $("#detailOverlay");
-            if (closeBtn) {
-                closeBtn.addEventListener("click", closeDetail);
-            }
-            if (overlay) {
-                overlay.addEventListener("click", e => {
-                    if (e.target.id === "detailOverlay") closeDetail();
+                $("#linkAI")?.addEventListener("click", e => {
+                    e.preventDefault();
+                    toggle();
+                    alert("Creator’s AI Consulting（AIクローン相談）の仮画面です。");
                 });
-            }
-            window.addEventListener("keydown", e => {
-                if (e.key === "Escape") closeDetail();
-            });
-        }
-
-        function setupMenu() {
-            const btn = $("#menuButton");
-            const ov = $("#menuOverlay");
-            if (!btn || !ov) return;
-
-            function toggle() {
-                btn.classList.toggle("active");
-                ov.classList.toggle("show");
+                $("#linkGuild")?.addEventListener("click", e => {
+                    e.preventDefault();
+                    toggle();
+                    alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面です。");
+                });
+                document.body.style.overflow = "";
             }
 
-            btn.addEventListener("click", toggle);
-            ov.addEventListener("click", e => {
-                if (e.target.id === "menuOverlay") toggle();
-            });
+            // 初期化
+            (function init() {
+                setupSearchAndSort();
+                setupModalClose();
+                setupMenu();
+                loadCreators();
 
-            $("#linkMarket")?.addEventListener("click", e => {
-                e.preventDefault();
-                toggle();
-                alert("Creator’s Market（ECモール構想）の仮画面です。");
-            });
-            $("#linkAI")?.addEventListener("click", e => {
-                e.preventDefault();
-                toggle();
-                alert("Creator’s AI Consulting（AIクローン相談）の仮画面です。");
-            });
-            $("#linkGuild")?.addEventListener("click", e => {
-                e.preventDefault();
-                toggle();
-                alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面です。");
-            });
-            document.body.style.overflow = "";
-        }
-
-        // 初期化
-        (function init() {
-            setupSearchAndSort();
-            setupModalClose();
-            setupMenu();
-            loadCreators();
-
-        })();
+            })();
     </script>
 </body>
 
