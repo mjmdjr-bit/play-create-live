@@ -1202,8 +1202,8 @@
 
                 card.dataset.creatorId = c.id;
 
-                card.addEventListener("click", (e) => {
-                    console.log("✅ card click:", c.id, c.name);
+                card.addEventListener("pointerdown", (e) => {
+                    console.log("✅ card pointerdown:", c.id, c.name);
                     openDetailById(c.id);
                 }, { passive: true });
 
@@ -1551,77 +1551,115 @@
 
             const ov = document.getElementById("detailOverlay");
             console.log("detailOverlay exists:", !!ov);
-            if (ov) {
-                ov.classList.add("show");
-                ov.style.zIndex = "2000";
+            ov?.classList.add("show");
 
-                document.body.style.overflow = "hidden";
-                console.log("✅ overlay show added");
+            ov.style.zIndex = "2000";
+
+            document.body.style.overflow = "hidden";
+            console.log("✅ overlay show added");
+        }
+
+        function closeDetail() {
+            const overlay = $("#detailOverlay");
+            const videoWrap = $("#detailVideoContainer");
+            const worksWrap = $("#worksContainer");
+            const list = $("#commentList");
+
+            overlay.classList.remove("show");
+            if (messagesUnsub) {
+                messagesUnsub();
+                messagesUnsub = null;
+            }
+            if (videoWrap) videoWrap.innerHTML = "";
+            if (worksWrap) worksWrap.innerHTML = "";
+            if (list) list.innerHTML = "";
+            document.body.style.overflow = "";
+        }
+
+        // 検索 & ソート
+        function setupSearchAndSort() {
+            const sIn = $("#searchInput");
+            const cSel = $("#categorySelect");
+            const sort = $("#sortSelect");
+
+            if (sIn) {
+                sIn.addEventListener("input", e => {
+                    currentSearch = e.target.value || "";
+                    renderGrid();
+                });
+            }
+            if (cSel) {
+                cSel.addEventListener("change", e => {
+                    currentCategory = e.target.value || "";
+                    renderGrid();
+                });
+            }
+            if (sort) {
+                sort.addEventListener("change", e => {
+                    currentSort = e.target.value || "newest";
+                    renderGrid();
+                });
+            }
+        }
+
+        // メニュー & モーダル クローズ
+        function setupModalClose() {
+            const closeBtn = $("#detailClose");
+            const overlay = $("#detailOverlay");
+            if (closeBtn) {
+                closeBtn.addEventListener("click", closeDetail);
+            }
+            if (overlay) {
+                overlay.addEventListener("click", e => {
+                    if (e.target.id === "detailOverlay") closeDetail();
+                });
+            }
+            window.addEventListener("keydown", e => {
+                if (e.key === "Escape") closeDetail();
+            });
+        }
+
+        function setupMenu() {
+            const btn = $("#menuButton");
+            const ov = $("#menuOverlay");
+            if (!btn || !ov) return;
+
+            function toggle() {
+                btn.classList.toggle("active");
+                ov.classList.toggle("show");
             }
 
-            })();
-            function closeDetail() {
-                    const overlay = $("#detailOverlay");
-                    overlay?.classList.remove("show");
-                    document.body.style.overflow = ""; // ←戻す
+            btn.addEventListener("click", toggle);
+            ov.addEventListener("click", e => {
+                if (e.target.id === "menuOverlay") toggle();
+            });
 
-                    if (messagesUnsub) { messagesUnsub(); messagesUnsub = null; }
-                    $("#detailVideoContainer")?.replaceChildren();
-                    $("#worksContainer")?.replaceChildren();
-                    $("#commentList")?.replaceChildren();
-                }
+            $("#linkMarket")?.addEventListener("click", e => {
+                e.preventDefault();
+                toggle();
+                alert("Creator’s Market（ECモール構想）の仮画面です。");
+            });
+            $("#linkAI")?.addEventListener("click", e => {
+                e.preventDefault();
+                toggle();
+                alert("Creator’s AI Consulting（AIクローン相談）の仮画面です。");
+            });
+            $("#linkGuild")?.addEventListener("click", e => {
+                e.preventDefault();
+                toggle();
+                alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面です。");
+            });
+            document.body.style.overflow = "";
+        }
 
-                function setupSearchAndSort() {
-                    $("#searchInput")?.addEventListener("input", e => {
-                        currentSearch = e.target.value || "";
-                        renderGrid();
-                    });
-                    $("#categorySelect")?.addEventListener("change", e => {
-                        currentCategory = e.target.value || "";
-                        renderGrid();
-                    });
-                    $("#sortSelect")?.addEventListener("change", e => {
-                        currentSort = e.target.value || "newest";
-                        renderGrid();
-                    });
-                }
+        // 初期化
+        (function init() {
+            setupSearchAndSort();
+            setupModalClose();
+            setupMenu();
+            loadCreators();
 
-                function setupModalClose() {
-                    $("#detailClose")?.addEventListener("click", closeDetail);
-                    $("#detailOverlay")?.addEventListener("click", e => {
-                        if (e.target.id === "detailOverlay") closeDetail();
-                    });
-                    window.addEventListener("keydown", e => {
-                        if (e.key === "Escape") closeDetail();
-                    });
-                }
-
-                function setupMenu() {
-                    const btn = $("#menuButton");
-                    const ov = $("#menuOverlay");
-                    if (!btn || !ov) return;
-
-                    const toggle = () => {
-                        btn.classList.toggle("active");
-                        ov.classList.toggle("show");
-                    };
-
-                    btn.addEventListener("click", toggle);
-                    ov.addEventListener("click", e => {
-                        if (e.target.id === "menuOverlay") toggle();
-                    });
-
-                    $("#linkMarket")?.addEventListener("click", e => { e.preventDefault(); toggle(); alert("Creator’s Market（仮）"); });
-                    $("#linkAI")?.addEventListener("click", e => { e.preventDefault(); toggle(); alert("Creator’s AI Consulting（仮）"); });
-                    $("#linkGuild")?.addEventListener("click", e => { e.preventDefault(); toggle(); alert("Creator’s Guild Produce（仮）"); });
-                }
-
-                (function init() {
-                    setupSearchAndSort();
-                    setupModalClose();
-                    setupMenu();
-                    loadCreators().catch(console.error);
-                })();
+        })();
     </script>
 </body>
 
