@@ -1552,8 +1552,7 @@
             const ov = document.getElementById("detailOverlay");
             console.log("detailOverlay exists:", !!ov);
             if (ov) {
-                ov?.classList.add("show");
-
+                ov.classList.add("show");
                 ov.style.zIndex = "2000";
 
                 document.body.style.overflow = "hidden";
@@ -1649,7 +1648,6 @@
                     toggle();
                     alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面です。");
                 });
-                document.body.style.overflow = "";
             }
 
             // 初期化
