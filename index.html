@@ -1275,15 +1275,13 @@
                 card.appendChild(tw);
                 card.appendChild(body);
 
-                card.dataset.creatorId = c.id;
-
-                // ✅ スマホ誤爆防止（タップ判定）
+                // スマホ誤爆防止（タップ判定）
                 bindCardTap(card, () => openDetailById(c.id));
 
-                // ✅ ここが大事：forEach の中で grid に追加
                 grid.appendChild(card);
             });
         }
+
 </main >
 
             // 埋め込みURL変換
@@ -1737,19 +1735,7 @@
         })();
         const toBottomBtn = document.getElementById("toBottomBtn");
         if (toBottomBtn) {
-            function updateToBottomBtn() {
-                const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
-                if (nearBottom) toBottomBtn.classList.remove("show");
-                else toBottomBtn.classList.add("show");
-            }
 
-            window.addEventListener("scroll", updateToBottomBtn, { passive: true });
-            window.addEventListener("resize", updateToBottomBtn, { passive: true });
-            updateToBottomBtn();
-
-            toBottomBtn.addEventListener("click", () => {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-            });
         }
 
 
