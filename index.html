@@ -1282,21 +1282,20 @@
             });
         }
 
-</main >
 
-            // 埋め込みURL変換
-            function toYoutubeEmbed(urlOrId) {
-                if (!urlOrId) return "";
-                if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
-                let s = urlOrId.trim();
-                const m = s.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_\-]{6,})/);
-                if (m) {
-                    s = m[1];
-                } else if (!/^[A-Za-z0-9_\-]{6,}$/.test(s)) {
-                    return "";
-                }
-                return `https://www.youtube.com/embed/${s}`;
+        // 埋め込みURL変換
+        function toYoutubeEmbed(urlOrId) {
+            if (!urlOrId) return "";
+            if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
+            let s = urlOrId.trim();
+            const m = s.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_\-]{6,})/);
+            if (m) {
+                s = m[1];
+            } else if (!/^[A-Za-z0-9_\-]{6,}$/.test(s)) {
+                return "";
             }
+            return `https://www.youtube.com/embed/${s}`;
+        }
 
         function isVerticalYoutube(url) {
             if (!url) return false;
@@ -1735,8 +1734,21 @@
         })();
         const toBottomBtn = document.getElementById("toBottomBtn");
         if (toBottomBtn) {
+            function updateToBottomBtn() {
+                const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
+                if (nearBottom) toBottomBtn.classList.remove("show");
+                else toBottomBtn.classList.add("show");
+            }
 
+            window.addEventListener("scroll", updateToBottomBtn, { passive: true });
+            window.addEventListener("resize", updateToBottomBtn, { passive: true });
+            updateToBottomBtn();
+
+            toBottomBtn.addEventListener("click", () => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+            });
         }
+
 
 
 
