@@ -1225,13 +1225,13 @@
 
                 card.dataset.creatorId = c.id;
 
-                bindCardTap(card, () => openDetailById(id));
-                console.log("✅ card tap:", c.id, c.name);
-                openDetailById(c.id);
-                );
+                bindCardTap(card, () {
+                    console.log("✅ card tap:", c.id, c.name);
+                    openDetailById(c.id);
+                });
 
-            grid.appendChild(card);
-        });
+                grid.appendChild(card);
+            });
         }
 
         // 埋め込みURL変換
