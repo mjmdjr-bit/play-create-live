@@ -781,6 +781,29 @@
             font-size: 12px;
             opacity: .8;
         }
+
+        #toBottomBtn {
+            position: fixed;
+            right: 14px;
+            bottom: 14px;
+            z-index: 9999;
+            width: 48px;
+            height: 48px;
+            border-radius: 999px;
+            border: 1px solid #ffffff22;
+            background: #11131aee;
+            color: #eaeef6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+            display: none;
+            /* 最初は隠す */
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        #toBottomBtn.show {
+            display: flex;
+        }
     </style>
 </head>
 
@@ -1202,13 +1225,13 @@
 
                 card.dataset.creatorId = c.id;
 
-                card.addEventListener("pointerdown", (e) => {
-                    console.log("✅ card pointerdown:", c.id, c.name);
-                    openDetailById(c.id);
-                }, { passive: true });
+                bindCardTap(card, () => openDetailById(id));
+                console.log("✅ card tap:", c.id, c.name);
+                openDetailById(c.id);
+                );
 
-                grid.appendChild(card);
-            });
+            grid.appendChild(card);
+        });
         }
 
         // 埋め込みURL変換
@@ -1660,7 +1683,24 @@
             loadCreators();
 
         })();
+        const toBottomBtn = document.getElementById("toBottomBtn");
+
+        function updateToBottomBtn() {
+            // 下にいる時は消す、ちょい上なら出す
+            const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
+            if (nearBottom) toBottomBtn.classList.remove("show");
+            else toBottomBtn.classList.add("show");
+        }
+
+        window.addEventListener("scroll", updateToBottomBtn, { passive: true });
+        window.addEventListener("resize", updateToBottomBtn, { passive: true });
+        updateToBottomBtn();
+
+        toBottomBtn.addEventListener("click", () => {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        });
     </script>
+    <button id="toBottomBtn" aria-label="一番下へ" title="一番下へ">↓</button>
 </body>
 
 </html>
