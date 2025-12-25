@@ -1276,13 +1276,12 @@
 
                 card.dataset.creatorId = c.id;
 
-                bindCardTap(card, () {
-                    console.log("✅ card tap:", c.id, c.name);
-                    openDetailById(c.id);
-                });
+                bindCardTap(card, () => openDetailById(c.id));
 
-                grid.appendChild(card);
             });
+
+            grid.appendChild(card);
+        });
         }
 
         // 埋め込みURL変換
@@ -1735,6 +1734,24 @@
 
         })();
         const toBottomBtn = document.getElementById("toBottomBtn");
+        if (!toBottomBtn) {
+            console.warn("toBottomBtn not found");
+        } else {
+            function updateToBottomBtn() {
+                const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
+                if (nearBottom) toBottomBtn.classList.remove("show");
+                else toBottomBtn.classList.add("show");
+            }
+
+            window.addEventListener("scroll", updateToBottomBtn, { passive: true });
+            window.addEventListener("resize", updateToBottomBtn, { passive: true });
+            updateToBottomBtn();
+
+            toBottomBtn.addEventListener("click", () => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+            });
+        }
+
 
         function updateToBottomBtn() {
             // 下にいる時は消す、ちょい上なら出す
