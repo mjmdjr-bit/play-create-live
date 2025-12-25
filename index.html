@@ -1246,6 +1246,7 @@
 
                 const footer = document.createElement("div");
                 footer.className = "card-footer";
+
                 const likesLabel = document.createElement("span");
                 likesLabel.textContent = `${c.likes} ♥`;
 
@@ -1276,27 +1277,28 @@
 
                 card.dataset.creatorId = c.id;
 
+                // ✅ スマホ誤爆防止（タップ判定）
                 bindCardTap(card, () => openDetailById(c.id));
 
+                // ✅ ここが大事：forEach の中で grid に追加
+                grid.appendChild(card);
             });
-
-            grid.appendChild(card);
-        });
         }
+</main >
 
-        // 埋め込みURL変換
-        function toYoutubeEmbed(urlOrId) {
-            if (!urlOrId) return "";
-            if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
-            let s = urlOrId.trim();
-            const m = s.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_\-]{6,})/);
-            if (m) {
-                s = m[1];
-            } else if (!/^[A-Za-z0-9_\-]{6,}$/.test(s)) {
-                return "";
+            // 埋め込みURL変換
+            function toYoutubeEmbed(urlOrId) {
+                if (!urlOrId) return "";
+                if (urlOrId.startsWith("https://www.youtube.com/embed/")) return urlOrId;
+                let s = urlOrId.trim();
+                const m = s.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_\-]{6,})/);
+                if (m) {
+                    s = m[1];
+                } else if (!/^[A-Za-z0-9_\-]{6,}$/.test(s)) {
+                    return "";
+                }
+                return `https://www.youtube.com/embed/${s}`;
             }
-            return `https://www.youtube.com/embed/${s}`;
-        }
 
         function isVerticalYoutube(url) {
             if (!url) return false;
@@ -1734,9 +1736,7 @@
 
         })();
         const toBottomBtn = document.getElementById("toBottomBtn");
-        if (!toBottomBtn) {
-            console.warn("toBottomBtn not found");
-        } else {
+        if (toBottomBtn) {
             function updateToBottomBtn() {
                 const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
                 if (nearBottom) toBottomBtn.classList.remove("show");
@@ -1751,6 +1751,7 @@
                 window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
             });
         }
+
 
 
         function updateToBottomBtn() {
@@ -1768,8 +1769,6 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
         });
     </script>
-    <footer>© CREATORS’ GUILD COLLECTIVE / Designed by Daijiro Majima</footer>
-    <button id="toBottomBtn" aria-label="一番下へ" title="一番下へ">↓</button>
 </body>
 
 </html>
