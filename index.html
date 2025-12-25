@@ -951,6 +951,56 @@
         const db = getFirestore(app);
         const $ = (s) => document.querySelector(s);
 
+        function bindCardTap(card, onOpen) {
+            const TAP_MOVE_PX = 14;   // 12〜16で調整（大きいほど誤爆しにくい）
+            const TAP_TIME_MS = 450;
+
+            let sx = 0, sy = 0, st = 0;
+            let moved = false;
+            let pointerId = null;
+
+            // 縦スクロールを優先（これが効く）
+            card.style.touchAction = "pan-y";
+
+            card.addEventListener("pointerdown", (e) => {
+                if (e.button != null && e.button !== 0) return;
+                pointerId = e.pointerId;
+                sx = e.clientX;
+                sy = e.clientY;
+                st = performance.now();
+                moved = false;
+                try { card.setPointerCapture(pointerId); } catch { }
+            }, { passive: true });
+
+            card.addEventListener("pointermove", (e) => {
+                if (pointerId == null || e.pointerId !== pointerId) return;
+                const dx = Math.abs(e.clientX - sx);
+                const dy = Math.abs(e.clientY - sy);
+                if (dx > TAP_MOVE_PX || dy > TAP_MOVE_PX) moved = true;
+            }, { passive: true });
+
+            card.addEventListener("pointerup", (e) => {
+                if (pointerId == null || e.pointerId !== pointerId) return;
+
+                const dt = performance.now() - st;
+                const dx = Math.abs(e.clientX - sx);
+                const dy = Math.abs(e.clientY - sy);
+
+                const isTap = !moved && dx <= TAP_MOVE_PX && dy <= TAP_MOVE_PX && dt <= TAP_TIME_MS;
+                pointerId = null;
+
+                if (!isTap) return;
+
+                // いいねボタン等を押した時に開かない
+                const t = e.target;
+                if (t && t.closest && t.closest("button, a, input, textarea, select, [data-no-open]")) return;
+
+                onOpen();
+            }, { passive: true });
+
+            card.addEventListener("pointercancel", () => { pointerId = null; }, { passive: true });
+        }
+
         // 状態
         let creators = [];
         let currentSort = "newest";
