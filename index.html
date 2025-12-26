@@ -7,6 +7,213 @@
     <title>CREATORS’ GUILD COLLECTIVE — Creator's Voice</title>
 
     <style>
+        /* CONTACT button (fixed near hamburger) */
+        .contact-btn {
+            position: fixed;
+            top: 14px;
+            right: 76px;
+            /* hamburgerの左 */
+            z-index: 1100;
+
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid #ffffff22;
+            cursor: pointer;
+
+            font-size: 11px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+
+            color: #111827;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+
+            box-shadow:
+                0 0 18px rgba(255, 180, 87, .65),
+                0 0 48px rgba(255, 140, 55, .35),
+                0 18px 40px rgba(0, 0, 0, .55);
+
+            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-1px) scale(1.03);
+            box-shadow:
+                0 0 28px rgba(255, 180, 87, .9),
+                0 0 72px rgba(255, 140, 55, .55),
+                0 24px 54px rgba(0, 0, 0, .65);
+            filter: brightness(1.05);
+        }
+
+        .contact-btn:active {
+            transform: scale(.98);
+        }
+
+        /* CONTACT modal */
+        .contact-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 2500;
+
+            background: rgba(0, 0, 0, .72);
+            backdrop-filter: blur(18px);
+        }
+
+        .contact-overlay.show {
+            display: flex;
+        }
+
+        .contact-modal {
+            width: min(680px, 94vw);
+            border-radius: 24px;
+            border: 1px solid #ffffff22;
+            background:
+                radial-gradient(120% 120% at 15% 10%, rgba(255, 180, 87, .14), transparent 60%),
+                radial-gradient(110% 110% at 90% 95%, rgba(96, 165, 250, .10), transparent 55%),
+                rgba(17, 19, 26, .92);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .9);
+            overflow: hidden;
+        }
+
+        .contact-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 18px 12px;
+            border-bottom: 1px solid #ffffff14;
+        }
+
+        .contact-title {
+            font-weight: 800;
+            letter-spacing: .22em;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .contact-sub {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #9aa3b2;
+            line-height: 1.5;
+        }
+
+        .contact-close {
+            background: transparent;
+            border: 0;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 6px 10px;
+        }
+
+        .contact-form {
+            padding: 14px 18px 18px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width:720px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .label {
+            font-size: 11px;
+            color: #cfd6e6;
+            letter-spacing: .10em;
+            text-transform: uppercase;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid #ffffff18;
+            background: rgba(2, 6, 23, .72);
+            color: #eaeef6;
+            padding: 10px 12px;
+            outline: none;
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: #ffb45755;
+            box-shadow: 0 0 0 3px rgba(255, 180, 87, .15);
+        }
+
+        .contact-actions {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .contact-status {
+            font-size: 12px;
+            color: #9aa3b2;
+            min-height: 18px;
+        }
+
+        .contact-send {
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid #ffffff22;
+            cursor: pointer;
+
+            font-size: 11px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+
+            color: #111827;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+            box-shadow:
+                0 0 18px rgba(255, 180, 87, .45),
+                0 14px 34px rgba(0, 0, 0, .55);
+            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+        }
+
+        .contact-send:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 0 26px rgba(255, 180, 87, .65),
+                0 18px 46px rgba(0, 0, 0, .65);
+            filter: brightness(1.05);
+        }
+
+        .contact-send:active {
+            transform: scale(.98);
+        }
+
+        .hp {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
         :root {
             --bg: #0b0c10;
             --card: #11131aee;
@@ -787,33 +994,25 @@
             right: 18px;
             bottom: 18px;
             z-index: 9999;
-
             width: 54px;
             height: 54px;
             border-radius: 999px;
             border: 1px solid #ffffff26;
-
-            /* ガラス＋オーロラっぽい光 */
             background:
                 radial-gradient(120% 120% at 20% 20%, rgba(255, 180, 87, .22), transparent 60%),
                 radial-gradient(110% 110% at 80% 90%, rgba(96, 165, 250, .18), transparent 55%),
                 rgba(17, 19, 26, .78);
-
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-
             color: #eaeef6;
             display: grid;
             place-items: center;
-
             box-shadow:
                 0 14px 40px rgba(0, 0, 0, .55),
                 0 0 22px rgba(255, 180, 87, .22);
-
             cursor: pointer;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-
             opacity: 0;
             transform: translateY(10px) scale(.92);
             pointer-events: none;
@@ -837,7 +1036,6 @@
             transform: translateY(1px) scale(.98);
         }
 
-        /* 中の矢印をアイコンっぽく */
         #toBottomBtn::before {
             content: "";
             width: 14px;
@@ -845,11 +1043,9 @@
             border-right: 2px solid rgba(255, 255, 255, .92);
             border-bottom: 2px solid rgba(255, 255, 255, .92);
             transform: rotate(45deg);
-            /* “下向き”の矢印 */
             filter: drop-shadow(0 0 10px rgba(255, 180, 87, .35));
         }
 
-        /* さりげない輪っか */
         #toBottomBtn::after {
             content: "";
             position: absolute;
@@ -972,6 +1168,53 @@
 
     <footer>© CREATORS’ GUILD COLLECTIVE / Designed by Daijiro Majima</footer>
     <button id="toBottomBtn" aria-label="一番下へ" title="一番下へ">↓</button>
+    <!-- CONTACT button -->
+    <button id="contactBtn" class="contact-btn" type="button" aria-label="お問い合わせ" title="CONTACT">
+        CONTACT
+    </button>
+
+    <!-- CONTACT modal -->
+    <div id="contactOverlay" class="contact-overlay" aria-hidden="true">
+        <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+            <div class="contact-head">
+                <div>
+                    <div id="contactTitle" class="contact-title">CONTACT</div>
+                    <div class="contact-sub">お問い合わせ内容を送信すると、こちらから折り返します。</div>
+                </div>
+                <button id="contactClose" class="contact-close" type="button" aria-label="閉じる">×</button>
+            </div>
+
+            <form id="contactForm" class="contact-form">
+                <!-- honeypot（スパム対策：人は触らない） -->
+                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" />
+
+                <div class="contact-grid">
+                    <label class="field">
+                        <span class="label">NAME</span>
+                        <input name="name" type="text" placeholder="お名前" required />
+                    </label>
+
+                    <label class="field">
+                        <span class="label">EMAIL</span>
+                        <input name="email" type="email" placeholder="返信先メール" required />
+                    </label>
+                </div>
+
+                <label class="field">
+                    <span class="label">MESSAGE</span>
+                    <textarea name="message" rows="6" placeholder="お問い合わせ内容" required></textarea>
+                </label>
+
+                <div class="contact-actions">
+                    <div id="contactStatus" class="contact-status" aria-live="polite"></div>
+                    <button id="contactSend" class="contact-send" type="submit">
+                        SEND
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1062,6 +1305,9 @@
         let currentSearch = "";
         let currentCategory = "";
         let messagesUnsub = null;
+        let currentCreatorName = "";
+        let currentCreatorId = "";
+        let currentCreatorUrl = "";
 
         // クライアントID（投稿者識別）
         let clientId = localStorage.getItem("pcl_client_id");
@@ -1643,6 +1889,9 @@
         }
         // DETAIL 開閉
         function openDetail(c) {
+            currentCreatorName = c?.name || "";
+            currentCreatorId = c?.id || "";
+            currentCreatorUrl = c?.url || "";
             const avatar = $("#detailAvatar");
             const nameEl = $("#detailName");
             const compEl = $("#detailCompany");
@@ -1741,7 +1990,9 @@
                 });
             }
             window.addEventListener("keydown", e => {
-                if (e.key === "Escape") closeDetail();
+                if (e.key === "Escape" && document.getElementById("detailOverlay")?.classList.contains("show")) {
+                    closeDetail();
+                }
             });
         }
 
@@ -1788,11 +2039,12 @@
         })();
         const toBottomBtn = document.getElementById("toBottomBtn");
         if (toBottomBtn) {
-            function updateToBottomBtn() {
-                const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
+            const updateToBottomBtn = () => {
+                const nearBottom =
+                    (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
                 if (nearBottom) toBottomBtn.classList.remove("show");
                 else toBottomBtn.classList.add("show");
-            }
+            };
 
             window.addEventListener("scroll", updateToBottomBtn, { passive: true });
             window.addEventListener("resize", updateToBottomBtn, { passive: true });
@@ -1802,25 +2054,83 @@
                 window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
             });
         }
+        // ===== CONTACT modal =====
+        const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeqorjp";
+        const contactBtn = document.getElementById("contactBtn");
+        const contactOverlay = document.getElementById("contactOverlay");
+        const contactClose = document.getElementById("contactClose");
+        const contactForm = document.getElementById("contactForm");
+        const contactStatus = document.getElementById("contactStatus");
+        const contactSend = document.getElementById("contactSend");
 
+        function openContact() {
+            contactOverlay?.classList.add("show");
+            contactOverlay?.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+            contactStatus.textContent = "";
+            // first input focus
+            const first = contactForm?.querySelector('input[name="name"]');
+            first?.focus();
+        }
+        function closeContact() {
+            contactOverlay?.classList.remove("show");
+            contactOverlay?.setAttribute("aria-hidden", "true");
 
-
-
-        function updateToBottomBtn() {
-            // 下にいる時は消す、ちょい上なら出す
-            const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 120);
-            if (nearBottom) toBottomBtn.classList.remove("show");
-            else toBottomBtn.classList.add("show");
+            const detailOpen = document.getElementById("detailOverlay")?.classList.contains("show");
+            if (!detailOpen) document.body.style.overflow = "";
         }
 
-        window.addEventListener("scroll", updateToBottomBtn, { passive: true });
-        window.addEventListener("resize", updateToBottomBtn, { passive: true });
-        updateToBottomBtn();
 
-        toBottomBtn.addEventListener("click", () => {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        contactBtn?.addEventListener("click", openContact);
+        contactClose?.addEventListener("click", closeContact);
+        contactOverlay?.addEventListener("click", (e) => {
+            if (e.target === contactOverlay) closeContact();
         });
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && contactOverlay?.classList.contains("show")) closeContact();
+        });
+
+        // submit → FormspreeへPOST → Gmailへ届く
+        contactForm?.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            contactSend.disabled = true;
+            contactStatus.textContent = "送信中…";
+
+            const fd = new FormData(contactForm);
+            fd.append("creator", currentCreatorName || "（一覧ページからの問い合わせ）");
+            fd.append("creatorId", currentCreatorId || "");
+            fd.append("creatorUrl", currentCreatorUrl || "");
+            fd.append("pageUrl", location.href);
+
+            // 追加情報（任意だけど便利）
+            fd.append("userAgent", navigator.userAgent);
+
+            try {
+                const res = await fetch(FORMSPREE_ENDPOINT, {
+                    method: "POST",
+                    body: fd,
+                    headers: { "Accept": "application/json" }
+                });
+
+                if (res.ok) {
+                    contactStatus.textContent = "送信しました。ありがとうございます！";
+                    contactForm.reset();
+                    setTimeout(closeContact, 700);
+                } else {
+                    contactStatus.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+                }
+            } catch (err) {
+                console.error(err);
+                contactStatus.textContent = "ネットワークエラーです。接続状況をご確認ください。";
+            } finally {
+                contactSend.disabled = false;
+            }
+
+        });
+
     </script>
+
 </body>
 
 </html>
