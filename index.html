@@ -252,6 +252,7 @@
             --glow: 0 0 22px #ffb457aa,
                 0 0 46px #ff8c37aa,
                 0 0 80px #ff6a00aa;
+            --topbar-h: 56px;
         }
 
         * {
@@ -388,7 +389,7 @@
 
         /* HEADER */
         header {
-            padding: 40px 24px 10px;
+            padding: 0 24px 10px;
             text-align: center;
             position: relative;
         }
@@ -1117,6 +1118,37 @@
         .detail-contact-btn:active {
             transform: scale(.98);
         }
+
+        /* iPhone notch / safe area 対応 */
+        /* ボタン位置：safe-area を足す */
+        /* スマホ時だけ、少しコンパクトにしてさらに綺麗に */
+        @media (max-width: 360px) {
+            :root {
+                --topbar-h: 64px;
+            }
+
+            /* ちょい余裕 */
+            .contact-btn {
+                right: 64px;
+                /* hamburgerの左に収まる */
+                padding: 8px 12px;
+                font-size: 9px;
+                letter-spacing: .14em;
+            }
+        }
+
+        /* ✅ 最終保険：どんな端末でも必ず上書きする（styleの一番最後に置く） */
+        .menu-button {
+            top: calc(16px + env(safe-area-inset-top, 0px)) !important;
+        }
+
+        .contact-btn {
+            top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+        }
+
+        header {
+            padding-top: calc(40px + var(--topbar-h) + env(safe-area-inset-top, 0px)) !important;
+        }
     </style>
 </head>
 
@@ -1206,13 +1238,13 @@
         <div class="subtitle">Creeds of The Refined Master Creators.</div>
         <div class="jpcopy">
             交差する才能を [ CGC ] が束ね、<br />
-            　　Space・Visual・Art・Beauty・AI・Robotics が<br />
-            　　融合して生まれる最先端の表現基盤に、<br />
-            　　深い美学と確かな戦略を重ねながら、<br />
-            　　未来の事業価値と文化の<br />
-            　　“まだ形を持たない輪郭”を静かに立ち上げていく。<br />
-            　　CREATIVE を確かな力へ変え、<br />
-            　　世界のTextureそのものを更新するCOLLECTIVE.
+            Space・Visual・Art・Beauty・AI・Robotics が<br />
+            融合して生まれる最先端の表現基盤に、<br />
+            深い美学と確かな戦略を重ねながら、<br />
+            未来の事業価値と文化の<br />
+            “まだ形を持たない輪郭”を静かに立ち上げていく。<br />
+            CREATIVE を確かな力へ変え、<br />
+            世界のTextureそのものを更新するCOLLECTIVE.
         </div>
 
     </header>
