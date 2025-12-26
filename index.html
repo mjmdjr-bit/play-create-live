@@ -194,6 +194,29 @@
             transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
         }
 
+        .contact-context {
+            padding: 10px 18px 0;
+            font-size: 12px;
+            color: #eaeef6;
+            opacity: .9;
+            letter-spacing: .06em;
+        }
+
+        .contact-context .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid #ffffff18;
+            background: rgba(2, 6, 23, .55);
+        }
+
+        .contact-context .pill b {
+            color: #ffcf7a;
+            font-weight: 700;
+        }
+
         .contact-send:hover {
             transform: translateY(-1px);
             box-shadow:
@@ -1054,6 +1077,46 @@
             border: 1px solid rgba(255, 255, 255, .10);
             pointer-events: none;
         }
+
+        .modal-head-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-contact-btn {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid #ffffff22;
+            cursor: pointer;
+
+            font-size: 10px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+
+            color: #111827;
+            background: linear-gradient(135deg, #ffb457, #ff8c37);
+
+            box-shadow:
+                0 0 14px rgba(255, 180, 87, .55),
+                0 0 36px rgba(255, 140, 55, .28),
+                0 12px 26px rgba(0, 0, 0, .45);
+
+            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .detail-contact-btn:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 0 20px rgba(255, 180, 87, .8),
+                0 0 52px rgba(255, 140, 55, .45),
+                0 18px 40px rgba(0, 0, 0, .55);
+        }
+
+        .detail-contact-btn:active {
+            transform: scale(.98);
+        }
     </style>
 </head>
 
@@ -1092,8 +1155,17 @@
                         <div id="detailUrl" class="detail-url"></div>
                     </div>
                 </div>
-                <button class="close" id="detailClose">×</button>
+
+
+                <!-- ★右上：CONTACT + CLOSE -->
+                <div class="modal-head-actions">
+                    <button id="detailContactBtn" class="detail-contact-btn" type="button" title="このクリエイターに問い合わせ">
+                        CONTACT
+                    </button>
+                    <button class="close" id="detailClose">×</button>
+                </div>
             </div>
+
 
             <div class="modal-body">
                 <!-- 左：Main Video + WORKS + CHAT -->
@@ -1183,7 +1255,7 @@
                 </div>
                 <button id="contactClose" class="contact-close" type="button" aria-label="閉じる">×</button>
             </div>
-
+            <div id="contactContext" class="contact-context"></div>
             <form id="contactForm" class="contact-form">
                 <!-- honeypot（スパム対策：人は触らない） -->
                 <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" />
@@ -1927,6 +1999,12 @@
             const ov = document.getElementById("detailOverlay");
             console.log("detailOverlay exists:", !!ov);
             ov?.classList.add("show");
+            const dcb = document.getElementById("detailContactBtn");
+            if (dcb) {
+                dcb.dataset.creatorName = currentCreatorName || "";
+                dcb.dataset.creatorId = currentCreatorId || "";
+                dcb.dataset.creatorUrl = currentCreatorUrl || "";
+            }
 
             ov.style.zIndex = "2000";
 
@@ -1948,7 +2026,9 @@
             if (videoWrap) videoWrap.innerHTML = "";
             if (worksWrap) worksWrap.innerHTML = "";
             if (list) list.innerHTML = "";
-            document.body.style.overflow = "";
+            const contactOpen = document.getElementById("contactOverlay")?.classList.contains("show");
+            if (!contactOpen) document.body.style.overflow = "";
+
         }
 
         // 検索 & ソート
@@ -2062,26 +2142,80 @@
         const contactForm = document.getElementById("contactForm");
         const contactStatus = document.getElementById("contactStatus");
         const contactSend = document.getElementById("contactSend");
+        const contactContext = document.getElementById("contactContext");
 
-        function openContact() {
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, m => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[m]));
+        }
+
+        function openContact({ name = undefined, id = undefined, url = undefined } = {}) {
+            // ✅ 引数が渡された時だけ上書き（渡されない時は現状維持）
+            if (name !== undefined) currentCreatorName = name;
+            if (id !== undefined) currentCreatorId = id;
+            if (url !== undefined) currentCreatorUrl = url;
+
+            const toName = currentCreatorName || "";
+
+            // 宛先表示（TO: ◯◯）
+            if (contactContext) {
+                contactContext.innerHTML = toName
+                    ? `<span class="pill">TO: <b>${escapeHtml(toName)}</b></span>`
+                    : `<span class="pill">TO: <b>CGC</b></span>`;
+            }
+
             contactOverlay?.classList.add("show");
             contactOverlay?.setAttribute("aria-hidden", "false");
             document.body.style.overflow = "hidden";
-            contactStatus.textContent = "";
-            // first input focus
+            if (contactStatus) contactStatus.textContent = "";
+
             const first = contactForm?.querySelector('input[name="name"]');
             first?.focus();
         }
+
+        const detailContactBtn = document.getElementById("detailContactBtn");
+        detailContactBtn?.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            const btn = e.currentTarget;
+            const name = btn?.dataset?.creatorName || "";
+            const id = btn?.dataset?.creatorId || "";
+            const url = btn?.dataset?.creatorUrl || "";
+
+            if (!id) {
+                alert("クリエイター情報の取得に失敗しました。もう一度カードを開き直してください。");
+                return;
+            }
+
+            // ✅ 先にDetailを閉じる（見た目が気持ちいい）
+            closeDetail();
+
+            // ✅ その後にCONTACT
+            openContact({ name, id, url });
+        });
+
+
+
         function closeContact() {
             contactOverlay?.classList.remove("show");
             contactOverlay?.setAttribute("aria-hidden", "true");
 
             const detailOpen = document.getElementById("detailOverlay")?.classList.contains("show");
-            if (!detailOpen) document.body.style.overflow = "";
+            document.body.style.overflow = detailOpen ? "hidden" : "";
         }
 
 
-        contactBtn?.addEventListener("click", openContact);
+        contactBtn?.addEventListener("click", () => {
+            openContact({ name: "", id: "", url: "" }); // 常にCGC宛（リセット）
+        });
+
+
+
         contactClose?.addEventListener("click", closeContact);
         contactOverlay?.addEventListener("click", (e) => {
             if (e.target === contactOverlay) closeContact();
@@ -2094,8 +2228,9 @@
         contactForm?.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            contactSend.disabled = true;
-            contactStatus.textContent = "送信中…";
+            if (contactSend) contactSend.disabled = true;
+            contactStatus && (contactStatus.textContent = "送信中…");
+
 
             const fd = new FormData(contactForm);
             fd.append("creator", currentCreatorName || "（一覧ページからの問い合わせ）");
@@ -2114,17 +2249,17 @@
                 });
 
                 if (res.ok) {
-                    contactStatus.textContent = "送信しました。ありがとうございます！";
+                    contactStatus && (contactStatus.textContent = "送信しました。ありがとうございます！");
                     contactForm.reset();
                     setTimeout(closeContact, 700);
                 } else {
-                    contactStatus.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+                    contactStatus && (contactStatus.textContent = "送信に失敗しました。時間をおいて再度お試しください。");
                 }
             } catch (err) {
                 console.error(err);
-                contactStatus.textContent = "ネットワークエラーです。接続状況をご確認ください。";
+                contactStatus && (contactStatus.textContent = "ネットワークエラーです。接続状況をご確認ください。");
             } finally {
-                contactSend.disabled = false;
+                if (contactSend) contactSend.disabled = false;
             }
 
         });
