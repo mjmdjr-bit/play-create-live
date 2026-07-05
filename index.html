@@ -1230,6 +1230,80 @@
             opacity: 0 !important;
             pointer-events: none !important;
         }
+    /* WORKS Lightbox */
+     .works-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 3200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 54px 18px 28px;
+      background: rgba(0, 0, 0, .86);
+      backdrop-filter: blur(18px);
+    }
+
+    .works-lightbox.show {
+     display: flex;
+    }
+
+    .works-lightbox-body {
+     width: min(1100px, 94vw);
+     max-height: 78vh;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+    }
+
+    .works-lightbox-body img,
+    .works-lightbox-body video,
+    .works-lightbox-body iframe {
+     max-width: 100%;
+     max-height: 78vh;
+     border: 0;
+     border-radius: 16px;
+     background: #020617;
+     box-shadow: 0 24px 70px rgba(0,0,0,.9);
+    }
+
+    .works-lightbox-body iframe {
+     width: min(1100px, 94vw);
+     aspect-ratio: 16 / 9;
+    }
+
+    .works-lightbox-close {
+     position: fixed;
+     top: calc(16px + env(safe-area-inset-top, 0px));
+     right: 18px;
+     z-index: 3210;
+     width: 44px;
+     height: 44px;
+     border-radius: 999px;
+     border: 1px solid #ffffff26;
+     background: rgba(17, 19, 26, .82);
+     color: #fff;
+     font-size: 26px;
+     cursor: pointer;
+    }
+
+    .works-lightbox-caption {
+     position: fixed;
+     left: 16px;
+     right: 16px;
+     bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+     text-align: center;
+     font-size: 12px;
+     color: #cfd6e6;
+     letter-spacing: .08em;
+    }
+
+    .work-card {
+     cursor: zoom-in;
+    }
+
+    .work-thumb iframe {
+     pointer-events: none;
+    }
     </style>
 </head>
 
@@ -1359,7 +1433,12 @@
     <button id="contactBtn" class="contact-btn" type="button" aria-label="お問い合わせ" title="CONTACT">
         CONTACT
     </button>
-
+    <!-- WORKS Lightbox -->
+     <div id="worksLightbox" class="works-lightbox" aria-hidden="true">
+     <button id="worksLightboxClose" class="works-lightbox-close" type="button" aria-label="閉じる">×</button>
+     <div id="worksLightboxBody" class="works-lightbox-body"></div>
+     <div id="worksLightboxCaption" class="works-lightbox-caption"></div>
+    </div>
     <!-- CONTACT modal -->
     <div id="contactOverlay" class="contact-overlay" aria-hidden="true">
         <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
@@ -1852,7 +1931,88 @@
                 container.appendChild(iframe);
             }
         }
+        function openWorksLightbox(work) {
+         const overlay = document.getElementById("worksLightbox");
+         const body = document.getElementById("worksLightboxBody");
+         const caption = document.getElementById("worksLightboxCaption");
+         if (!overlay || !body) return;
 
+         body.innerHTML = "";
+         if (caption) caption.textContent = work.title || "";
+
+         const type = (work.type || "").toLowerCase();
+         const url = work.url || "";
+
+         if (!url) return;
+
+         if (type === "image") {
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = work.title || "work";
+          body.appendChild(img);
+         } else if (type === "youtube") {
+          const iframe = document.createElement("iframe");
+          iframe.src = toYoutubeEmbed(url);
+          iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+          iframe.allowFullscreen = true;
+          iframe.frameBorder = "0";
+          body.appendChild(iframe);
+         } else if (type === "vimeo") {
+          const iframe = document.createElement("iframe");
+          iframe.src = toVimeoEmbed(url);
+          iframe.allow = "autoplay; fullscreen; picture-in-picture";
+          iframe.allowFullscreen = true;
+          iframe.frameBorder = "0";
+          body.appendChild(iframe);
+         } else {
+          const video = document.createElement("video");
+          video.src = url;
+          video.controls = true;
+          video.playsInline = true;
+          video.autoplay = true;
+          body.appendChild(video);
+         }
+
+         overlay.classList.add("show");
+         overlay.setAttribute("aria-hidden", "false");
+         document.body.style.overflow = "hidden";
+        }
+
+        function closeWorksLightbox() {
+         const overlay = document.getElementById("worksLightbox");
+         const body = document.getElementById("worksLightboxBody");
+         const caption = document.getElementById("worksLightboxCaption");
+
+         overlay?.classList.remove("show");
+         overlay?.setAttribute("aria-hidden", "true");
+
+         if (body) body.innerHTML = "";
+         if (caption) caption.textContent = "";
+
+         const detailOpen = document.getElementById("detailOverlay")?.classList.contains("show");
+         const contactOpen = document.getElementById("contactOverlay")?.classList.contains("show");
+         document.body.style.overflow = detailOpen || contactOpen ? "hidden" : "";
+        }
+
+        function setupWorksLightbox() {
+         const overlay = document.getElementById("worksLightbox");
+         const closeBtn = document.getElementById("worksLightboxClose");
+
+         closeBtn?.addEventListener("click", closeWorksLightbox);
+
+         overlay?.addEventListener("click", (e) => {
+          if (e.target === overlay) closeWorksLightbox();
+         });
+
+         window.addEventListener("keydown", (e) => {
+          if (
+            e.key === "Escape" &&
+            document.getElementById("worksLightbox")?.classList.contains("show")
+          ) {
+            closeWorksLightbox();
+          }
+         });
+        }
         // WORKS 描画
         function renderWorks(works) {
             const container = document.getElementById("worksContainer");
@@ -1925,7 +2085,9 @@
                     typeEl.textContent = w.type;
                     card.appendChild(typeEl);
                 }
-
+                card.addEventListener("click", () => {
+                  openWorksLightbox(w);
+                });
                 grid.appendChild(card);
             });
 
@@ -2228,6 +2390,7 @@
             setupSearchAndSort();
             setupModalClose();
             setupMenu();
+            setupWorksLightbox();
             loadCreators();
 
         })();
