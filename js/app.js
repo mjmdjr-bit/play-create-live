@@ -916,7 +916,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         function setupCgcHero3D() {
             console.log("Hero3D START");
             const mount = document.getElementById("hero3dCanvas");
-            if (!mount) return;
+            console.log(mount);
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(38, mount.clientWidth / mount.clientHeight, 0.1, 100);
