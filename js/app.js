@@ -914,7 +914,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         let cgcModelIndex = 0;
 
         function setupCgcHero3D() {
-            const mount = document.getElementById("hero3d");
+            const mount = document.getElementById("hero3dCanvas");
             if (!mount) return;
 
             const scene = new THREE.Scene();
