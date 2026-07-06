@@ -1386,22 +1386,22 @@
 .hero-3d::before {
   content: "";
   position: absolute;
-  inset: -28%;
+  inset: -45%;
   z-index: 0;
   pointer-events: none;
   border-radius: 50%;
   background:
     radial-gradient(circle at 50% 50%,
-      rgba(150, 95, 255, 0.42) 0%,
-      rgba(80, 190, 255, 0.26) 22%,
-      rgba(180, 80, 255, 0.16) 42%,
-      rgba(180, 80, 255, 0.06) 58%,
-      transparent 74%
+      rgba(130, 100, 255, 0.34) 0%,
+      rgba(80, 180, 255, 0.22) 24%,
+      rgba(170, 80, 255, 0.10) 46%,
+      rgba(20, 30, 60, 0.04) 62%,
+      transparent 78%
     );
-  filter: blur(46px);
-  opacity: 0.9;
+  filter: blur(70px);
+  opacity: 0.75;
   mix-blend-mode: screen;
-  animation: cgcAuraPulse 6s ease-in-out infinite;
+  transform: scale(1.25);
 }
 
 /* 回転の軌跡っぽい光 */
@@ -1539,6 +1539,27 @@
 
   }
 
+}
+.hero-3d,
+.hero-visual,
+#hero3dCanvas {
+  background: transparent !important;
+}
+
+.hero-3d {
+  overflow: visible !important;
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    #000 0%,
+    #000 58%,
+    transparent 82%
+  );
+  mask-image: radial-gradient(
+    ellipse at center,
+    #000 0%,
+    #000 58%,
+    transparent 82%
+  );
 }
 </style>
 <script type="importmap">
