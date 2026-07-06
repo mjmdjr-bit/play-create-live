@@ -1347,6 +1347,128 @@
 
     line-height:1.8;
 }
+/* ==============================
+   CGC 3D HERO EFFECTS
+============================== */
+
+.hero-3d {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+#hero3dCanvas {
+  position: relative;
+  z-index: 2;
+  filter:
+    drop-shadow(0 0 18px rgba(68, 220, 255, 0.35))
+    drop-shadow(0 0 42px rgba(168, 85, 247, 0.28));
+}
+
+#hero3dCanvas canvas {
+  transition: filter 0.45s ease, opacity 0.45s ease;
+  will-change: transform, filter;
+}
+
+/* 周囲の妖しいオーラ */
+.hero-3d::before {
+  content: "";
+  position: absolute;
+  inset: 8% 4%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 48% 44%, rgba(80, 220, 255, 0.24), transparent 30%),
+    radial-gradient(circle at 56% 54%, rgba(188, 85, 247, 0.30), transparent 38%),
+    radial-gradient(circle at 42% 58%, rgba(255, 139, 60, 0.16), transparent 34%);
+  filter: blur(42px);
+  opacity: 0.95;
+  animation: cgcAuraPulse 5.8s ease-in-out infinite;
+}
+
+/* 回転の軌跡っぽい光 */
+.hero-3d::after {
+  content: "";
+  position: absolute;
+  width: min(54vw, 620px);
+  aspect-ratio: 1;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(76, 221, 255, 0.0) 55deg,
+      rgba(76, 221, 255, 0.34) 78deg,
+      transparent 105deg,
+      transparent 190deg,
+      rgba(190, 92, 255, 0.34) 220deg,
+      transparent 255deg,
+      transparent 360deg
+    );
+  filter: blur(14px);
+  opacity: 0.55;
+  animation: cgcEnergyRing 8s cubic-bezier(.55,.02,.28,1) infinite;
+  mix-blend-mode: screen;
+}
+
+/* JSで .is-rotating を付けた時だけブラー強め */
+.hero-3d.is-rotating #hero3dCanvas canvas {
+  filter:
+    blur(1.2px)
+    drop-shadow(0 0 22px rgba(80, 220, 255, 0.46))
+    drop-shadow(0 0 54px rgba(188, 85, 247, 0.42));
+}
+
+.hero-3d.is-rotating::after {
+  opacity: 0.9;
+  filter: blur(18px);
+  animation-duration: 2.8s;
+}
+
+@keyframes cgcAuraPulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.96) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.08) rotate(4deg);
+  }
+  70% {
+    opacity: 0.75;
+    transform: scale(1.01) rotate(-3deg);
+  }
+}
+
+@keyframes cgcEnergyRing {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.92);
+  }
+  42% {
+    transform: translate(-50%, -50%) rotate(155deg) scale(1.04);
+  }
+  68% {
+    transform: translate(-50%, -50%) rotate(238deg) scale(0.98);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(0.92);
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-3d::after {
+    width: 78vw;
+  }
+
+  .hero-3d::before {
+    filter: blur(32px);
+  }
+}
 </style>
 <script type="importmap">
 {
