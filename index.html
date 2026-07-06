@@ -1938,42 +1938,33 @@
 
 @media (max-width:768px){
 
-.hero-3d-wrap{
-
-    height:130vw !important;
-
-    min-height:620px !important;
-
-    max-height:none !important;
-
+  .hero-3d-wrap{
+    height:105vw !important;
+    min-height:440px !important;
+    max-height:560px !important;
     overflow:visible !important;
+  }
 
+  .hero-3d{
+    width:94vw !important;
+    height:105vw !important;
+    min-height:440px !important;
+    max-height:560px !important;
+    margin:0 auto !important;
+  }
+
+  #hero3dCanvas{
+    inset:-60px !important;
+    width:calc(100% + 120px) !important;
+    height:calc(100% + 120px) !important;
+  }
 }
-
-.hero-3d{
-
-    width:100% !important;
-
-    height:100% !important;
-
-    min-height:620px !important;
-
-    max-height:none !important;
-
+@media (max-width:768px){
+  #hero3dCanvas,
+  #hero3dCanvas canvas{
+    touch-action: none !important;
+  }
 }
-
-#hero3dCanvas{
-
-    inset:-90px !important;
-
-    width:calc(100% + 180px) !important;
-
-    height:calc(100% + 180px) !important;
-
-}
-
-}
-
 </style>
 <script type="importmap">
 {

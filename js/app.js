@@ -935,7 +935,10 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             const controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.enablePan = false;
-            controls.enableZoom = false;
+            controls.enableZoom = true;
+            controls.minDistance = 2.2;
+            controls.maxDistance = 6.5;
+            controls.enablePan = false;
             controls.rotateSpeed = 0.55;
             controls.autoRotate = false;
 
