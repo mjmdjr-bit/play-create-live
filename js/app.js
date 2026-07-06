@@ -906,9 +906,9 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         // CGC 3D HERO / Three.js GLB Viewer
         // ==============================
         const CGC_MODELS = [
-            "assets/models/cgc_mechanical.glb",
-            "assets/models/cgc_nature.glb",
-            "assets/models/cgc_crystal.glb"
+            "assets/models/01.glb",
+            "assets/models/02.glb",
+            "assets/models/03.glb"
         ];
 
         let cgcModelIndex = 0;
