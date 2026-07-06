@@ -984,36 +984,44 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 });
             }
 
+            let modelLoadToken = 0;
+
             function loadCgcModel(index) {
-             console.log("load model");
+              const path = CGC_MODELS[index];
+              if (!path) return;
 
-             const path = CGC_MODELS[index];
-             if (!path) return;
+              const token = ++modelLoadToken;
 
-             const oldModel = currentModel;
+              loader.load(
+               path,
+               (gltf) => {
+              if (token !== modelLoadToken) {
+              disposeModel(gltf.scene);
+                return;
+             }
 
-             loader.load(
-              path,
-             (gltf) => {
-              const model = gltf.scene;
+               if (currentModel) {
+               disposeModel(currentModel);
+               currentModel = null;
+             }
 
-              normalizeModel(model);
-              model.rotation.set(0.18, 0, 0);
-              model.position.y = 0;
+             const model = gltf.scene;
 
-              currentModel = model;
-              scene.add(currentModel);
-              console.log("MODEL ADDED", currentModel);
-              disposeModel(oldModel);
+             normalizeModel(model);
+             model.rotation.set(0.18, 0, 0);
+             model.position.y = 0;
+
+             currentModel = model;
+             scene.add(currentModel);
 
               const placeholder = document.getElementById("hero3dPlaceholder");
-              if (placeholder) placeholder.style.display = "none";
+                if (placeholder) placeholder.style.display = "none";
               },
              undefined,
              (err) => {
               console.warn("GLB load failed:", path, err);
               }
-              );
+             );
             }
 
             function animate(now) {
@@ -1049,7 +1057,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              controls.update();
              renderer.render(scene, camera);
              }
-             
+
             function nextModel() {
               cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
               loadCgcModel(cgcModelIndex);
