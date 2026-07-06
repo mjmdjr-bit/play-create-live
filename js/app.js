@@ -1,18 +1,25 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import {
-            getFirestore,
-            collection,
-            getDocs,
-            doc,
-            updateDoc,
-            increment,
-            addDoc,
-            serverTimestamp,
-            onSnapshot,
-            deleteDoc,
-            query,
-            orderBy
-        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  increment,
+  addDoc,
+  serverTimestamp,
+  onSnapshot,
+  deleteDoc,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+import {
+  getStorage,
+  ref,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
@@ -32,6 +39,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
         const $ = (s) => document.querySelector(s);
 
         function bindCardTap(card, onOpen) {
@@ -362,11 +370,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
                 // スマホ誤爆防止（タップ判定）
                 bindCardTap(card, () => openDetailById(c.id));
-
-                card.addEventListener("click", () => {
-                    openWorksLightbox(w);
-                });
-
                 grid.appendChild(card);
             });
         }
@@ -599,8 +602,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                     typeEl.textContent = w.type;
                     card.appendChild(typeEl);
                 }
-
-                card.addEventListener("click", () => {
+                  card.addEventListener("click", () => {
                     openWorksLightbox(w);
                 });
 
@@ -906,7 +908,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         // CGC 3D HERO / Three.js GLB Viewer
         // ==============================
         const CGC_MODELS = [
-            https://console.firebase.google.com/u/1/project/play-create-live/storage/play-create-live.firebasestorage.app/files/~2Fmodels#:~:text=drive_file-,01,-.glb,
+            "models/01.glb"
         ];
 
         let cgcModelIndex = 0;
@@ -978,32 +980,56 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 });
             }
 
-            function loadCgcModel(index) {
-                const path = CGC_MODELS[index];
-                if (!path) return;
-                const oldModel = currentModel;
-                loader.load(path, (gltf) => {
-                    const model = gltf.scene;
-                    normalizeModel(model);
-                    model.rotation.set(0.18, 0, 0);
-                    model.position.y = 0;
-                    model.traverse((obj) => {
-                        if (!obj.isMesh) return;
-                        obj.castShadow = true;
-                        obj.receiveShadow = true;
-                        if (obj.material) {
-                            obj.material.envMapIntensity = 1.6;
-                            obj.material.needsUpdate = true;
-                        }
-                    });
-                    currentModel = model;
-                    scene.add(currentModel);
-                    disposeModel(oldModel);
-                }, undefined, (err) => {
-                    console.warn("GLB load failed:", path, err);
-                });
-            }
+            async function loadCgcModel(index) {
+              const storagePath = CGC_MODELS[index];
+              if (!storagePath) return;
 
+              const oldModel = currentModel;
+
+              try {
+                const url = await getDownloadURL(ref(storage, storagePath));
+
+                loader.load(
+                 url,
+                 (gltf) => {
+                   const model = gltf.scene;
+
+                   normalizeModel(model);
+
+                   model.rotation.set(0.18, 0, 0);
+                   model.position.y = 0;
+
+                   model.traverse((obj) => {
+                     if (!obj.isMesh) return;
+
+                     obj.castShadow = true;
+                     obj.receiveShadow = true;
+
+                     if (obj.material) {
+                     obj.material.envMapIntensity = 1.6;
+                     obj.material.needsUpdate = true;
+                    }
+                   });
+
+                   currentModel = model;
+                   scene.add(currentModel);
+                   disposeModel(oldModel);
+
+                  const placeholder = document.getElementById("hero3dPlaceholder");
+                  if (placeholder) placeholder.style.display = "none";
+                 },
+                 undefined,
+                 (err) => {
+                   console.warn("GLB load failed:", storagePath, err);
+                 }
+                );
+               } catch (err) {
+                 console.warn("Storage URL failed:", storagePath, err);
+
+                 const placeholder = document.getElementById("hero3dPlaceholder");
+                 if (placeholder) placeholder.style.display = "flex";
+                }
+            }
             function nextModel() {
                 cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
                 loadCgcModel(cgcModelIndex);
