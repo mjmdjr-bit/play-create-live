@@ -1045,7 +1045,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              }
 
              controls.update();
-             renderer.setClearColor(0xff0000, 1);
              renderer.render(scene, camera);
              }
 
