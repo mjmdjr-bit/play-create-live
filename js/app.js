@@ -1001,6 +1001,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
               currentModel = model;
               scene.add(currentModel);
+              console.log("MODEL ADDED", currentModel);
               disposeModel(oldModel);
 
               const placeholder = document.getElementById("hero3dPlaceholder");
@@ -1044,6 +1045,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              }
 
              controls.update();
+             renderer.setClearColor(0xff0000, 1);
              renderer.render(scene, camera);
              }
 
