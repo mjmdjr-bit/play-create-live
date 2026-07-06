@@ -906,7 +906,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         // CGC 3D HERO / Three.js GLB Viewer
         // ==============================
         const CGC_MODELS = [
-            "assets/models/01.glb",
+            https://console.firebase.google.com/u/1/project/play-create-live/storage/play-create-live.firebasestorage.app/files/~2Fmodels#:~:text=drive_file-,01,-.glb,
         ];
 
         let cgcModelIndex = 0;
