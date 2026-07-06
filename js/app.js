@@ -111,61 +111,143 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         const ADMIN_SECRET = "pcl-admin-2024";
         let isAdmin = false;
 
-        // 背景パーティクル
+        // 背景パーティクル：hover reactive
         (function () {
-            const canvas = document.getElementById("particles");
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            let W, H, dpr = window.devicePixelRatio || 1;
+          const canvas = document.getElementById("particles");
+           if (!canvas) return;
 
-            const palettes = [
-                "rgba(255,180,87,0.65)",
-                "rgba(72,219,251,0.65)",
-                "rgba(129,140,248,0.65)",
-                "rgba(45,212,191,0.65)",
-                "rgba(244,114,182,0.65)"
-            ];
-            const color = palettes[Math.floor(Math.random() * palettes.length)];
+          const ctx = canvas.getContext("2d");
+           let W, H, dpr;
+           let mouse = { x: 0, y: 0, active: false };
+           let mode = "float";
+           let modeTimer = 0;
 
-            function resize() {
-                W = canvas.width = innerWidth * dpr;
-                H = canvas.height = innerHeight * dpr;
-                canvas.style.width = innerWidth + "px";
-                canvas.style.height = innerHeight + "px";
-            }
-            resize();
-            window.addEventListener("resize", resize);
+          const colors = [
+           "rgba(80,220,255,",
+           "rgba(180,90,255,",
+           "rgba(255,180,87,",
+           "rgba(120,255,220,"
+         ];
 
-            const parts = [];
-            for (let i = 0; i < 80; i++) {
-                parts.push({
-                    x: Math.random() * W,
-                    y: Math.random() * H,
-                    r: Math.random() * 3 * dpr + 1,
-                    a: Math.random() * Math.PI * 2,
-                    v: 0.25 + Math.random() * 0.5
-                });
-            }
+         function resize() {
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          W = canvas.width = innerWidth * dpr;
+          H = canvas.height = innerHeight * dpr;
+            canvas.style.width = innerWidth + "px";
+            canvas.style.height = innerHeight + "px";
+          }
 
-            function draw() {
-                ctx.clearRect(0, 0, W, H);
-                for (const p of parts) {
-                    p.x += Math.cos(p.a) * p.v;
-                    p.y += Math.sin(p.a) * p.v;
-                    p.a += (Math.random() - 0.5) * 0.03;
-                    if (p.x < 0) p.x = W;
-                    if (p.x > W) p.x = 0;
-                    if (p.y < 0) p.y = H;
-                    if (p.y > H) p.y = 0;
+          resize();
+          window.addEventListener("resize", resize);
 
-                    ctx.beginPath();
-                    ctx.fillStyle = color;
-                    ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                requestAnimationFrame(draw);
-            }
-            draw();
+         const parts = Array.from({ length: 120 }, () => ({
+           x: Math.random() * W,
+           y: Math.random() * H,
+           ox: Math.random() * W,
+           oy: Math.random() * H,
+           vx: 0,
+           vy: 0,
+           r: (Math.random() * 2.6 + 0.8) * dpr,
+           a: Math.random() * Math.PI * 2,
+           color: colors[Math.floor(Math.random() * colors.length)]
+         }));
+
+         function changeMode() {
+         const modes = ["gather", "burst", "orbit", "glow", "collapse"];
+          mode = modes[Math.floor(Math.random() * modes.length)];
+          modeTimer = 90 + Math.random() * 90;
+         }
+
+          window.addEventListener("pointermove", (e) => {
+           mouse.x = e.clientX * dpr;
+           mouse.y = e.clientY * dpr;
+           mouse.active = true;
+
+           if (Math.random() < 0.025) changeMode();
+          }, { passive: true });
+
+         window.addEventListener("pointerleave", () => {
+           mouse.active = false;
+           mode = "float";
+          });
+
+         function draw() {
+          ctx.clearRect(0, 0, W, H);
+
+           if (mouse.active) {
+            modeTimer--;
+           if (modeTimer <= 0) changeMode();
+          }
+
+          for (const p of parts) {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          const range = 260 * dpr;
+          const force = Math.max(0, 1 - dist / range);
+
+          if (mouse.active) {
+          if (mode === "gather") {
+           p.vx += dx * 0.0009 * force;
+           p.vy += dy * 0.0009 * force;
+          }
+
+          if (mode === "burst") {
+           p.vx -= dx * 0.0018 * force;
+           p.vy -= dy * 0.0018 * force;
+          }
+
+          if (mode === "orbit") {
+           p.vx += -dy * 0.0011 * force;
+           p.vy += dx * 0.0011 * force;
+          }
+
+          if (mode === "collapse") {
+           p.vx += dx * 0.0022 * force;
+           p.vy += dy * 0.0022 * force;
+          if (dist < 34 * dpr) {
+            p.x = Math.random() * W;
+            p.y = Math.random() * H;
+          }
+         }
+
+          if (mode === "glow") {
+           p.vx += dx * 0.00045 * force;
+           p.vy += dy * 0.00045 * force;
+          }
+         }
+
+          p.a += 0.015;
+          p.vx += Math.cos(p.a) * 0.025 * dpr;
+          p.vy += Math.sin(p.a) * 0.025 * dpr;
+
+          p.vx *= 0.94;
+          p.vy *= 0.94;
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < -20) p.x = W + 20;
+          if (p.x > W + 20) p.x = -20;
+          if (p.y < -20) p.y = H + 20;
+          if (p.y > H + 20) p.y = -20;
+
+         const glow = mouse.active ? 0.25 + force * 0.75 : 0.22;
+         const size = p.r * (mouse.active ? 2.2 + force * 5.5 : 2.4);
+
+          ctx.beginPath();
+          ctx.fillStyle = `${p.color}${glow})`;
+          ctx.shadowBlur = 18 * glow;
+          ctx.shadowColor = `${p.color}0.9)`;
+          ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+          ctx.fill();
+          }
+
+          ctx.shadowBlur = 0;
+           requestAnimationFrame(draw);
+          }
+
+         draw();
         })();
 
         // Creators取得
