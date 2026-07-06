@@ -981,57 +981,35 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 });
             }
 
-            async function loadCgcModel(index) {
-              console.log("load model");
-              const storagePath = CGC_MODELS[index];
-              if (!storagePath) return;
+            function loadCgcModel(index) {
+             console.log("load model");
 
-              const oldModel = currentModel;
+             const path = CGC_MODELS[index];
+              if (!path) return;
 
-              try {
-                const url = await getDownloadURL(ref(storage, storagePath));
-                console.log("GLB URL:", url);
+             const oldModel = currentModel;
 
-                loader.load(
-                 url,
-                 (gltf) => {
-                   const model = gltf.scene;
+             loader.load(
+               path,
+               (gltf) => {
+              const model = gltf.scene;
 
-                   normalizeModel(model);
+              normalizeModel(model);
+               model.rotation.set(0.18, 0, 0);
+               model.position.y = 0;
 
-                   model.rotation.set(0.18, 0, 0);
-                   model.position.y = 0;
+             currentModel = model;
+               scene.add(currentModel);
+              disposeModel(oldModel);
 
-                   model.traverse((obj) => {
-                     if (!obj.isMesh) return;
-
-                     obj.castShadow = true;
-                     obj.receiveShadow = true;
-
-                     if (obj.material) {
-                     obj.material.envMapIntensity = 1.6;
-                     obj.material.needsUpdate = true;
-                    }
-                   });
-
-                   currentModel = model;
-                   scene.add(currentModel);
-                   disposeModel(oldModel);
-
-                  const placeholder = document.getElementById("hero3dPlaceholder");
-                  if (placeholder) placeholder.style.display = "none";
-                 },
-                 undefined,
-                 (err) => {
-                   console.warn("GLB load failed:", storagePath, err);
-                 }
-                );
-               } catch (err) {
-                 console.warn("Storage URL failed:", storagePath, err);
-
-                 const placeholder = document.getElementById("hero3dPlaceholder");
-                 if (placeholder) placeholder.style.display = "flex";
-                }
+             const placeholder = document.getElementById("hero3dPlaceholder");
+              if (placeholder) placeholder.style.display = "none";
+             },
+             undefined,
+              (err) => {
+             console.warn("GLB load failed:", path, err);
+              }
+             );
             }
             function nextModel() {
                 cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
@@ -1066,6 +1044,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             window.addEventListener("resize", resize);
 
             function animate(now) {
+                loadCgcModel(cgcModelIndex);
                 requestAnimationFrame(animate);
                 const elapsed = now * 0.001;
                 const idle = now - lastInteraction > 1800;
