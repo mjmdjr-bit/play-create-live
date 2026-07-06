@@ -1049,15 +1049,35 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              controls.update();
              renderer.render(scene, camera);
              }
+             
+            function nextModel() {
+              cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
+              loadCgcModel(cgcModelIndex);
+            }
+
+            function prevModel() {
+             cgcModelIndex = (cgcModelIndex - 1 + CGC_MODELS.length) % CGC_MODELS.length;
+              loadCgcModel(cgcModelIndex);
+            }
+
+             document.getElementById("modelNextBtn")?.addEventListener("click", () => {
+              nextModel();
+              restartAutoModelTimer();
+             });
+
+             document.getElementById("modelPrevBtn")?.addEventListener("click", () => {
+             prevModel();
+              restartAutoModelTimer();
+             });
              let autoModelTimer = null;
 
-             function restartAutoModelTimer() {
+            function restartAutoModelTimer() {
               if (autoModelTimer) clearInterval(autoModelTimer);
 
               autoModelTimer = setInterval(() => {
                 nextModel();
                }, 12000);
-             }
+            }
 
             loadCgcModel(cgcModelIndex);
           
@@ -1081,7 +1101,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              restartAutoModelTimer();
             });
             restartAutoModelTimer();
-            
+
             requestAnimationFrame(animate);
             }
 
