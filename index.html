@@ -1386,16 +1386,22 @@
 .hero-3d::before {
   content: "";
   position: absolute;
-  inset: 8% 4%;
+  inset: -28%;
   z-index: 0;
   pointer-events: none;
+  border-radius: 50%;
   background:
-    radial-gradient(circle at 48% 44%, rgba(80, 220, 255, 0.24), transparent 30%),
-    radial-gradient(circle at 56% 54%, rgba(188, 85, 247, 0.30), transparent 38%),
-    radial-gradient(circle at 42% 58%, rgba(255, 139, 60, 0.16), transparent 34%);
-  filter: blur(42px);
-  opacity: 0.95;
-  animation: cgcAuraPulse 5.8s ease-in-out infinite;
+    radial-gradient(circle at 50% 50%,
+      rgba(150, 95, 255, 0.42) 0%,
+      rgba(80, 190, 255, 0.26) 22%,
+      rgba(180, 80, 255, 0.16) 42%,
+      rgba(180, 80, 255, 0.06) 58%,
+      transparent 74%
+    );
+  filter: blur(46px);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  animation: cgcAuraPulse 6s ease-in-out infinite;
 }
 
 /* 回転の軌跡っぽい光 */
@@ -1480,6 +1486,32 @@
   .hero-3d::before {
     filter: blur(32px);
   }
+}
+.hero-visual,
+.hero-3d {
+  overflow: visible;
+}
+
+.hero-3d {
+  position: relative;
+  width: min(62vw, 860px);
+  height: min(56vw, 680px);
+  min-height: 520px;
+}
+
+#hero3dCanvas {
+  position: absolute;
+  inset: -80px -120px;
+  width: calc(100% + 240px);
+  height: calc(100% + 160px);
+  background: transparent !important;
+  overflow: visible;
+}
+
+#hero3dCanvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
 }
 </style>
 <script type="importmap">
