@@ -1045,7 +1045,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
             function animate(now) {
              requestAnimationFrame(animate);
-
+             }
              const elapsed = now * 0.001;
              const idle = now - lastInteraction > 1200;
 
