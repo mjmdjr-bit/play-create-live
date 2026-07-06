@@ -985,97 +985,67 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              console.log("load model");
 
              const path = CGC_MODELS[index];
-              if (!path) return;
+             if (!path) return;
 
              const oldModel = currentModel;
 
              loader.load(
-               path,
-               (gltf) => {
+              path,
+             (gltf) => {
               const model = gltf.scene;
 
               normalizeModel(model);
-               model.rotation.set(0.18, 0, 0);
-               model.position.y = 0;
+              model.rotation.set(0.18, 0, 0);
+              model.position.y = 0;
 
-             currentModel = model;
-               scene.add(currentModel);
+              currentModel = model;
+              scene.add(currentModel);
               disposeModel(oldModel);
 
-             const placeholder = document.getElementById("hero3dPlaceholder");
+              const placeholder = document.getElementById("hero3dPlaceholder");
               if (placeholder) placeholder.style.display = "none";
-             },
+              },
              undefined,
-              (err) => {
-             console.warn("GLB load failed:", path, err);
+             (err) => {
+              console.warn("GLB load failed:", path, err);
               }
-             );
+              );
             }
-            function nextModel() {
-                cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
-                loadCgcModel(cgcModelIndex);
-            }
-            function prevModel() {
-                cgcModelIndex = (cgcModelIndex - 1 + CGC_MODELS.length) % CGC_MODELS.length;
-                loadCgcModel(cgcModelIndex);
-            }
-
-            document.getElementById("modelNextBtn")?.addEventListener("click", nextModel);
-            document.getElementById("modelPrevBtn")?.addEventListener("click", prevModel);
-            renderer.domElement.addEventListener("pointerdown", () => { isPointerActive = true; lastInteraction = performance.now(); });
-            window.addEventListener("pointerup", () => { isPointerActive = false; lastInteraction = performance.now(); });
-            renderer.domElement.addEventListener("pointermove", () => { lastInteraction = performance.now(); });
-            renderer.domElement.addEventListener("touchstart", (e) => { const t = e.touches[0]; swipeStartX = t.clientX; swipeStartY = t.clientY; }, { passive: true });
-            renderer.domElement.addEventListener("touchend", (e) => {
-                const t = e.changedTouches[0];
-                const dx = t.clientX - swipeStartX;
-                const dy = t.clientY - swipeStartY;
-                if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.4) {
-                    if (dx < 0) nextModel(); else prevModel();
-                }
-            }, { passive: true });
-
-            function resize() {
-                if (!mount.clientWidth || !mount.clientHeight) return;
-                camera.aspect = mount.clientWidth / mount.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(mount.clientWidth, mount.clientHeight);
-            }
-            window.addEventListener("resize", resize);
 
             function animate(now) {
              requestAnimationFrame(animate);
-             }
+
              const elapsed = now * 0.001;
              const idle = now - lastInteraction > 1200;
 
              if (currentModel) {
-               const speed =
-                 0.006 +
-                 Math.sin(elapsed * 0.55) * 0.003 +
-                 Math.sin(elapsed * 1.37) * 0.0018;
+             const speed =
+             0.006 +
+             Math.sin(elapsed * 0.55) * 0.003 +
+             Math.sin(elapsed * 1.37) * 0.0018;
 
-               if (idle && !isPointerActive) {
-                 targetRotationY += Math.max(speed, 0.0015);
-                 targetRotationX = 0.16 + Math.sin(elapsed * 0.48) * 0.14;
+              if (idle && !isPointerActive) {
+              targetRotationY += Math.max(speed, 0.0015);
+              targetRotationX = 0.16 + Math.sin(elapsed * 0.48) * 0.14;
 
-                 currentModel.rotation.y +=
-                 (targetRotationY - currentModel.rotation.y) * 0.035;
+                currentModel.rotation.y +=
+               (targetRotationY - currentModel.rotation.y) * 0.035;
 
-                 currentModel.rotation.x +=
-                 (targetRotationX - currentModel.rotation.x) * 0.025;
+               currentModel.rotation.x +=
+               (targetRotationX - currentModel.rotation.x) * 0.025;
 
-                 mount.closest(".hero-3d")?.classList.add("is-rotating");
-                } else {
-                 mount.closest(".hero-3d")?.classList.remove("is-rotating");
-                }
+              mount.closest(".hero-3d")?.classList.add("is-rotating");
+             } else {
+              mount.closest(".hero-3d")?.classList.remove("is-rotating");
+             }
 
-               currentModel.position.y = Math.sin(elapsed * 1.05) * 0.08;
-              }
+             currentModel.position.y = Math.sin(elapsed * 1.05) * 0.08;
+             }
 
-              controls.update();
-              renderer.render(scene, camera);
-            }
+             controls.update();
+             renderer.render(scene, camera);
+             }
+
             loadCgcModel(cgcModelIndex);
             requestAnimationFrame(animate);
 
