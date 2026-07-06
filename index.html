@@ -1286,7 +1286,68 @@
 .works-lightbox-caption { position: fixed; left: 16px; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom,0px)); text-align: center; font-size: 12px; color: #cfd6e6; letter-spacing: .08em; }
 .work-card { cursor: zoom-in; }
 .work-thumb iframe { pointer-events: none; }
-    </style>
+.hero-3d{
+    position:absolute;
+    inset:0;
+}
+
+#hero3dCanvas{
+    position:absolute;
+    inset:0;
+}
+
+.hero-placeholder{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:18px;
+
+    background:
+        radial-gradient(circle at center,
+        rgba(96,165,250,.08),
+        transparent 70%);
+}
+
+.hero-placeholder-logo{
+
+    font-size:120px;
+    font-weight:900;
+
+    letter-spacing:.18em;
+
+    color:white;
+
+    opacity:.08;
+
+    text-shadow:
+    0 0 30px rgba(96,165,250,.3);
+}
+
+.hero-placeholder-text{
+
+    font-size:14px;
+
+    letter-spacing:.35em;
+
+    color:#ffffffcc;
+}
+
+.hero-placeholder-sub{
+
+    font-size:12px;
+
+    color:#8d96a5;
+
+    text-align:center;
+
+    line-height:1.8;
+}
+</style>
 <script type="importmap">
 {
   "imports": {
@@ -1390,7 +1451,24 @@
 
      <div class="hero-3d-wrap">
       <button id="modelPrevBtn" class="model-arrow model-arrow-left" type="button">‹</button>
-      <div id="hero3d" class="hero-3d"></div>
+      <div class="hero-3d">
+        <div id="hero3dCanvas"></div>
+
+        <div id="hero3dPlaceholder" class="hero-placeholder">
+          <div class="hero-placeholder-logo">
+             CGC
+          </div>
+
+          <div class="hero-placeholder-text">
+             3D LOGO LOADING
+          </div>
+
+          <div class="hero-placeholder-sub">
+             assets/models にGLBを配置すると
+             自動で3D表示へ切り替わります
+          </div>
+       </div>
+     </div>
       <button id="modelNextBtn" class="model-arrow model-arrow-right" type="button">›</button>
       <div class="hero-3d-hint">DRAG TO ROTATE / SWIPE TO CHANGE</div>
      </div>
