@@ -1048,6 +1048,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
             loadCgcModel(cgcModelIndex);
             requestAnimationFrame(animate);
+            }
 
         // 初期化
         (function init() {
