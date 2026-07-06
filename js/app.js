@@ -908,7 +908,9 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         // CGC 3D HERO / Three.js GLB Viewer
         // ==============================
         const CGC_MODELS = [
-            "models/01.glb"
+         "models/01.glb",
+         "models/02.glb",
+         "models/03.glb"
         ];
 
         let cgcModelIndex = 0;
@@ -1078,7 +1080,31 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 controls.update();
                 renderer.render(scene, camera);
             }
-            loadCgcModel(cgcModelIndex);
+            function loadCgcModel(index) {
+             const path = CGC_MODELS[index];
+             if (!path) return;
+
+             const oldModel = currentModel;
+
+             loader.load(
+              path,
+              (gltf) => {
+                const model = gltf.scene;
+                normalizeModel(model);
+                model.rotation.set(0.18, 0, 0);
+                model.position.y = 0;
+
+                currentModel = model;
+                scene.add(currentModel);
+                disposeModel(oldModel);
+
+               const placeholder = document.getElementById("hero3dPlaceholder");
+               if (placeholder) placeholder.style.display = "none";
+             },
+             undefined,
+             (err) => console.warn("GLB load failed:", path, err)
+            );
+           }
             requestAnimationFrame(animate);
         }
 
