@@ -1044,25 +1044,40 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             window.addEventListener("resize", resize);
 
             function animate(now) {
-                loadCgcModel(cgcModelIndex);
-                requestAnimationFrame(animate);
-                const elapsed = now * 0.001;
-                const idle = now - lastInteraction > 1800;
-                if (currentModel) {
-                    currentModel.position.y = Math.sin(elapsed * 1.1) * 0.08;
-                    if (idle && !isPointerActive) {
-                        targetRotationY += 0.0035 + Math.sin(elapsed * 0.7) * 0.002 + Math.sin(elapsed * 1.9) * 0.001;
-                        targetRotationX = 0.16 + Math.sin(elapsed * 0.55) * 0.12;
-                        currentModel.rotation.y += (targetRotationY - currentModel.rotation.y) * 0.025;
-                        currentModel.rotation.x += (targetRotationX - currentModel.rotation.x) * 0.025;
-                    }
+             requestAnimationFrame(animate);
+
+             const elapsed = now * 0.001;
+             const idle = now - lastInteraction > 1200;
+
+             if (currentModel) {
+               const speed =
+                 0.006 +
+                 Math.sin(elapsed * 0.55) * 0.003 +
+                 Math.sin(elapsed * 1.37) * 0.0018;
+
+               if (idle && !isPointerActive) {
+                 targetRotationY += Math.max(speed, 0.0015);
+                 targetRotationX = 0.16 + Math.sin(elapsed * 0.48) * 0.14;
+
+                 currentModel.rotation.y +=
+                 (targetRotationY - currentModel.rotation.y) * 0.035;
+
+                 currentModel.rotation.x +=
+                 (targetRotationX - currentModel.rotation.x) * 0.025;
+
+                 mount.closest(".hero-3d")?.classList.add("is-rotating");
+                } else {
+                 mount.closest(".hero-3d")?.classList.remove("is-rotating");
                 }
-                controls.update();
-                renderer.render(scene, camera);
+
+               currentModel.position.y = Math.sin(elapsed * 1.05) * 0.08;
+              }
+
+              controls.update();
+              renderer.render(scene, camera);
             }
             loadCgcModel(cgcModelIndex);
             requestAnimationFrame(animate);
-        }
 
         // 初期化
         (function init() {
