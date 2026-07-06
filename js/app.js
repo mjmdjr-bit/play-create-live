@@ -909,8 +909,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         // ==============================
         const CGC_MODELS = [
          "models/01.glb",
-         "models/02.glb",
-         "models/03.glb"
         ];
 
         let cgcModelIndex = 0;
