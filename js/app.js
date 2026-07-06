@@ -914,6 +914,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         let cgcModelIndex = 0;
 
         function setupCgcHero3D() {
+            console.log("Hero3D START");
             const mount = document.getElementById("hero3dCanvas");
             if (!mount) return;
 
@@ -981,6 +982,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             }
 
             async function loadCgcModel(index) {
+              console.log("load model");
               const storagePath = CGC_MODELS[index];
               if (!storagePath) return;
 
@@ -988,6 +990,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
               try {
                 const url = await getDownloadURL(ref(storage, storagePath));
+                console.log("GLB URL:", url);
 
                 loader.load(
                  url,
