@@ -920,7 +920,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(38, mount.clientWidth / mount.clientHeight, 0.1, 100);
-            camera.position.set(0, 0.25, 3.6);
+            camera.position.set(0, 0.2, 4.2);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -964,7 +964,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 box.getSize(size);
                 box.getCenter(center);
                 const maxAxis = Math.max(size.x, size.y, size.z) || 1;
-                const scale = 5.2 / maxAxis;
+                const scale = 3.4 / maxAxis;
                 model.scale.setScalar(scale);
                 model.position.sub(center.multiplyScalar(scale));
                 model.position.y = 0;
