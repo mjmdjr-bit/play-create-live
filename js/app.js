@@ -909,6 +909,8 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         // ==============================
         const CGC_MODELS = [
          "models/01.glb",
+         "models/02.glb",
+         "models/03.glb",
         ];
 
         let cgcModelIndex = 0;
@@ -1047,8 +1049,39 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              controls.update();
              renderer.render(scene, camera);
              }
+             let autoModelTimer = null;
+
+             function restartAutoModelTimer() {
+              if (autoModelTimer) clearInterval(autoModelTimer);
+
+              autoModelTimer = setInterval(() => {
+                nextModel();
+               }, 12000);
+             }
 
             loadCgcModel(cgcModelIndex);
+          
+            function nextModel() {
+              cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
+              loadCgcModel(cgcModelIndex);
+            }
+
+            function prevModel() {
+              cgcModelIndex = (cgcModelIndex - 1 + CGC_MODELS.length) % CGC_MODELS.length;
+              loadCgcModel(cgcModelIndex);
+            }
+
+            document.getElementById("modelNextBtn")?.addEventListener("click", () => {
+             nextModel();
+             restartAutoModelTimer();
+            });
+
+            document.getElementById("modelPrevBtn")?.addEventListener("click", () => {
+             prevModel();
+             restartAutoModelTimer();
+            });
+            restartAutoModelTimer();
+            
             requestAnimationFrame(animate);
             }
 
