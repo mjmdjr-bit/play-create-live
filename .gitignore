@@ -1,4 +1,1 @@
-assets/models/*.glb
-.DS_Store
-models/*.glb
-assets/models/*.glb
+﻿.DS_Store
