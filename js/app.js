@@ -998,229 +998,247 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         let cgcModelIndex = 0;
 
         function setupCgcHero3D() {
-            console.log("Hero3D START");
-            const mount = document.getElementById("hero3dCanvas");
-            console.log(mount);
+        const mount = document.getElementById("hero3dCanvas");
+         if (!mount) return;
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(38, mount.clientWidth / mount.clientHeight, 0.1, 100);
-            camera.position.set(0, 0.2, 3.0);
+        const PC_X_OFFSET = 0.15;
+        const MOBILE_X_OFFSET = 0;
 
-            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-            renderer.setSize(mount.clientWidth, mount.clientHeight);
-            renderer.outputColorSpace = THREE.SRGBColorSpace;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.15;
-            mount.appendChild(renderer.domElement);
+        const scene = new THREE.Scene();
 
-            const controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.enablePan = false;
-            controls.enableZoom = true;
-            controls.minDistance = 2.2;
-            controls.maxDistance = 6.5;
-            controls.enablePan = false;
-            controls.rotateSpeed = 0.55;
-            controls.autoRotate = false;
+        const camera = new THREE.PerspectiveCamera(
+         38,
+         mount.clientWidth / mount.clientHeight,
+         0.1,
+         100
+        );
+        camera.position.set(0, 0.2, 3.0);
 
-            scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-            const keyLight = new THREE.DirectionalLight(0x9bdcff, 3.2);
-            keyLight.position.set(3, 4, 5);
-            scene.add(keyLight);
-            const orangeLight = new THREE.PointLight(0xff8c37, 7, 9);
-            orangeLight.position.set(-2.8, -1.4, 2.5);
-            scene.add(orangeLight);
-            const blueLight = new THREE.PointLight(0x38bdf8, 8, 10);
-            blueLight.position.set(2.8, 1.2, 2.5);
-            scene.add(blueLight);
+        const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true
+       });
 
-            const loader = new GLTFLoader();
-            let currentModel = null;
-            let targetRotationY = 0;
-            let baseRotation = 0;
-            let targetRotationX = 0;
-            let isPointerActive = false;
-            let lastInteraction = performance.now();
-            let swipeStartX = 0;
-            let swipeStartY = 0;
+       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+       renderer.setSize(mount.clientWidth, mount.clientHeight);
+       renderer.setClearColor(0x000000, 0);
+       renderer.outputColorSpace = THREE.SRGBColorSpace;
+       renderer.toneMapping = THREE.ACESFilmicToneMapping;
+       renderer.toneMappingExposure = 1.15;
 
-            function normalizeModel(model) {
-                const box = new THREE.Box3().setFromObject(model);
-                const size = new THREE.Vector3();
-                const center = new THREE.Vector3();
-                box.getSize(size);
-                box.getCenter(center);
-                const maxAxis = Math.max(size.x, size.y, size.z) || 1;
-                const scale = 2.0 / maxAxis;
-                model.scale.setScalar(scale);
-                model.position.sub(center.multiplyScalar(scale));
-                model.position.y = 0;
-            }
+      mount.innerHTML = "";
+      mount.appendChild(renderer.domElement);
 
-            function disposeModel(model) {
-                if (!model) return;
-                scene.remove(model);
-                model.traverse((obj) => {
-                    if (obj.geometry) obj.geometry.dispose();
-                    if (obj.material) {
-                        if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose?.());
-                        else obj.material.dispose?.();
-                    }
-                });
-            }
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.enablePan = false;
+      controls.enableZoom = true;
+      controls.minDistance = 2.2;
+      controls.maxDistance = 6.5;
+      controls.rotateSpeed = 0.45;
+      controls.autoRotate = false;
 
-            let modelLoadToken = 0;
+      scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
-            function loadCgcModel(index) {
-              const path = CGC_MODELS[index];
-              if (!path) return;
+      const keyLight = new THREE.DirectionalLight(0x9bdcff, 3.2);
+      keyLight.position.set(3, 4, 5);
+     scene.add(keyLight);
 
-              const token = ++modelLoadToken;
+     const orangeLight = new THREE.PointLight(0xff8c37, 7, 9);
+     orangeLight.position.set(-2.8, -1.4, 2.5);
+     scene.add(orangeLight);
 
-              loader.load(
-               path,
-               (gltf) => {
-              if (token !== modelLoadToken) {
-              disposeModel(gltf.scene);
-                return;
-             }
+     const blueLight = new THREE.PointLight(0x38bdf8, 8, 10);
+     blueLight.position.set(2.8, 1.2, 2.5);
+     scene.add(blueLight);
 
-               if (currentModel) {
-               disposeModel(currentModel);
-               currentModel = null;
-             }
+     const loader = new GLTFLoader();
 
-             const model = gltf.scene;
+     let currentModel = null;
+     let modelLoadToken = 0;
 
-             normalizeModel(model);
-             model.rotation.set(0.18, 0, 0);
+     let targetRotationY = 0;
+     let targetRotationX = 0;
+     let baseRotation = 0;
 
-             if (window.innerWidth >= 900) {
-               model.position.x = 0.55;
-             } else {
-               model.position.x = 0;
-             }
+     let isPointerActive = false;
+     let lastInteraction = performance.now();
 
-             model.position.y = 0;
+     let autoModelTimer = null;
 
-             currentModel = model;
-             scene.add(currentModel);
+     function normalizeModel(model) {
+     const box = new THREE.Box3().setFromObject(model);
+     const size = new THREE.Vector3();
+     const center = new THREE.Vector3();
 
-              const placeholder = document.getElementById("hero3dPlaceholder");
-                if (placeholder) placeholder.style.display = "none";
-              },
-             undefined,
-             (err) => {
-              console.warn("GLB load failed:", path, err);
-              }
-             );
-            }
+     box.getSize(size);
+     box.getCenter(center);
 
-            function animate(now) {
-             requestAnimationFrame(animate);
+     const maxAxis = Math.max(size.x, size.y, size.z) || 1;
+     const scale = 2.0 / maxAxis;
 
-             const elapsed = now * 0.001;
-             const idle = now - lastInteraction > 1200;
+     model.scale.setScalar(scale);
+     model.position.sub(center.multiplyScalar(scale));
 
-             if (currentModel) {
-             // =======================
-             // Organic Idle Animation
-             // =======================
+     model.position.x = window.innerWidth >= 900 ? PC_X_OFFSET : MOBILE_X_OFFSET;
+     model.position.y = 0;
+     model.position.z = 0;
+    }
 
-             if (idle && !isPointerActive) {
+    function disposeModel(model) {
+     if (!model) return;
 
-               // 呼吸するような左右回転
-               baseRotation =
-                   Math.sin(elapsed * 0.18) * 0.75;
+     scene.remove(model);
 
-               targetRotationY = baseRotation;
+     model.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose();
 
-               // 少し上下に傾く
-              targetRotationX =
-                 0.18 +
-                 Math.sin(elapsed * 0.42) * 0.08;
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach((m) => m.dispose?.());
+        } else {
+          obj.material.dispose?.();
+        }
+       }
+      });
+    }
 
-              currentModel.rotation.y +=
-                 (targetRotationY - currentModel.rotation.y) * 0.018;
+    function loadCgcModel(index) {
+     const path = CGC_MODELS[index];
+      if (!path) return;
 
-              currentModel.rotation.x +=
-                 (targetRotationX - currentModel.rotation.x) * 0.016;
+     const token = ++modelLoadToken;
 
-              mount.closest(".hero-3d")?.classList.add("is-rotating");
+     loader.load(
+      path,
+      (gltf) => {
+        if (token !== modelLoadToken) {
+          disposeModel(gltf.scene);
+          return;
+        }
 
-             } else {
+        if (currentModel) {
+          disposeModel(currentModel);
+          currentModel = null;
+        }
 
-              mount.closest(".hero-3d")?.classList.remove("is-rotating");
+        const model = gltf.scene;
 
-             }
+        normalizeModel(model);
+        model.rotation.set(0.18, 0, 0);
 
-             // 浮遊
-             currentModel.position.y =
-                Math.sin(elapsed * 0.55) * 0.05;
+        currentModel = model;
+        scene.add(currentModel);
 
-             // 少し前後にも揺れる 
-             currentModel.position.z =
-                Math.sin(elapsed * 0.28) * 0.03;
+        const placeholder = document.getElementById("hero3dPlaceholder");
+        if (placeholder) placeholder.style.display = "none";
+      },
+      undefined,
+      (err) => {
+        console.warn("GLB load failed:", path, err);
+       }
+      );
+    }
 
-             controls.update();
-             renderer.render(scene, camera);
-             }
+    function nextModel() {
+      cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
+      loadCgcModel(cgcModelIndex);
+    }
 
-            function nextModel() {
-              cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
-              loadCgcModel(cgcModelIndex);
-            }
+    function prevModel() {
+     cgcModelIndex =
+      (cgcModelIndex - 1 + CGC_MODELS.length) % CGC_MODELS.length;
+     loadCgcModel(cgcModelIndex);
+    }
 
-            function prevModel() {
-             cgcModelIndex = (cgcModelIndex - 1 + CGC_MODELS.length) % CGC_MODELS.length;
-              loadCgcModel(cgcModelIndex);
-            }
+    function restartAutoModelTimer() {
+      if (autoModelTimer) clearInterval(autoModelTimer);
 
-             document.getElementById("modelNextBtn")?.addEventListener("click", () => {
-              nextModel();
-              restartAutoModelTimer();
-             });
+       autoModelTimer = setInterval(() => {
+       nextModel();
+       }, 12000);
+    }
 
-             document.getElementById("modelPrevBtn")?.addEventListener("click", () => {
-             prevModel();
-              restartAutoModelTimer();
-             });
-             let autoModelTimer = null;
+    document.getElementById("modelNextBtn")?.addEventListener("click", () => {
+     nextModel();
+     restartAutoModelTimer();
+    });
 
-            function restartAutoModelTimer() {
-              if (autoModelTimer) clearInterval(autoModelTimer);
+    document.getElementById("modelPrevBtn")?.addEventListener("click", () => {
+     prevModel();
+     restartAutoModelTimer();
+    });
 
-              autoModelTimer = setInterval(() => {
-                nextModel();
-               }, 12000);
-            }
+    renderer.domElement.addEventListener("pointerdown", () => {
+     isPointerActive = true;
+     lastInteraction = performance.now();
+    });
 
-            loadCgcModel(cgcModelIndex);
-          
-            function nextModel() {
-              cgcModelIndex = (cgcModelIndex + 1) % CGC_MODELS.length;
-              loadCgcModel(cgcModelIndex);
-            }
+    renderer.domElement.addEventListener("pointerup", () => {
+     isPointerActive = false;
+     lastInteraction = performance.now();
+    });
 
-            function prevModel() {
-              cgcModelIndex = (cgcModelIndex - 1 + CGC_MODELS.length) % CGC_MODELS.length;
-              loadCgcModel(cgcModelIndex);
-            }
+    renderer.domElement.addEventListener("pointercancel", () => {
+     isPointerActive = false;
+     lastInteraction = performance.now();
+    });
 
-            document.getElementById("modelNextBtn")?.addEventListener("click", () => {
-             nextModel();
-             restartAutoModelTimer();
-            });
+    function animate(now) {
+     requestAnimationFrame(animate);
 
-            document.getElementById("modelPrevBtn")?.addEventListener("click", () => {
-             prevModel();
-             restartAutoModelTimer();
-            });
-            restartAutoModelTimer();
+     const elapsed = now * 0.001;
+     const idle = now - lastInteraction > 1200;
 
-            requestAnimationFrame(animate);
-            }
+     if (currentModel) {
+      if (idle && !isPointerActive) {
+        baseRotation = Math.sin(elapsed * 0.18) * 0.75;
+
+        targetRotationY = baseRotation;
+        targetRotationX = 0.18 + Math.sin(elapsed * 0.42) * 0.08;
+
+        currentModel.rotation.y +=
+          (targetRotationY - currentModel.rotation.y) * 0.018;
+
+        currentModel.rotation.x +=
+          (targetRotationX - currentModel.rotation.x) * 0.016;
+
+        mount.closest(".hero-3d")?.classList.add("is-rotating");
+      } else {
+        mount.closest(".hero-3d")?.classList.remove("is-rotating");
+      }
+
+      currentModel.position.y = Math.sin(elapsed * 0.55) * 0.05;
+      currentModel.position.z = Math.sin(elapsed * 0.28) * 0.03;
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+    }
+
+    function onResize() {
+     const w = mount.clientWidth;
+     const h = mount.clientHeight;
+
+      if (!w || !h) return;
+
+     camera.aspect = w / h;
+     camera.updateProjectionMatrix();
+
+     renderer.setSize(w, h);
+
+     if (currentModel) {
+      currentModel.position.x =
+        window.innerWidth >= 900 ? PC_X_OFFSET : MOBILE_X_OFFSET;
+      }
+    }
+
+    window.addEventListener("resize", onResize);
+
+    loadCgcModel(cgcModelIndex);
+    restartAutoModelTimer();
+    requestAnimationFrame(animate);
+    }
 
         // 初期化
         (function init() {
