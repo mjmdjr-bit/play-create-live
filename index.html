@@ -2436,6 +2436,55 @@
   object-fit: cover;
   display: block;
 }
+/* ==============================
+   Workflow PC readable layout
+============================== */
+
+@media (min-width: 901px) {
+  .workflow-section {
+    max-width: 1240px !important;
+  }
+
+  .workflow-timeline {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 22px !important;
+  }
+
+  .workflow-arrow {
+    display: none !important;
+  }
+
+  .workflow-step {
+    display: grid !important;
+    grid-template-columns: 46% 54% !important;
+    min-height: 220px !important;
+    border-radius: 24px !important;
+  }
+
+  .workflow-image {
+    aspect-ratio: auto !important;
+    height: 100% !important;
+  }
+
+  .workflow-image video {
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .workflow-content {
+    padding: 24px 22px !important;
+  }
+
+  .workflow-content h3 {
+    font-size: 18px !important;
+  }
+
+  .workflow-content p {
+    font-size: 13px !important;
+    line-height: 1.85 !important;
+  }
+}
 </style>
 <script type="importmap">
 {
