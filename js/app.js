@@ -1038,6 +1038,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             const loader = new GLTFLoader();
             let currentModel = null;
             let targetRotationY = 0;
+            let baseRotation = 0;
             let targetRotationX = 0;
             let isPointerActive = false;
             let lastInteraction = performance.now();
@@ -1123,28 +1124,44 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
              const idle = now - lastInteraction > 1200;
 
              if (currentModel) {
-             const speed =
-             0.0016 +
-             Math.sin(elapsed * 0.38) * 0.0008 +
-             Math.sin(elapsed * 0.9) * 0.0005;
+             // =======================
+             // Organic Idle Animation
+             // =======================
 
-              if (idle && !isPointerActive) {
-              targetRotationY += Math.max(speed, 0.0015);
-              targetRotationX = 0.16 + Math.sin(elapsed * 0.48) * 0.14;
+             if (idle && !isPointerActive) {
 
-                currentModel.rotation.y +=
-               (targetRotationY - currentModel.rotation.y) * 0.018;
+               // 呼吸するような左右回転
+               baseRotation =
+                   Math.sin(elapsed * 0.18) * 0.75;
 
-               currentModel.rotation.x +=
-               (targetRotationX - currentModel.rotation.x) * 0.014;
+               targetRotationY = baseRotation;
+
+               // 少し上下に傾く
+              targetRotationX =
+                 0.18 +
+                 Math.sin(elapsed * 0.42) * 0.08;
+
+              currentModel.rotation.y +=
+                 (targetRotationY - currentModel.rotation.y) * 0.018;
+
+              currentModel.rotation.x +=
+                 (targetRotationX - currentModel.rotation.x) * 0.016;
 
               mount.closest(".hero-3d")?.classList.add("is-rotating");
+
              } else {
+
               mount.closest(".hero-3d")?.classList.remove("is-rotating");
+
              }
 
-             currentModel.position.y = Math.sin(elapsed * 1.05) * 0.08;
-             }
+             // 浮遊
+             currentModel.position.y =
+                Math.sin(elapsed * 0.55) * 0.05;
+
+             // 少し前後にも揺れる 
+             currentModel.position.z =
+                Math.sin(elapsed * 0.28) * 0.03;
 
              controls.update();
              renderer.render(scene, camera);
