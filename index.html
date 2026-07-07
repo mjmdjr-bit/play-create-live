@@ -1965,6 +1965,187 @@
     touch-action: none !important;
   }
 }
+/* ==============================
+   CGC Workflow Flow
+============================== */
+
+.workflow-flow {
+  margin-top: 40px;
+}
+
+.workflow-timeline {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.workflow-step {
+  flex: 1;
+  min-width: 0;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.14);
+  background:
+    radial-gradient(circle at 0 0, rgba(255,180,87,.14), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(80,190,255,.12), transparent 60%),
+    rgba(8,12,24,.72);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.46),
+    0 0 26px rgba(80,220,255,.08);
+  transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+
+.workflow-step:hover {
+  transform: translateY(-6px);
+  border-color: rgba(120,230,255,.5);
+  box-shadow:
+    0 24px 64px rgba(0,0,0,.62),
+    0 0 40px rgba(80,220,255,.22);
+}
+
+.workflow-image img,
+.workflow-image video{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+
+    transition:
+        transform .6s ease,
+        opacity .6s ease;
+
+}
+
+.workflow-step:hover .workflow-image img,
+.workflow-step:hover .workflow-image video{
+
+    transform:scale(1.08);
+
+}
+
+.workflow-content {
+  padding: 16px 14px 18px;
+}
+
+.workflow-content span {
+  color: #ffb457;
+  font-size: 11px;
+  letter-spacing: .18em;
+  font-weight: 800;
+}
+
+.workflow-content h3 {
+  margin: 8px 0 8px;
+  font-size: 15px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.workflow-content p {
+  margin: 0;
+  color: #b8c2d4;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+/* animated light arrow */
+.workflow-arrow {
+  align-self: center;
+  width: 54px;
+  height: 2px;
+  flex: 0 0 54px;
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(100,230,255,.55),
+    transparent
+  );
+  filter: drop-shadow(0 0 10px rgba(80,220,255,.7));
+  overflow: hidden;
+}
+
+.workflow-arrow::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -30%;
+  width: 26px;
+  height: 12px;
+  background: rgba(180,245,255,.9);
+  filter: blur(7px);
+  animation: workflowLight 1.8s linear infinite;
+}
+
+.workflow-arrow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid rgba(220,250,255,.95);
+  border-right: 1.5px solid rgba(220,250,255,.95);
+  transform: rotate(45deg);
+}
+
+@keyframes workflowLight {
+  from { left: -35%; opacity: 0; }
+  25% { opacity: 1; }
+  to { left: 110%; opacity: 0; }
+}
+
+/* mobile */
+@media (max-width: 900px) {
+  .workflow-timeline {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .workflow-arrow {
+    width: 2px;
+    height: 48px;
+    flex: 0 0 48px;
+    margin: 0 auto;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(100,230,255,.55),
+      transparent
+    );
+  }
+
+  .workflow-arrow::before {
+    top: -30%;
+    left: -5px;
+    width: 12px;
+    height: 26px;
+    animation: workflowLightY 1.8s linear infinite;
+  }
+
+  .workflow-arrow::after {
+    right: auto;
+    left: -4px;
+    top: auto;
+    bottom: 0;
+    transform: rotate(135deg);
+  }
+
+  .workflow-image {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@keyframes workflowLightY {
+  from { top: -35%; opacity: 0; }
+  25% { opacity: 1; }
+  to { top: 110%; opacity: 0; }
+}
 </style>
 <script type="importmap">
 {
@@ -2091,6 +2272,108 @@
       <div class="hero-3d-hint">DRAG TO ROTATE / SWIPE TO CHANGE</div>
      </div>
     </header>
+    <section class="workflow-section workflow-flow" id="workflow">
+     <div class="workflow-head">
+     <div class="workflow-kicker">WORK FLOW</div>
+     <h2>Creative without boundaries.</h2>
+     <p>
+       領域を越えて、体験をつくる。<br>
+       課題発見からクリエイターの編成、制作・施工、納品まで一気通貫で伴走します。
+      </p>
+     </div>
+
+     <div class="workflow-timeline">
+
+      <article class="workflow-step">
+        <div class="workflow-image">
+
+        <video
+          autoplay
+          muted
+          loop
+          playsinline>
+
+          <source
+            src="media/workflow/discover.mp4"
+            type="video/mp4">
+
+        </video>
+
+     </div>
+        <div class="workflow-content">
+         <span>01</span>
+         <h3>Discover</h3>
+         <p>企業・地域・ブランドが抱える課題や可能性を見つけ、プロジェクトの入口を整理します。</p>
+        </div>
+     </article>
+
+     <div class="workflow-arrow"></div>
+
+     <article class="workflow-step">
+       <div class="workflow-image">
+         <img src="images/workflow/imagine.jpg" alt="Imagine">
+       </div>
+       <div class="workflow-content">
+         <span>02</span>
+         <h3>Imagine</h3>
+         <p>空間、イベント、映像、プロダクトなどを横断し、実現したい未来像を描きます。</p>
+      </div>
+     </article>
+
+     <div class="workflow-arrow"></div>
+
+     <article class="workflow-step">
+       <div class="workflow-image">
+         <img src="images/workflow/curate.jpg" alt="Curate">
+       </div>
+       <div class="workflow-content">
+        <span>03</span>
+        <h3>Curate</h3>
+        <p>最適なクリエイター、技術者、制作・施工チームを選び、体制を組みます。</p>
+      </div>
+     </article>
+
+     <div class="workflow-arrow"></div>
+
+     <article class="workflow-step">
+      <div class="workflow-image">
+        <img src="images/workflow/create.jpg" alt="Create">
+      </div>
+      <div class="workflow-content">
+        <span>04</span>
+        <h3>Create</h3>
+        <p>クリエイティブディレクションを行いながら、企画・デザイン・体験設計へ落とし込みます。</p>
+      </div>
+     </article>
+
+     <div class="workflow-arrow"></div>
+
+     <article class="workflow-step">
+      <div class="workflow-image">
+        <img src="images/workflow/build.jpg" alt="Build">
+      </div>
+      <div class="workflow-content">
+        <span>05</span>
+        <h3>Build</h3>
+        <p>製作・施工・実装チームと連携し、アイデアを現実の体験として形にします。</p>
+      </div>
+     </article>
+
+      <div class="workflow-arrow"></div>
+
+       <article class="workflow-step">
+        <div class="workflow-image">
+          <img src="images/workflow/deliver.jpg" alt="Deliver">
+        </div>
+        <div class="workflow-content">
+         <span>06</span>
+         <h3>Deliver</h3>
+         <p>公開・納品・運用まで伴走し、企業や社会に届く価値として仕上げます。</p>
+        </div>
+       </article>
+
+      </div>
+     </section>
      <section class="workflow-section" id="workflow">
      <div class="workflow-head">
      <div class="workflow-kicker">WORK FLOW</div>
