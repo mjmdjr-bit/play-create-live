@@ -1094,6 +1094,13 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
              normalizeModel(model);
              model.rotation.set(0.18, 0, 0);
+
+             if (window.innerWidth >= 900) {
+               model.position.x = 0.55;
+             } else {
+               model.position.x = 0;
+             }
+
              model.position.y = 0;
 
              currentModel = model;
