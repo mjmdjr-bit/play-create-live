@@ -2397,6 +2397,37 @@
   pointer-events: none;
   box-shadow: inset 0 0 14px rgba(120,220,255,.06);
 }
+/* CONTACT fixed bottom center */
+.contact-btn {
+  position: fixed !important;
+  top: auto !important;
+  right: auto !important;
+  left: 50% !important;
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+
+  width: auto !important;
+  height: auto !important;
+  min-width: 132px !important;
+  min-height: 0 !important;
+
+  transform: translateX(-50%) !important;
+
+  padding: 11px 22px !important;
+  border-radius: 999px !important;
+
+  font-size: 10px !important;
+  line-height: 1 !important;
+  letter-spacing: .24em !important;
+  text-align: center !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.contact-btn:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.03) !important;
+}
 </style>
 <script type="importmap">
 {
