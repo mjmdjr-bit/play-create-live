@@ -2146,6 +2146,251 @@
   25% { opacity: 1; }
   to { top: 110%; opacity: 0; }
 }
+/* ==============================
+   CGC UI FINAL TUNING
+============================== */
+
+/* PC: 3Dモデルを中央寄せ */
+@media (min-width: 901px) {
+  .hero-3d-section {
+    grid-template-columns: minmax(340px, 520px) 1fr !important;
+  }
+
+  .hero-3d-wrap {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .hero-3d {
+    transform: translateX(8vw);
+  }
+}
+
+/* 左右矢印：細い線＋発光 */
+.model-arrow {
+  width: 42px !important;
+  height: 42px !important;
+  border: 1px solid rgba(180, 240, 255, .55) !important;
+  background: rgba(2, 8, 18, .18) !important;
+  box-shadow:
+    0 0 18px rgba(80, 220, 255, .24),
+    inset 0 0 10px rgba(180, 240, 255, .08) !important;
+}
+
+.model-arrow::before {
+  width: 10px !important;
+  height: 10px !important;
+  border-top: 1px solid rgba(240, 255, 255, .95) !important;
+  border-right: 1px solid rgba(240, 255, 255, .95) !important;
+}
+
+.model-arrow:hover {
+  transform: translateY(-50%) scale(1.08) !important;
+  box-shadow:
+    0 0 28px rgba(80, 220, 255, .65),
+    0 0 60px rgba(160, 90, 255, .28) !important;
+}
+
+/* PCでは右側に縦並び */
+@media (min-width: 769px) {
+  .model-arrow-left,
+  .model-arrow-right {
+    left: auto !important;
+    right: 34px !important;
+  }
+
+  .model-arrow-left {
+    top: calc(50% - 34px) !important;
+  }
+
+  .model-arrow-right {
+    top: calc(50% + 34px) !important;
+  }
+}
+
+/* ハンバーガー：右画像風 */
+.menu-button {
+  width: 58px !important;
+  height: 58px !important;
+  right: 18px !important;
+  top: 18px !important;
+  border-radius: 50%;
+  border: 1px solid rgba(220, 250, 255, .55);
+  background: rgba(255,255,255,.04);
+  display: grid !important;
+  place-items: center;
+  box-shadow:
+    0 0 20px rgba(80,220,255,.22),
+    inset 0 0 12px rgba(255,255,255,.08);
+}
+
+.menu-button .bar {
+  position: absolute;
+  width: 24px;
+  height: 1px !important;
+  background: rgba(240,255,255,.95) !important;
+  box-shadow: 0 0 10px rgba(80,220,255,.65) !important;
+}
+
+.menu-button .bar:nth-child(1) { transform: translateY(-5px); }
+.menu-button .bar:nth-child(2) { transform: translateY(0); }
+.menu-button .bar:nth-child(3) { transform: translateY(5px); }
+
+/* 上下スクロールボタン：シンプル線＋光 */
+#toTopBtn,
+#toBottomBtn {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(220,250,255,.55) !important;
+  background: rgba(255,255,255,.035) !important;
+  box-shadow:
+    0 0 20px rgba(80,220,255,.24),
+    inset 0 0 12px rgba(255,255,255,.08) !important;
+}
+
+#toTopBtn::before,
+#toBottomBtn::before {
+  width: 12px !important;
+  height: 12px !important;
+  border-right: 1px solid rgba(240,255,255,.95) !important;
+  border-bottom: 1px solid rgba(240,255,255,.95) !important;
+  filter: drop-shadow(0 0 10px rgba(80,220,255,.75)) !important;
+}
+
+#toTopBtn:hover,
+#toBottomBtn:hover,
+.menu-button:hover {
+  box-shadow:
+    0 0 30px rgba(80,220,255,.6),
+    0 0 70px rgba(160,90,255,.28),
+    inset 0 0 14px rgba(255,255,255,.12) !important;
+}
+.workflow-image {
+  display: none !important;
+}
+
+.workflow-content {
+  padding-top: 28px !important;
+}
+/* ==============================
+   Apple Liquid Glass UI
+============================== */
+
+.model-arrow,
+#toTopBtn,
+#toBottomBtn {
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 50% !important;
+
+  border: 1px solid rgba(210, 245, 255, .38) !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.035)),
+    radial-gradient(circle at 30% 18%, rgba(255,255,255,.28), transparent 34%),
+    rgba(8, 14, 28, .34) !important;
+
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.32),
+    inset 0 -8px 18px rgba(255,255,255,.035),
+    0 0 0 1px rgba(255,255,255,.035),
+    0 0 18px rgba(80,220,255,.20),
+    0 12px 34px rgba(0,0,0,.34) !important;
+
+  color: transparent !important;
+  transition:
+    transform .28s ease,
+    border-color .28s ease,
+    box-shadow .28s ease,
+    background .28s ease;
+}
+
+.model-arrow:hover,
+#toTopBtn:hover,
+#toBottomBtn:hover {
+  transform: translateY(-50%) scale(1.06) !important;
+  border-color: rgba(220, 250, 255, .72) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.42),
+    inset 0 -10px 22px rgba(255,255,255,.055),
+    0 0 24px rgba(80,220,255,.46),
+    0 0 54px rgba(160,90,255,.18),
+    0 16px 40px rgba(0,0,0,.42) !important;
+}
+
+.model-arrow::before,
+#toTopBtn::before,
+#toBottomBtn::before {
+  content: "" !important;
+  width: 10px !important;
+  height: 10px !important;
+  border: 0 !important;
+  border-top: 1.25px solid rgba(245, 253, 255, .92) !important;
+  border-right: 1.25px solid rgba(245, 253, 255, .92) !important;
+  filter:
+    drop-shadow(0 0 6px rgba(105,230,255,.62))
+    drop-shadow(0 0 14px rgba(105,230,255,.26)) !important;
+}
+
+/* 3D左右 */
+.model-arrow-left::before {
+  transform: rotate(-135deg) !important;
+}
+
+.model-arrow-right::before {
+  transform: rotate(45deg) !important;
+}
+
+/* スクロール上下 */
+#toBottomBtn::before {
+  transform: rotate(135deg) !important;
+}
+
+#toTopBtn::before {
+  transform: rotate(-45deg) !important;
+}
+
+/* スクロールボタンはhoverで上下ズレしない */
+#toTopBtn:hover,
+#toBottomBtn:hover {
+  transform: translateY(0) scale(1.06) !important;
+}
+
+/* 内側の薄いリング */
+.model-arrow::after,
+#toTopBtn::after,
+#toBottomBtn::after {
+  content: "" !important;
+  position: absolute;
+  inset: 7px;
+  border-radius: inherit;
+  border: 1px solid rgba(255,255,255,.08);
+  pointer-events: none;
+  box-shadow: inset 0 0 14px rgba(120,220,255,.06);
+}
+/* PC: 3D model center adjust */
+@media (min-width: 901px) {
+  .hero-3d-wrap {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .hero-3d {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: translateX(14vw) !important;
+  }
+
+  #hero3dCanvas {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
 </style>
 <script type="importmap">
 {
