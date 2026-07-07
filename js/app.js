@@ -1117,19 +1117,19 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
              if (currentModel) {
              const speed =
-             0.006 +
-             Math.sin(elapsed * 0.55) * 0.003 +
-             Math.sin(elapsed * 1.37) * 0.0018;
+             0.0016 +
+             Math.sin(elapsed * 0.38) * 0.0008 +
+             Math.sin(elapsed * 0.9) * 0.0005;
 
               if (idle && !isPointerActive) {
               targetRotationY += Math.max(speed, 0.0015);
               targetRotationX = 0.16 + Math.sin(elapsed * 0.48) * 0.14;
 
                 currentModel.rotation.y +=
-               (targetRotationY - currentModel.rotation.y) * 0.035;
+               (targetRotationY - currentModel.rotation.y) * 0.018;
 
                currentModel.rotation.x +=
-               (targetRotationX - currentModel.rotation.x) * 0.025;
+               (targetRotationX - currentModel.rotation.x) * 0.014;
 
               mount.closest(".hero-3d")?.classList.add("is-rotating");
              } else {
