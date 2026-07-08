@@ -1317,20 +1317,49 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     });
 
 
-    renderer.domElement.addEventListener("pointerdown", () => {
-     isPointerActive = true;
-     lastInteraction = performance.now();
-    });
+    let pressTimer = null;
+    let canRotateByTouch = false;
 
-    renderer.domElement.addEventListener("pointerup", () => {
-     isPointerActive = false;
+    renderer.domElement.addEventListener("pointerdown", (e) => {
      lastInteraction = performance.now();
-    });
 
-    renderer.domElement.addEventListener("pointercancel", () => {
-     isPointerActive = false;
-     lastInteraction = performance.now();
-    });
+     if (window.innerWidth <= 768 && e.pointerType === "touch") {
+     canRotateByTouch = false;
+
+     pressTimer = setTimeout(() => {
+      canRotateByTouch = true;
+      isPointerActive = true;
+      controls.enabled = true;
+     }, 420);
+
+      controls.enabled = false;
+      return;
+     }
+
+      isPointerActive = true;
+      controls.enabled = true;
+     });
+
+     renderer.domElement.addEventListener("pointermove", () => {
+      if (window.innerWidth <= 768 && !canRotateByTouch) {
+      controls.enabled = false;
+      } 
+     });
+
+     renderer.domElement.addEventListener("pointerup", () => {
+      clearTimeout(pressTimer);
+      canRotateByTouch = false;
+      isPointerActive = false;
+      controls.enabled = true;
+      lastInteraction = performance.now();
+     });
+
+     renderer.domElement.addEventListener("pointercancel", () => {
+      clearTimeout(pressTimer);
+      canRotateByTouch = false;
+      isPointerActive = false;
+      controls.enabled = true;
+     });
 
 
     function animate(now) {
