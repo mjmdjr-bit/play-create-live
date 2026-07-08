@@ -1386,10 +1386,10 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       return true;
      });
 
-     } // ← if(currentModel)
+    } // ← if(currentModel)
 
-     controls.update();
-     renderer.render(scene, camera);
+    controls.update();
+    renderer.render(scene, camera);
      
     } // ← animate()
 
