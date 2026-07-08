@@ -1291,9 +1291,12 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       return true;
      });
 
-    controls.update();
-    renderer.render(scene, camera);
-  }
+     controls.update();
+     renderer.render(scene, camera);
+
+     } // ← if(currentModel)
+
+     } // ← animate()
 
     function onResize() {
      const w = mount.clientWidth;
@@ -1317,9 +1320,12 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     loadCgcModel(cgcModelIndex);
     restartAutoModelTimer();
     requestAnimationFrame(animate);
-    }
 
-        // 初期化
+    } // animate
+
+    } // setupCgcHero3D
+
+    // 初期化
         (function init() {
             setupSearchAndSort();
             setupModalClose();
