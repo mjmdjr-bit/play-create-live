@@ -2484,23 +2484,6 @@
     font-size: 13px !important;
     line-height: 1.85 !important;
   }
-}
-.hero-3d.electric-flash{
-
-    filter:
-        drop-shadow(0 0 18px rgba(80,220,255,.7))
-        drop-shadow(0 0 60px rgba(120,180,255,.6))
-        drop-shadow(0 0 120px rgba(170,90,255,.4));
-
-}
-
-.hero-3d.electric-flash::before{
-
-    opacity:1;
-
-    filter:blur(120px);
-
-    transform:scale(1.18);
 
 }
 /* ==============================
@@ -2509,23 +2492,21 @@
 
 .hero-3d.electric-flash #hero3dCanvas canvas {
   filter:
-    brightness(1.55)
-    contrast(1.15)
-    drop-shadow(0 0 18px rgba(120,240,255,.85))
-    drop-shadow(0 0 54px rgba(80,180,255,.55))
-    drop-shadow(0 0 110px rgba(180,90,255,.42)) !important;
+    brightness(1.03)
+    contrast(1.02) !important;
+  }
+
+ .hero-3d.electric-flash::before {
+   opacity: .28 !important;
+   filter: blur(70px) !important;
+   transform: scale(1) !important;
+  }
+
+ .hero-3d.electric-flash::after {
+  opacity: .08 !important;
+  filter: blur(8px) !important;
 }
 
-.hero-3d.electric-flash::before {
-  opacity: 1 !important;
-  filter: blur(130px) !important;
-  transform: scale(1.25) !important;
-}
-
-.hero-3d.electric-flash::after {
-  opacity: .95 !important;
-  filter: blur(18px) !important;
-}
 </style>
 <script type="importmap">
 {
