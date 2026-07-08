@@ -26,6 +26,34 @@ function playTone(freq, duration, volume, type = "sine") {
 
   osc.stop(audioCtx.currentTime + duration);
 }
+function unlockAudio() {
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+}
+
+function playHoverSE() {
+  unlockAudio();
+  playTone(1800, 0.07, 0.035, "triangle");
+
+  setTimeout(() => {
+    playTone(2400, 0.04, 0.022, "sine");
+  }, 18);
+}
+
+function playClickSE() {
+  unlockAudio();
+  playTone(760, 0.08, 0.045, "triangle");
+}
+
+function playElectricSE() {
+  unlockAudio();
+  playTone(260, 0.04, 0.055, "sawtooth");
+
+  setTimeout(() => {
+    playTone(1600, 0.06, 0.04, "triangle");
+  }, 25);
+}
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
@@ -1396,8 +1424,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       audioCtx.resume();
      }
 
-     playHoverSE();
-
      });
 
      });
@@ -1406,10 +1432,10 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
     // 初期化
         (function init() {
-         setupSearchAndSort();
-         setupModalClose();
-         setupMenu();
-         setupWorksLightbox();
+          setupSearchAndSort();
+          setupModalClose();
+          setupMenu();
+          setupWorksLightbox();
 
          loadCreators();
 
@@ -1418,6 +1444,16 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
          } catch (err) {
          console.error("3D init error:", err);
          }
+
+         document.addEventListener("pointerover", (e) => {
+         const target = e.target.closest(
+         ".model-arrow, .contact-btn, .workflow-step, .card, #toTopBtn, #toBottomBtn, .menu-button"
+         );
+
+         if (!target) return;
+
+         playHoverSE();
+         });
         })();
 
         const toBottomBtn = document.getElementById("toBottomBtn");
