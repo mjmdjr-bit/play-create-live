@@ -1070,42 +1070,66 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       let electricLines = [];
 
       function createElectricLine() {
-      if (!currentModel) return;
+       if (!currentModel) return;
 
-      const points = [];
-      const count = 9;
+       const meshes = [];
+       currentModel.traverse((obj) => {
+        if (obj.isMesh && obj.geometry) meshes.push(obj);
+       });
 
-       for (let i = 0; i < count; i++) {
-      const t = i / (count - 1);
-      points.push(
-      new THREE.Vector3(
-        -0.85 + t * 1.7 + (Math.random() - 0.5) * 0.18,
-        0.45 - t * 0.9 + (Math.random() - 0.5) * 0.22,
-        0.16 + (Math.random() - 0.5) * 0.08
-      )
-      );
-     }
+       if (!meshes.length) return;
 
-     const geometry = new THREE.BufferGeometry().setFromPoints(points);
+       const mesh = meshes[Math.floor(Math.random() * meshes.length)];
+       const geometry = mesh.geometry;
 
-     const material = new THREE.LineBasicMaterial({
-      color: 0x9ff6ff,
+        if (!geometry.attributes.position) return;
+
+       const pos = geometry.attributes.position;
+       const points = [];
+
+       const start = Math.floor(Math.random() * pos.count);
+       const step = Math.max(1, Math.floor(pos.count / 18));
+
+       for (let i = 0; i < 10; i++) {
+       const index = (start + i * step) % pos.count;
+
+       const p = new THREE.Vector3().fromBufferAttribute(pos, index);
+
+      // メッシュ表面から少しだけ浮かせる
+       p.multiplyScalar(1.018);
+
+       mesh.localToWorld(p);
+       currentModel.worldToLocal(p);
+
+      // ビリビリ感
+       p.x += (Math.random() - 0.5) * 0.025;
+       p.y += (Math.random() - 0.5) * 0.025;
+       p.z += (Math.random() - 0.5) * 0.025;
+
+       points.push(p);
+      }
+
+     const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+
+     const lineMaterial = new THREE.LineBasicMaterial({
+      color: 0xbffcff,
       transparent: true,
-      opacity: 1
-      });
+      opacity: 1,
+      depthTest: true,
+      depthWrite: false
+     });
 
-     const line = new THREE.Line(geometry, material);
+     const line = new THREE.Line(lineGeometry, lineMaterial);
       line.userData.life = 1;
 
       currentModel.add(line);
       electricLines.push(line);
-     }
-
+    }
      function triggerElectricFlash(now) {
      const hero = mount.closest(".hero-3d");
      hero?.classList.add("electric-flash");
 
-     for (let i = 0; i < 5; i++) {
+     for (let i = 0; i < 2; i++) {
       createElectricLine();
      }
 
