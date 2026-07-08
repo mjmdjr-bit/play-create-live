@@ -1335,41 +1335,35 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
 
     function animate(now) {
-     requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
 
      const elapsed = now * 0.001;
      const idle = now - lastInteraction > 1200;
 
      if (currentModel) {
-      if (idle && !isPointerActive) {
-        baseRotation = Math.sin(elapsed * 0.18) * 0.75;
+     if (idle && !isPointerActive) {
+      baseRotation = Math.sin(elapsed * 0.18) * 0.75;
 
-        targetRotationY = baseRotation;
-        targetRotationX = 0.18 + Math.sin(elapsed * 0.42) * 0.08;
+      targetRotationY = baseRotation;
+      targetRotationX = 0.18 + Math.sin(elapsed * 0.42) * 0.08;
 
-        currentModel.rotation.y +=
-          (targetRotationY - currentModel.rotation.y) * 0.018;
+      currentModel.rotation.y +=
+        (targetRotationY - currentModel.rotation.y) * 0.018;
 
-        currentModel.rotation.x +=
-          (targetRotationX - currentModel.rotation.x) * 0.016;
+      currentModel.rotation.x +=
+        (targetRotationX - currentModel.rotation.x) * 0.016;
 
-        mount.closest(".hero-3d")?.classList.add("is-rotating");
-      } else {
-        mount.closest(".hero-3d")?.classList.remove("is-rotating");
-      }
+      mount.closest(".hero-3d")?.classList.add("is-rotating");
+     } else {
+      mount.closest(".hero-3d")?.classList.remove("is-rotating");
+     }
 
-      currentModel.position.y =
-       Math.sin(elapsed * 0.55) * 0.05;
+     currentModel.position.y = Math.sin(elapsed * 0.55) * 0.05;
+     currentModel.position.z = Math.sin(elapsed * 0.28) * 0.03;
 
-      currentModel.position.z =
-       Math.sin(elapsed * 0.28) * 0.03;
-
-    // ---------------------------
-    // Electric Flash
-    // ---------------------------
      if (now > nextElectricFlash) {
       triggerElectricFlash(now);
-      }
+     }
 
      electricLines = electricLines.filter((line) => {
       line.userData.life -= 0.035;
@@ -1377,21 +1371,19 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       line.scale.setScalar(1 + (1 - line.userData.life) * 0.08);
 
       if (line.userData.life <= 0) {
-       line.parent?.remove(line);
-       line.geometry.dispose();
-       line.material.dispose();
-       return false;
+        line.parent?.remove(line);
+        line.geometry.dispose();
+        line.material.dispose();
+        return false;
       }
 
       return true;
-     });
+      });
+     }
 
-    } // ← if(currentModel)
-
-    controls.update();
-    renderer.render(scene, camera);
-     
-    } // ← animate()
+     controls.update();
+     renderer.render(scene, camera);
+    }
 
     function onResize() {
      const w = mount.clientWidth;
