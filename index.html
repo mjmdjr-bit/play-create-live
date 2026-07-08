@@ -2506,7 +2506,48 @@
   opacity: .08 !important;
   filter: blur(8px) !important;
 }
+@media (max-width: 720px) {
+  .modal-head {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    align-items: start !important;
+    gap: 10px !important;
+  }
 
+  .modal-head > div:first-child {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #detailUrl {
+    max-width: calc(100vw - 160px) !important;
+  }
+
+  #detailUrl a {
+    max-width: 100% !important;
+    display: inline-flex !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .modal-head-actions {
+    position: sticky !important;
+    right: 0 !important;
+    top: 0 !important;
+    flex-shrink: 0 !important;
+    z-index: 30 !important;
+  }
+
+  .detail-contact-btn {
+    max-width: 86px !important;
+    overflow: hidden !important;
+  }
+
+  .close {
+    min-width: 34px !important;
+  }
+}
 </style>
 <script type="importmap">
 {
