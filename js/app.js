@@ -1184,6 +1184,11 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      lastInteraction = performance.now();
     });
 
+    let nextFlash =
+     performance.now() +
+     10000 +
+     Math.random()*12000;
+
     function animate(now) {
      requestAnimationFrame(animate);
 
@@ -1210,6 +1215,24 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
       currentModel.position.y = Math.sin(elapsed * 0.55) * 0.05;
       currentModel.position.z = Math.sin(elapsed * 0.28) * 0.03;
+      if(now > nextFlash){
+
+      mount.closest(".hero-3d")
+        ?.classList.add("flash");
+
+      setTimeout(()=>{
+
+        mount.closest(".hero-3d")
+            ?.classList.remove("flash");
+
+       },700);
+
+      nextFlash =
+        now +
+        12000 +
+        Math.random()*10000;
+
+      }
     }
 
     controls.update();
