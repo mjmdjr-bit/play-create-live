@@ -1316,8 +1316,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     restartAutoModelTimer();
     requestAnimationFrame(animate);
 
-    } // animate
-
     } // setupCgcHero3D
 
     // 初期化
@@ -1330,9 +1328,9 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
          loadCreators();
 
          try {
-          setupCgcHero3D();
+         setupCgcHero3D();
          } catch (err) {
-          console.error("3D init error:", err);
+         console.error("3D init error:", err);
          }
         })();
 
