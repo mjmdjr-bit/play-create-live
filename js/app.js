@@ -1291,30 +1291,29 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
        }, 12000);
     }
 
-    document.getElementById("modelNextBtn")?.addEventListener("click", () => {
     const nextBtn = document.getElementById("modelNextBtn");
     const prevBtn = document.getElementById("modelPrevBtn");
 
     nextBtn?.addEventListener("pointerup", (e) => {
-     e.preventDefault();
-     e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
 
-     unlockAudio();
-     playClickSE();
+      unlockAudio();
+      playClickSE();
 
-     nextModel();
-     restartAutoModelTimer();
+      nextModel();
+      restartAutoModelTimer();
     });
 
     prevBtn?.addEventListener("pointerup", (e) => {
-     e.preventDefault();
-     e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
 
-     unlockAudio();
-     playClickSE();
+      unlockAudio();
+      playClickSE();
 
-     prevModel();
-     restartAutoModelTimer();
+      prevModel();
+      restartAutoModelTimer();
     });
 
 
@@ -1407,9 +1406,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      loadCgcModel(cgcModelIndex);
      restartAutoModelTimer();
      requestAnimationFrame(animate);
-     });
-
-    } // setupCgcHero3D
+     } // setupCgcHero3D
 
     // 初期化
        (function init() {
