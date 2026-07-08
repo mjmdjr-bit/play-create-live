@@ -1041,30 +1041,80 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
       const keyLight = new THREE.DirectionalLight(0x9bdcff, 3.2);
-      keyLight.position.set(3, 4, 5);
-     scene.add(keyLight);
+       keyLight.position.set(3, 4, 5);
+      scene.add(keyLight);
 
-     const orangeLight = new THREE.PointLight(0xff8c37, 7, 9);
-     orangeLight.position.set(-2.8, -1.4, 2.5);
-     scene.add(orangeLight);
+      const orangeLight = new THREE.PointLight(0xff8c37, 7, 9);
+      orangeLight.position.set(-2.8, -1.4, 2.5);
+      scene.add(orangeLight);
 
-     const blueLight = new THREE.PointLight(0x38bdf8, 8, 10);
-     blueLight.position.set(2.8, 1.2, 2.5);
-     scene.add(blueLight);
+      const blueLight = new THREE.PointLight(0x38bdf8, 8, 10);
+      blueLight.position.set(2.8, 1.2, 2.5);
+      scene.add(blueLight);
 
-     const loader = new GLTFLoader();
+      const loader = new GLTFLoader();
 
-     let currentModel = null;
-     let modelLoadToken = 0;
+      let currentModel = null;
+      let modelLoadToken = 0;
 
-     let targetRotationY = 0;
-     let targetRotationX = 0;
-     let baseRotation = 0;
+      let targetRotationY = 0;
+      let targetRotationX = 0;
+      let baseRotation = 0;
 
-     let isPointerActive = false;
-     let lastInteraction = performance.now();
+      let isPointerActive = false;
+      let lastInteraction = performance.now();
 
-     let autoModelTimer = null;
+      let autoModelTimer = null;
+      let nextElectricFlash =
+       performance.now() + 9000 + Math.random() * 9000;
+      let electricLines = [];
+
+      function createElectricLine() {
+      if (!currentModel) return;
+
+      const points = [];
+      const count = 9;
+
+       for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      points.push(
+      new THREE.Vector3(
+        -0.85 + t * 1.7 + (Math.random() - 0.5) * 0.18,
+        0.45 - t * 0.9 + (Math.random() - 0.5) * 0.22,
+        0.16 + (Math.random() - 0.5) * 0.08
+      )
+      );
+     }
+
+     const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+     const material = new THREE.LineBasicMaterial({
+      color: 0x9ff6ff,
+      transparent: true,
+      opacity: 1
+      });
+
+     const line = new THREE.Line(geometry, material);
+      line.userData.life = 1;
+
+      currentModel.add(line);
+      electricLines.push(line);
+     }
+
+     function triggerElectricFlash(now) {
+     const hero = mount.closest(".hero-3d");
+     hero?.classList.add("electric-flash");
+
+     for (let i = 0; i < 5; i++) {
+      createElectricLine();
+     }
+
+     setTimeout(() => {
+      hero?.classList.remove("electric-flash");
+     }, 850);
+
+     nextElectricFlash = now + 12000 + Math.random() * 12000;
+     }
 
      function normalizeModel(model) {
      const box = new THREE.Box3().setFromObject(model);
@@ -1213,31 +1263,37 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         mount.closest(".hero-3d")?.classList.remove("is-rotating");
       }
 
-      currentModel.position.y = Math.sin(elapsed * 0.55) * 0.05;
-      currentModel.position.z = Math.sin(elapsed * 0.28) * 0.03;
-      if(now > nextFlash){
+      currentModel.position.y =
+       Math.sin(elapsed * 0.55) * 0.05;
 
-      mount.closest(".hero-3d")
-        ?.classList.add("flash");
+      currentModel.position.z =
+       Math.sin(elapsed * 0.28) * 0.03;
 
-      setTimeout(()=>{
-
-        mount.closest(".hero-3d")
-            ?.classList.remove("flash");
-
-       },700);
-
-      nextFlash =
-        now +
-        12000 +
-        Math.random()*10000;
-
+    // ---------------------------
+    // Electric Flash
+    // ---------------------------
+     if (now > nextElectricFlash) {
+      triggerElectricFlash(now);
       }
-    }
+
+     electricLines = electricLines.filter((line) => {
+      line.userData.life -= 0.035;
+      line.material.opacity = Math.max(line.userData.life, 0);
+      line.scale.setScalar(1 + (1 - line.userData.life) * 0.08);
+
+      if (line.userData.life <= 0) {
+       line.parent?.remove(line);
+       line.geometry.dispose();
+       line.material.dispose();
+       return false;
+      }
+
+      return true;
+     });
 
     controls.update();
     renderer.render(scene, camera);
-    }
+  }
 
     function onResize() {
      const w = mount.clientWidth;
