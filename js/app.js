@@ -1292,24 +1292,31 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     }
 
     document.getElementById("modelNextBtn")?.addEventListener("click", () => {
+    const nextBtn = document.getElementById("modelNextBtn");
+    const prevBtn = document.getElementById("modelPrevBtn");
 
+    nextBtn?.addEventListener("pointerup", (e) => {
+     e.preventDefault();
+     e.stopPropagation();
+
+     unlockAudio();
      playClickSE();
 
      nextModel();
-
      restartAutoModelTimer();
-
     });
 
-    document.getElementById("modelPrevBtn")?.addEventListener("click", () => {
+    prevBtn?.addEventListener("pointerup", (e) => {
+     e.preventDefault();
+     e.stopPropagation();
 
+     unlockAudio();
      playClickSE();
 
      prevModel();
-
      restartAutoModelTimer();
-
     });
+
 
     renderer.domElement.addEventListener("pointerdown", () => {
      isPointerActive = true;
@@ -1408,53 +1415,38 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      loadCgcModel(cgcModelIndex);
      restartAutoModelTimer();
      requestAnimationFrame(animate);
-     document.querySelectorAll(
-     ".model-arrow,\
-     .contact-btn,\
-     .workflow-step,\
-     .card,\
-     #toTopBtn,\
-     #toBottomBtn,\
-     .menu-button"
-     ).forEach(el => {
-
-     el.addEventListener("pointerenter", () => {
-
-     if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-     }
-
-     });
-
      });
 
     } // setupCgcHero3D
 
     // 初期化
-        (function init() {
-          setupSearchAndSort();
-          setupModalClose();
-          setupMenu();
-          setupWorksLightbox();
+       (function init() {
+        setupSearchAndSort();
+        setupModalClose();
+        setupMenu();
+        setupWorksLightbox();
 
-         loadCreators();
+       loadCreators();
 
-         try {
-         setupCgcHero3D();
-         } catch (err) {
-         console.error("3D init error:", err);
-         }
+        document.addEventListener("pointerdown", () => {
+       unlockAudio();
+       }, { once: true });
 
-         document.addEventListener("pointerover", (e) => {
-         const target = e.target.closest(
-         ".model-arrow, .contact-btn, .workflow-step, .card, #toTopBtn, #toBottomBtn, .menu-button"
-         );
+       document.addEventListener("pointerover", (e) => {
+       const target = e.target.closest(
+       ".model-arrow, .contact-btn, .workflow-step, .card, #toTopBtn, #toBottomBtn, .menu-button"
+       );
 
-         if (!target) return;
+      if (!target) return;
+      playHoverSE();
+      });
 
-         playHoverSE();
-         });
-        })();
+      try {
+      setupCgcHero3D();
+      } catch (err) {
+      console.error("3D init error:", err);
+     }
+    })();
 
         const toBottomBtn = document.getElementById("toBottomBtn");
         if (toBottomBtn) {
