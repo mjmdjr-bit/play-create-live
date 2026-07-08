@@ -493,7 +493,7 @@
 
         /* MAIN layout */
         .container {
-            max-width: 1120px;
+            max-width: 1240px;
             margin: 0 auto;
             padding: 0 20px 60px;
         }
@@ -2547,6 +2547,50 @@
   .close {
     min-width: 34px !important;
   }
+}
+@media (max-width: 768px) {
+  .hero-3d,
+  #hero3dCanvas,
+  #hero3dCanvas canvas {
+    touch-action: pan-y !important;
+  }
+}
+/* ==============================
+   Creators Section
+============================== */
+
+.creators-head{
+  max-width:1240px;
+  margin:80px auto 42px;
+}
+
+.creators-kicker{
+  color:var(--accent2);
+  font-size:11px;
+  letter-spacing:.35em;
+  font-weight:800;
+  margin-bottom:14px;
+  text-transform:uppercase;
+}
+
+.creators-title{
+  margin:0;
+  font-size:clamp(28px,4vw,48px);
+  font-weight:900;
+  letter-spacing:.04em;
+  line-height:1.15;
+}
+
+.creators-copy{
+  margin-top:22px;
+  max-width:860px;
+  color:#cfd6e6;
+  font-size:15px;
+  line-height:1.9;
+}
+
+.toolbar{
+  margin-top:42px;
 }
 </style>
 <script type="importmap">
