@@ -1,3 +1,32 @@
+// ==============================
+// CGC UI Sound
+// ==============================
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(freq, duration, volume, type = "sine") {
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.value = freq;
+
+  gain.gain.value = volume;
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001,
+    audioCtx.currentTime + duration
+  );
+
+  osc.stop(audioCtx.currentTime + duration);
+}
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
 import {
@@ -1132,6 +1161,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      for (let i = 0; i < 2; i++) {
       createElectricLine();
      }
+     playElectricSE();
 
      setTimeout(() => {
       hero?.classList.remove("electric-flash");
@@ -1234,13 +1264,23 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     }
 
     document.getElementById("modelNextBtn")?.addEventListener("click", () => {
+
+     playClickSE();
+
      nextModel();
+
      restartAutoModelTimer();
+
     });
 
     document.getElementById("modelPrevBtn")?.addEventListener("click", () => {
+
+     playClickSE();
+
      prevModel();
+
      restartAutoModelTimer();
+
     });
 
     renderer.domElement.addEventListener("pointerdown", () => {
@@ -1257,6 +1297,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      isPointerActive = false;
      lastInteraction = performance.now();
     });
+
 
     function animate(now) {
      requestAnimationFrame(animate);
@@ -1332,13 +1373,34 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       currentModel.position.x =
         window.innerWidth >= 900 ? PC_X_OFFSET : MOBILE_X_OFFSET;
       }
-    }
+     }
 
-    window.addEventListener("resize", onResize);
+     window.addEventListener("resize", onResize);
 
-    loadCgcModel(cgcModelIndex);
-    restartAutoModelTimer();
-    requestAnimationFrame(animate);
+     loadCgcModel(cgcModelIndex);
+     restartAutoModelTimer();
+     requestAnimationFrame(animate);
+     document.querySelectorAll(
+     ".model-arrow,\
+     .contact-btn,\
+     .workflow-step,\
+     .card,\
+     #toTopBtn,\
+     #toBottomBtn,\
+     .menu-button"
+     ).forEach(el => {
+
+     el.addEventListener("pointerenter", () => {
+
+     if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+     }
+
+     playHoverSE();
+
+     });
+
+     });
 
     } // setupCgcHero3D
 
