@@ -1234,11 +1234,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      lastInteraction = performance.now();
     });
 
-    let nextFlash =
-     performance.now() +
-     10000 +
-     Math.random()*12000;
-
     function animate(now) {
      requestAnimationFrame(animate);
 
@@ -1327,12 +1322,19 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
     // 初期化
         (function init() {
-            setupSearchAndSort();
-            setupModalClose();
-            setupMenu();
-            setupWorksLightbox();
-            setupCgcHero3D();
-            loadCreators();
+         setupSearchAndSort();
+         setupModalClose();
+         setupMenu();
+         setupWorksLightbox();
+
+         loadCreators();
+
+         try {
+          setupCgcHero3D();
+         } catch (err) {
+          console.error("3D init error:", err);
+         }
+        })();
 
         })();
         const toBottomBtn = document.getElementById("toBottomBtn");
