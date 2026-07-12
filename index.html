@@ -1459,14 +1459,6 @@
   mix-blend-mode: screen;
 }
 
-/* JSで .is-rotating を付けた時だけブラー強め */
-.hero-3d.is-rotating #hero3dCanvas canvas {
-  filter:
-    blur(1.2px)
-    drop-shadow(0 0 22px rgba(80, 220, 255, 0.46))
-    drop-shadow(0 0 54px rgba(188, 85, 247, 0.42));
-}
-
 .hero-3d.is-rotating::after {
   opacity: 0.9;
   filter: blur(18px);
@@ -1503,15 +1495,6 @@
   }
 }
 
-@media (max-width: 720px) {
-  .hero-3d::after {
-    width: 78vw;
-  }
-
-  .hero-3d::before {
-    filter: blur(32px);
-  }
-}
 .hero-visual,
 .hero-3d {
   overflow: visible;
@@ -1576,57 +1559,6 @@
   background: transparent !important;
   width: 100% !important;
   height: 100% !important;
-}
-
-/* soft aura, no square edge */
-.hero-3d::before {
-  content: "";
-  position: absolute;
-  inset: -65%;
-  z-index: 0;
-  pointer-events: none;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(115, 120, 255, .36) 0%,
-      rgba(80, 210, 255, .18) 30%,
-      rgba(190, 80, 255, .10) 48%,
-      transparent 72%
-    );
-  filter: blur(95px);
-  opacity: .82;
-  mix-blend-mode: screen;
-  animation: cgcAuraBreath 7s ease-in-out infinite;
-}
-
-.hero-3d::after {
-  content: "";
-  position: absolute;
-  inset: -28%;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: 999px;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent 0deg,
-      rgba(80, 230, 255, .22) 70deg,
-      transparent 118deg,
-      transparent 210deg,
-      rgba(180, 90, 255, .22) 250deg,
-      transparent 310deg
-    );
-  filter: blur(24px);
-  opacity: .36;
-  mix-blend-mode: screen;
-  animation: cgcRingRotate 12s linear infinite;
-}
-
-.hero-3d.is-rotating #hero3dCanvas canvas {
-  filter:
-    blur(.75px)
-    drop-shadow(0 0 18px rgba(80, 220, 255, .36))
-    drop-shadow(0 0 44px rgba(170, 90, 255, .28));
 }
 
 /* PC: arrows together on right */
@@ -1732,22 +1664,6 @@
   }
 }
 
-@keyframes cgcAuraBreath {
-  0%, 100% {
-    opacity: .52;
-    transform: scale(.94);
-  }
-  48% {
-    opacity: .95;
-    transform: scale(1.08);
-  }
-}
-
-@keyframes cgcRingRotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
 /* ==============================
    CGC HERO FINAL OVERRIDE
 ============================== */
@@ -2531,16 +2447,6 @@
 }
 .toolbar{
   margin-top:42px;
-}@media (max-width: 768px) {
-  .hero-3d.is-touch-rotating {
-    cursor: grabbing;
-  }
-
-  .hero-3d.is-touch-rotating #hero3dCanvas canvas {
-    filter:
-      drop-shadow(0 0 20px rgba(80,220,255,.42))
-      drop-shadow(0 0 46px rgba(170,90,255,.26));
-  }
 }
 @media (max-width: 768px) {
   #hero3dCanvas,
