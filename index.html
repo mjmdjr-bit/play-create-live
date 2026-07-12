@@ -2599,6 +2599,16 @@
 }
 .toolbar{
   margin-top:42px;
+}@media (max-width: 768px) {
+  .hero-3d.is-touch-rotating {
+    cursor: grabbing;
+  }
+
+  .hero-3d.is-touch-rotating #hero3dCanvas canvas {
+    filter:
+      drop-shadow(0 0 20px rgba(80,220,255,.42))
+      drop-shadow(0 0 46px rgba(170,90,255,.26));
+  }
 }
 </style>
 <script type="importmap">

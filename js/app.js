@@ -1090,12 +1090,27 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
+      controls.dampingFactor = 0.04;
+
       controls.enablePan = false;
       controls.enableZoom = true;
-      controls.minDistance = 2.2;
-      controls.maxDistance = 6.5;
-      controls.rotateSpeed = 0.45;
+      controls.enableRotate = true;
+
+      controls.minDistance = 2.0;
+      controls.maxDistance = 7.2;
+
+      controls.rotateSpeed = 1.35;
+      controls.zoomSpeed = 0.9;
+
       controls.autoRotate = false;
+
+      controls.minPolarAngle = 0;
+      controls.maxPolarAngle = Math.PI;
+
+      controls.touches = {
+        ONE: THREE.TOUCH.ROTATE,
+        TWO: THREE.TOUCH.DOLLY_ROTATE
+      };
 
       scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
@@ -1319,49 +1334,74 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     });
 
 
-    let pressTimer = null;
-    let canRotateByTouch = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchMode = "none";
+    // none / scroll / rotate
+
+    const TOUCH_ROTATE_THRESHOLD = 8;
+    const TOUCH_DIRECTION_BIAS = 1.15;
 
     renderer.domElement.addEventListener("pointerdown", (e) => {
-     lastInteraction = performance.now();
+      lastInteraction = performance.now();
 
-     if (window.innerWidth <= 768 && e.pointerType === "touch") {
-     canRotateByTouch = false;
-
-     pressTimer = setTimeout(() => {
-      canRotateByTouch = true;
       isPointerActive = true;
       controls.enabled = true;
-     }, 420);
 
-      controls.enabled = false;
-      return;
+      if (window.innerWidth <= 768 && e.pointerType === "touch") {
+        touchStartX = e.clientX;
+        touchStartY = e.clientY;
+        touchMode = "none";
+
+        // 最初はスクロールを殺さない
+        controls.enabled = false;
+      }
+    }, { passive: true });
+
+    renderer.domElement.addEventListener("pointermove", (e) => {
+      if (!(window.innerWidth <= 768 && e.pointerType === "touch")) return;
+
+      const dx = e.clientX - touchStartX;
+      const dy = e.clientY - touchStartY;
+
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+
+      if (touchMode === "none") {
+        if (absX < TOUCH_ROTATE_THRESHOLD && absY < TOUCH_ROTATE_THRESHOLD) return;
+
+        if (absX > absY * TOUCH_DIRECTION_BIAS) {
+          touchMode = "rotate";
+          controls.enabled = true;
+          mount.closest(".hero-3d")?.classList.add("is-touch-rotating");
+        } else {
+         touchMode = "scroll";
+         controls.enabled = false;
+        }
+      }
+
+     if (touchMode === "rotate") {
+       controls.enabled = true;
+       lastInteraction = performance.now();
      }
+    }, { passive: true });
 
-      isPointerActive = true;
-      controls.enabled = true;
-     });
-
-     renderer.domElement.addEventListener("pointermove", () => {
-      if (window.innerWidth <= 768 && !canRotateByTouch) {
-      controls.enabled = false;
-      } 
-     });
-
-     renderer.domElement.addEventListener("pointerup", () => {
-      clearTimeout(pressTimer);
-      canRotateByTouch = false;
+    renderer.domElement.addEventListener("pointerup", () => {
       isPointerActive = false;
+      touchMode = "none";
       controls.enabled = true;
       lastInteraction = performance.now();
-     });
 
-     renderer.domElement.addEventListener("pointercancel", () => {
-      clearTimeout(pressTimer);
-      canRotateByTouch = false;
+     mount.closest(".hero-3d")?.classList.remove("is-touch-rotating");
+    }, { passive: true });
+
+    renderer.domElement.addEventListener("pointercancel", () => {
       isPointerActive = false;
+      touchMode = "none";
       controls.enabled = true;
-     });
+
+      mount.closest(".hero-3d")?.classList.remove("is-touch-rotating");
+    }, { passive: true });
 
 
     function animate(now) {
