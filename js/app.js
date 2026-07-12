@@ -1085,83 +1085,6 @@ function setupBgmToggle() {
     }
   }
 
-  function stopBgm() {
-    bgmAudio.pause();
-    bgmAudio.currentTime = 0;
-
-    bgmTrackIndex = -1;
-    bgmEnabled = false;
-
-    updateUI();
-  }
-
-  btn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    playClickSE();
-
-    const nextIndex = bgmTrackIndex + 1;
-
-    if (nextIndex >= BGM_TRACKS.length) {
-      stopBgm();
-      return;
-    }
-
-    await playTrack(nextIndex);
-  });
-
-  updateUI();
- }
-
-     function stopBgm() {
-      bgmAudio.pause();
-      bgmAudio.currentTime = 0;
-      bgmEnabled = false;
-      localStorage.setItem("cgc_bgm_enabled", "false");
-      updateUI();
-     }
-
-     btn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      playClickSE();
-
-       if (bgmEnabled && !bgmAudio.paused) {
-        stopBgm();
-       } else {
-        bgmEnabled = true;
-        localStorage.setItem("cgc_bgm_enabled", "true");
-        updateUI();
-        await startBgm();
-      }
-     });
-
-     updateUI();
-
-     // アクセス時に自動再生を試す
-     startBgm();
-
-     // ブロックされた場合、最初の操作で再生
-      function startBgmByGesture() {
-      if (bgmEnabled && bgmAudio.paused) {
-        startBgm();
-      }
-
-      window.removeEventListener("pointerdown", startBgmByGesture);
-      window.removeEventListener("touchstart", startBgmByGesture);
-      window.removeEventListener("click", startBgmByGesture);
-      window.removeEventListener("keydown", startBgmByGesture);
-      window.removeEventListener("scroll", startBgmByGesture);
-     }
-
-      window.addEventListener("pointerdown", startBgmByGesture, { passive: true });
-      window.addEventListener("touchstart", startBgmByGesture, { passive: true });
-      window.addEventListener("click", startBgmByGesture, { passive: true });
-      window.addEventListener("keydown", startBgmByGesture);
-      window.addEventListener("scroll", startBgmByGesture, { passive: true });
-
         // ==============================
         // CGC 3D HERO / Three.js GLB Viewer
         // ==============================
@@ -1791,4 +1714,4 @@ function setupBgmToggle() {
                 if (contactSend) contactSend.disabled = false;
             }
 
-        });
+        })}
