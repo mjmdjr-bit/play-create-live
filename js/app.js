@@ -1107,6 +1107,11 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       controls.minPolarAngle = 0;
       controls.maxPolarAngle = Math.PI;
 
+      controls.touches = {
+       ONE: THREE.TOUCH.ROTATE,
+       TWO: THREE.TOUCH.DOLLY_ROTATE
+      };
+
       let touchStartX = 0;
       let touchStartY = 0;
       let touchMode = "none";
@@ -1414,31 +1419,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       prevModel();
       restartAutoModelTimer();
     });
-
-
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchMode = "none";
-    // none / scroll / rotate
-
-    const TOUCH_ROTATE_THRESHOLD = 8;
-    const TOUCH_DIRECTION_BIAS = 1.15;
-
-    renderer.domElement.addEventListener("pointerdown", (e) => {
-      lastInteraction = performance.now();
-
-      isPointerActive = true;
-      controls.enabled = true;
-
-      if (window.innerWidth <= 768 && e.pointerType === "touch") {
-        touchStartX = e.clientX;
-        touchStartY = e.clientY;
-        touchMode = "none";
-
-        // 最初はスクロールを殺さない
-        controls.enabled = false;
-      }
-    }, { passive: true });
 
     renderer.domElement.addEventListener("pointermove", (e) => {
       if (!(window.innerWidth <= 768 && e.pointerType === "touch")) return;
