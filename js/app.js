@@ -1043,7 +1043,72 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             });
             document.body.style.overflow = "";
         }
+        // ==============================
+        // CGC BGM
+        // ==============================
 
+        const bgmAudio = new Audio("audio/bgm.mp3");
+        bgmAudio.loop = true;
+        bgmAudio.volume = 0.42;
+        bgmAudio.preload = "auto";
+
+        let bgmEnabled = localStorage.getItem("cgc_bgm_enabled") === "true";
+ 
+        function setupBgmToggle() {
+          const btn = document.getElementById("soundToggleBtn");
+          const text = document.getElementById("soundToggleText");
+
+          if (!btn || !text) return;
+
+          function updateUI() {
+            btn.classList.toggle("is-on", bgmEnabled);
+            text.textContent = bgmEnabled ? "SOUND ON" : "SOUND OFF";
+          }
+
+         async function startBgm() {
+           unlockAudio();
+
+           try {
+             await bgmAudio.play();
+             bgmEnabled = true;
+             localStorage.setItem("cgc_bgm_enabled", "true");
+             updateUI();
+            } catch (err) {
+             console.warn("BGM play failed:", err);
+             bgmEnabled = false;
+             localStorage.setItem("cgc_bgm_enabled", "false");
+             updateUI();
+            }
+          }
+
+         function stopBgm() {
+           bgmAudio.pause();
+           bgmEnabled = false;
+           localStorage.setItem("cgc_bgm_enabled", "false");
+           updateUI();
+         }
+
+         btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+         playClickSE();
+
+         if (bgmEnabled && !bgmAudio.paused) {
+           stopBgm();
+         } else {
+          await startBgm();
+         }
+         });
+
+         updateUI();
+
+         if (bgmEnabled) {
+          document.addEventListener("pointerdown", () => {
+            startBgm();
+           }, { once: true });
+         }
+        }
 
         // ==============================
         // CGC 3D HERO / Three.js GLB Viewer
@@ -1580,6 +1645,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         setupModalClose();
         setupMenu();
         setupWorksLightbox();
+        setupBgmToggle();
 
        loadCreators();
 
