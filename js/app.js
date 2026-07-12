@@ -1039,46 +1039,89 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         // CGC BGM
         // ==============================
 
-        const bgmAudio = new Audio("audio/bgm.mp3");
+       const BGM_TRACKS = [
+         "audio/bgm-01.mp3",
+         "audio/bgm-02.mp3",
+         "audio/bgm-03.mp3",
+         "audio/bgm-04.mp3"
+        ];
+
+        let bgmTrackIndex = Number(localStorage.getItem("cgc_bgm_track_index") || "-1");
+        let bgmEnabled = localStorage.getItem("cgc_bgm_enabled") === "true";
+
+        const bgmAudio = new Audio();
         bgmAudio.loop = true;
-        bgmAudio.volume = 0.42; 
+        bgmAudio.volume = 0.42;
         bgmAudio.preload = "auto";
 
-        let bgmEnabled = localStorage.getItem("cgc_bgm_enabled");
+       function setupBgmToggle() {
+        const btn = document.getElementById("soundToggleBtn");
+        const text = document.getElementById("soundToggleText");
 
-       // 初回アクセスはON扱い
-      if (bgmEnabled === null) {
-       bgmEnabled = "true";
-       localStorage.setItem("cgc_bgm_enabled", "true");
+        if (!btn || !text) return;
+
+       function updateUI() {
+        btn.classList.toggle("is-on", bgmEnabled);
+
+        if (!bgmEnabled) {
+          text.textContent = "SOUND OFF";
+          return;
+        }
+
+        text.textContent = `SOUND ON ${bgmTrackIndex + 1}/4`;
       }
 
-      bgmEnabled = bgmEnabled === "true";
-
-      function setupBgmToggle() {
-      const btn = document.getElementById("soundToggleBtn");
-      const text = document.getElementById("soundToggleText");
-
-     if (!btn || !text) return;
-
-     function updateUI() {
-      btn.classList.toggle("is-on", bgmEnabled);
-      text.textContent = bgmEnabled ? "SOUND ON" : "SOUND OFF";
-     }
-
-     async function startBgm() {
-      if (!bgmEnabled) return;
-
-     unlockAudio();
-
-      try {
-       await bgmAudio.play();
+     async function playTrack(index) {
+       bgmTrackIndex = index;
        bgmEnabled = true;
+
+       bgmAudio.pause();
+       bgmAudio.src = BGM_TRACKS[bgmTrackIndex];
+       bgmAudio.currentTime = 0;
+
        localStorage.setItem("cgc_bgm_enabled", "true");
+       localStorage.setItem("cgc_bgm_track_index", String(bgmTrackIndex));
+
        updateUI();
-      } catch (err) {
-       console.warn("BGM autoplay blocked. Waiting for user gesture.", err);
-       updateUI();
+       unlockAudio();
+
+       try {
+         await bgmAudio.play();
+       } catch (err) {
+         console.warn("BGM play blocked:", err);
+       }
       }
+
+       function stopBgm() {
+         bgmAudio.pause();
+         bgmAudio.currentTime = 0;
+
+         bgmEnabled = false;
+         bgmTrackIndex = -1;
+
+         localStorage.setItem("cgc_bgm_enabled", "false");
+         localStorage.setItem("cgc_bgm_track_index", "-1");
+
+         updateUI();
+        }
+
+      btn.addEventListener("click", async (e) => {
+       e.preventDefault();
+       e.stopPropagation();
+
+       playClickSE();
+
+       const nextIndex = bgmTrackIndex + 1;
+
+       if (nextIndex >= BGM_TRACKS.length) {
+        stopBgm();
+        return;
+       }
+
+       await playTrack(nextIndex);
+      });
+
+      updateUI();
      }
 
      function stopBgm() {

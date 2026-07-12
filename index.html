@@ -2501,8 +2501,23 @@
 
 .sound-toggle-text {
   position: absolute;
-  left: -9999px;
-}
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  color: rgba(235, 250, 255, .86);
+  font-size: 8px;
+  line-height: 1;
+  letter-spacing: .18em;
+  font-weight: 700;
+  white-space: nowrap;
+
+  text-shadow:
+    0 0 8px rgba(80,220,255,.55),
+    0 0 18px rgba(160,90,255,.35);
+
+  pointer-events: none;
+ }
 
 .sound-record {
   position: relative;
@@ -2630,10 +2645,10 @@
     </div>
 
     <button id="soundToggleBtn" class="sound-toggle" type="button" aria-label="Sound toggle" title="SOUND">
-      <span class="sound-record">
+     <span class="sound-record">
        <span class="sound-record-core"></span>
-      </span>
-      <span id="soundToggleText" class="sound-toggle-text">SOUND OFF</span>
+     </span>
+     <span id="soundToggleText" class="sound-toggle-text">SOUND OFF</span>
     </button>
 
     <!-- メニューオーバーレイ -->
