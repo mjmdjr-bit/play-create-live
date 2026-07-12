@@ -661,8 +661,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             });
         }
 
-        setupWorkflowVideos();
-
         // WORKS 描画
         function renderWorks(works) {
             const container = document.getElementById("worksContainer");
@@ -1556,6 +1554,7 @@ function setupBgmToggle() {
         setupModalClose();
         setupMenu();
         setupWorksLightbox();
+        setupWorkflowVideos();
         setupBgmToggle();
 
        loadCreators();
