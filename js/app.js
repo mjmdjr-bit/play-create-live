@@ -1035,94 +1035,84 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             });
             document.body.style.overflow = "";
         }
-        // ==============================
-        // CGC BGM
-        // ==============================
+      // ==============================
+// CGC BGM
+// ==============================
 
-       const BGM_TRACKS = [
-         "audio/bgm-01.mp3",
-         "audio/bgm-02.mp3",
-         "audio/bgm-03.mp3",
-         "audio/bgm-04.mp3"
-        ];
+const BGM_TRACKS = [
+  "audio/bgm-01.mp3",
+  "audio/bgm-02.mp3",
+  "audio/bgm-03.mp3",
+  "audio/bgm-04.mp3"
+];
 
-        let bgmTrackIndex = Number(localStorage.getItem("cgc_bgm_track_index") || "-1");
-        let bgmEnabled = localStorage.getItem("cgc_bgm_enabled") === "true";
+let bgmTrackIndex = -1;
+let bgmEnabled = false;
 
-        const bgmAudio = new Audio();
-        bgmAudio.loop = true;
-        bgmAudio.volume = 0.42;
-        bgmAudio.preload = "auto";
+const bgmAudio = new Audio();
+bgmAudio.loop = true;
+bgmAudio.volume = 0.42;
+bgmAudio.preload = "auto";
 
-       function setupBgmToggle() {
-        const btn = document.getElementById("soundToggleBtn");
-        const text = document.getElementById("soundToggleText");
+function setupBgmToggle() {
+  const btn = document.getElementById("soundToggleBtn");
+  const text = document.getElementById("soundToggleText");
 
-        if (!btn || !text) return;
+  if (!btn || !text) return;
 
-       function updateUI() {
-        btn.classList.toggle("is-on", bgmEnabled);
+  function updateUI() {
+    btn.classList.toggle("is-on", bgmEnabled);
+    text.textContent = bgmEnabled
+      ? `SOUND ON ${bgmTrackIndex + 1}/4`
+      : "SOUND OFF";
+  }
 
-        if (!bgmEnabled) {
-          text.textContent = "SOUND OFF";
-          return;
-        }
+  async function playTrack(index) {
+    bgmTrackIndex = index;
+    bgmEnabled = true;
 
-        text.textContent = `SOUND ON ${bgmTrackIndex + 1}/4`;
-      }
+    bgmAudio.pause();
+    bgmAudio.src = BGM_TRACKS[bgmTrackIndex];
+    bgmAudio.currentTime = 0;
 
-     async function playTrack(index) {
-       bgmTrackIndex = index;
-       bgmEnabled = true;
+    updateUI();
+    unlockAudio();
 
-       bgmAudio.pause();
-       bgmAudio.src = BGM_TRACKS[bgmTrackIndex];
-       bgmAudio.currentTime = 0;
+    try {
+      await bgmAudio.play();
+    } catch (err) {
+      console.warn("BGM play blocked:", err);
+    }
+  }
 
-       localStorage.setItem("cgc_bgm_enabled", "true");
-       localStorage.setItem("cgc_bgm_track_index", String(bgmTrackIndex));
+  function stopBgm() {
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
 
-       updateUI();
-       unlockAudio();
+    bgmTrackIndex = -1;
+    bgmEnabled = false;
 
-       try {
-         await bgmAudio.play();
-       } catch (err) {
-         console.warn("BGM play blocked:", err);
-       }
-      }
+    updateUI();
+  }
 
-       function stopBgm() {
-         bgmAudio.pause();
-         bgmAudio.currentTime = 0;
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-         bgmEnabled = false;
-         bgmTrackIndex = -1;
+    playClickSE();
 
-         localStorage.setItem("cgc_bgm_enabled", "false");
-         localStorage.setItem("cgc_bgm_track_index", "-1");
+    const nextIndex = bgmTrackIndex + 1;
 
-         updateUI();
-        }
+    if (nextIndex >= BGM_TRACKS.length) {
+      stopBgm();
+      return;
+    }
 
-      btn.addEventListener("click", async (e) => {
-       e.preventDefault();
-       e.stopPropagation();
+    await playTrack(nextIndex);
+  });
 
-       playClickSE();
-
-       const nextIndex = bgmTrackIndex + 1;
-
-       if (nextIndex >= BGM_TRACKS.length) {
-        stopBgm();
-        return;
-       }
-
-       await playTrack(nextIndex);
-      });
-
-      updateUI();
-     }
+  updateUI();
+ }
 
      function stopBgm() {
       bgmAudio.pause();
