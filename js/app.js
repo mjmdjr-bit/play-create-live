@@ -1049,66 +1049,82 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
         const bgmAudio = new Audio("audio/bgm.mp3");
         bgmAudio.loop = true;
-        bgmAudio.volume = 0.42;
+        bgmAudio.volume = 0.42; 
         bgmAudio.preload = "auto";
 
-        let bgmEnabled = localStorage.getItem("cgc_bgm_enabled") === "true";
- 
-        function setupBgmToggle() {
-          const btn = document.getElementById("soundToggleBtn");
-          const text = document.getElementById("soundToggleText");
+        let bgmEnabled = localStorage.getItem("cgc_bgm_enabled");
 
-          if (!btn || !text) return;
+       // 初回アクセスはON扱い
+      if (bgmEnabled === null) {
+       bgmEnabled = "true";
+       localStorage.setItem("cgc_bgm_enabled", "true");
+      }
 
-          function updateUI() {
-            btn.classList.toggle("is-on", bgmEnabled);
-            text.textContent = bgmEnabled ? "SOUND ON" : "SOUND OFF";
-          }
+      bgmEnabled = bgmEnabled === "true";
 
-         async function startBgm() {
-           unlockAudio();
+      function setupBgmToggle() {
+      const btn = document.getElementById("soundToggleBtn");
+      const text = document.getElementById("soundToggleText");
 
-           try {
-             await bgmAudio.play();
-             bgmEnabled = true;
-             localStorage.setItem("cgc_bgm_enabled", "true");
-             updateUI();
-            } catch (err) {
-             console.warn("BGM play failed:", err);
-             bgmEnabled = false;
-             localStorage.setItem("cgc_bgm_enabled", "false");
-             updateUI();
-            }
-          }
+     if (!btn || !text) return;
 
-         function stopBgm() {
-           bgmAudio.pause();
-           bgmEnabled = false;
-           localStorage.setItem("cgc_bgm_enabled", "false");
-           updateUI();
-         }
+     function updateUI() {
+      btn.classList.toggle("is-on", bgmEnabled);
+      text.textContent = bgmEnabled ? "SOUND ON" : "SOUND OFF";
+     }
 
-         btn.addEventListener("click", async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+     async function startBgm() {
+      if (!bgmEnabled) return;
 
-         playClickSE();
+     unlockAudio();
 
-         if (bgmEnabled && !bgmAudio.paused) {
-           stopBgm();
-         } else {
-          await startBgm();
-         }
-         });
+      try {
+       await bgmAudio.play();
+       bgmEnabled = true;
+       localStorage.setItem("cgc_bgm_enabled", "true");
+       updateUI();
+      } catch (err) {
+       console.warn("BGM autoplay blocked. Waiting for user gesture.", err);
+       updateUI();
+      }
+     }
 
-         updateUI();
+     function stopBgm() {
+      bgmAudio.pause();
+      bgmAudio.currentTime = 0;
+      bgmEnabled = false;
+      localStorage.setItem("cgc_bgm_enabled", "false");
+      updateUI();
+     }
 
-         if (bgmEnabled) {
-          document.addEventListener("pointerdown", () => {
-            startBgm();
-           }, { once: true });
-         }
-        }
+     btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      playClickSE();
+
+       if (bgmEnabled && !bgmAudio.paused) {
+        stopBgm();
+       } else {
+        bgmEnabled = true;
+        localStorage.setItem("cgc_bgm_enabled", "true");
+        updateUI();
+        await startBgm();
+      }
+     });
+
+     updateUI();
+
+     // アクセス時に自動再生を試す
+     startBgm();
+
+     // ブロックされた場合、最初の操作で再生
+      document.addEventListener("pointerdown", () => {
+       if (bgmEnabled && bgmAudio.paused) {
+        startBgm();
+       }
+      }, { once: true });
+     }
 
         // ==============================
         // CGC 3D HERO / Three.js GLB Viewer
