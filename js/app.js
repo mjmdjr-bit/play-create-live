@@ -1038,52 +1038,80 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       // ==============================
       // CGC BGM
       // ==============================
-
       const BGM_TRACKS = [
-       "audio/bgm-01.mp3",
-       "audio/bgm-02.mp3",
-       "audio/bgm-03.mp3",
-       "audio/bgm-04.mp3"
-     ];
+  "audio/bgm-01.mp3",
+  "audio/bgm-02.mp3",
+  "audio/bgm-03.mp3",
+  "audio/bgm-04.mp3"
+];
 
-     let bgmTrackIndex = -1;
-     let bgmEnabled = false;
+let bgmTrackIndex = -1;
+let bgmEnabled = false;
 
-     const bgmAudio = new Audio();
-     bgmAudio.loop = true;
-     bgmAudio.volume = 0.42;
-     bgmAudio.preload = "auto";
+const bgmAudio = new Audio();
+bgmAudio.loop = true;
+bgmAudio.volume = 0.42;
+bgmAudio.preload = "auto";
 
-     function setupBgmToggle() {
-       const btn = document.getElementById("soundToggleBtn");
-       const text = document.getElementById("soundToggleText");
+function setupBgmToggle() {
+  const btn = document.getElementById("soundToggleBtn");
+  const text = document.getElementById("soundToggleText");
 
-       if (!btn || !text) return;
+  if (!btn || !text) return;
 
-      function updateUI() {
-        btn.classList.toggle("is-on", bgmEnabled);
-        text.textContent = bgmEnabled
-          ? `SOUND ON ${bgmTrackIndex + 1}/4`
-          : "SOUND OFF";
-      }
+  function updateUI() {
+    btn.classList.toggle("is-on", bgmEnabled);
+    text.textContent = bgmEnabled
+      ? `SOUND ON ${bgmTrackIndex + 1}/4`
+      : "SOUND OFF";
+  }
 
-     async function playTrack(index) {
-       bgmTrackIndex = index;
-       bgmEnabled = true;
+  async function playTrack(index) {
+    bgmTrackIndex = index;
+    bgmEnabled = true;
 
-       bgmAudio.pause();
-       bgmAudio.src = BGM_TRACKS[bgmTrackIndex];
-       bgmAudio.currentTime = 0;
+    bgmAudio.pause();
+    bgmAudio.src = BGM_TRACKS[bgmTrackIndex];
+    bgmAudio.currentTime = 0;
 
-       updateUI();
-       unlockAudio();
+    updateUI();
+    unlockAudio();
 
-       try {
-         await bgmAudio.play();
-        } catch (err) {
-         console.warn("BGM play blocked:", err);
-        }
-      }
+    try {
+      await bgmAudio.play();
+    } catch (err) {
+      console.warn("BGM play blocked:", err);
+    }
+  }
+
+  function stopBgm() {
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
+    bgmTrackIndex = -1;
+    bgmEnabled = false;
+    updateUI();
+  }
+
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    playClickSE();
+
+    const nextIndex = bgmTrackIndex + 1;
+
+    if (nextIndex >= BGM_TRACKS.length) {
+      stopBgm();
+      return;
+    }
+
+    await playTrack(nextIndex);
+  });
+
+  updateUI();
+ }
+
+
 
         // ==============================
         // CGC 3D HERO / Three.js GLB Viewer
