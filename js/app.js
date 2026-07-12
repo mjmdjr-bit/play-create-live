@@ -1107,10 +1107,92 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       controls.minPolarAngle = 0;
       controls.maxPolarAngle = Math.PI;
 
-      controls.touches = {
-        ONE: THREE.TOUCH.ROTATE,
-        TWO: THREE.TOUCH.DOLLY_ROTATE
-      };
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchMode = "none";
+      // none / scroll / rotate / multi
+
+     const TOUCH_ROTATE_THRESHOLD = 6;
+     const TOUCH_DIRECTION_BIAS = 1.05;
+
+     renderer.domElement.addEventListener("pointerdown", (e) => {
+      lastInteraction = performance.now();
+
+      isPointerActive = true;
+
+      if (window.innerWidth <= 768 && e.pointerType === "touch") {
+        touchStartX = e.clientX;
+        touchStartY = e.clientY;
+        touchMode = "none";
+
+        // 2本指以上は即OrbitControlsに渡す
+       if (e.isPrimary === false) {
+         touchMode = "multi";
+         controls.enabled = true;
+         return;
+        }
+
+       // 1本指は最初だけ方向判定
+       controls.enabled = false;
+       return;
+      }
+
+      controls.enabled = true;
+     }, { passive: true });
+
+     renderer.domElement.addEventListener("pointermove", (e) => {
+      if (!(window.innerWidth <= 768 && e.pointerType === "touch")) return;
+
+      // 2本指は常にズーム・回転OK
+      if (touchMode === "multi" || e.isPrimary === false) {
+        touchMode = "multi";
+        controls.enabled = true;
+        lastInteraction = performance.now();
+        return;
+      }
+
+     const dx = e.clientX - touchStartX;
+     const dy = e.clientY - touchStartY;
+
+     const absX = Math.abs(dx);
+     const absY = Math.abs(dy);
+
+     if (touchMode === "none") {
+      if (absX < TOUCH_ROTATE_THRESHOLD && absY < TOUCH_ROTATE_THRESHOLD) return;
+
+      // ほぼ横、斜め、少し縦でも3D操作に入る
+      if (absX > absY * TOUCH_DIRECTION_BIAS || absY < 42) {
+       touchMode = "rotate";
+       controls.enabled = true;
+       mount.closest(".hero-3d")?.classList.add("is-touch-rotating");
+      } else {
+       touchMode = "scroll";
+       controls.enabled = false;
+      }
+     }
+
+     if (touchMode === "rotate") {
+      controls.enabled = true;
+      lastInteraction = performance.now();
+     }
+     }, { passive: true });
+
+     renderer.domElement.addEventListener("pointerup", () => {
+       isPointerActive = false;
+       touchMode = "none";
+       controls.enabled = true;
+       lastInteraction = performance.now();
+
+       mount.closest(".hero-3d")?.classList.remove("is-touch-rotating");
+     }, { passive: true });
+
+     renderer.domElement.addEventListener("pointercancel", () => {
+      isPointerActive = false;
+      touchMode = "none";
+      controls.enabled = true;
+
+      mount.closest(".hero-3d")?.classList.remove("is-touch-rotating");
+     }, { passive: true });
 
       scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
