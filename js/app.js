@@ -1119,11 +1119,23 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      startBgm();
 
      // ブロックされた場合、最初の操作で再生
-      document.addEventListener("pointerdown", () => {
-       if (bgmEnabled && bgmAudio.paused) {
+      function startBgmByGesture() {
+      if (bgmEnabled && bgmAudio.paused) {
         startBgm();
-       }
-      }, { once: true });
+      }
+
+      window.removeEventListener("pointerdown", startBgmByGesture);
+      window.removeEventListener("touchstart", startBgmByGesture);
+      window.removeEventListener("click", startBgmByGesture);
+      window.removeEventListener("keydown", startBgmByGesture);
+      window.removeEventListener("scroll", startBgmByGesture);
+     }
+
+      window.addEventListener("pointerdown", startBgmByGesture, { passive: true });
+      window.addEventListener("touchstart", startBgmByGesture, { passive: true });
+      window.addEventListener("click", startBgmByGesture, { passive: true });
+      window.addEventListener("keydown", startBgmByGesture);
+      window.addEventListener("scroll", startBgmByGesture, { passive: true });
      }
 
         // ==============================
@@ -1307,81 +1319,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       let lastInteraction = performance.now();
 
       let autoModelTimer = null;
-      let nextElectricFlash =
-       performance.now() + 9000 + Math.random() * 9000;
-      let electricLines = [];
-
-      function createElectricLine() {
-       if (!currentModel) return;
-
-       const meshes = [];
-       currentModel.traverse((obj) => {
-        if (obj.isMesh && obj.geometry) meshes.push(obj);
-       });
-
-       if (!meshes.length) return;
-
-       const mesh = meshes[Math.floor(Math.random() * meshes.length)];
-       const geometry = mesh.geometry;
-
-        if (!geometry.attributes.position) return;
-
-       const pos = geometry.attributes.position;
-       const points = [];
-
-       const start = Math.floor(Math.random() * pos.count);
-       const step = Math.max(1, Math.floor(pos.count / 18));
-
-       for (let i = 0; i < 10; i++) {
-       const index = (start + i * step) % pos.count;
-
-       const p = new THREE.Vector3().fromBufferAttribute(pos, index);
-
-      // メッシュ表面から少しだけ浮かせる
-       p.multiplyScalar(1.018);
-
-       mesh.localToWorld(p);
-       currentModel.worldToLocal(p);
-
-      // ビリビリ感
-       p.x += (Math.random() - 0.5) * 0.025;
-       p.y += (Math.random() - 0.5) * 0.025;
-       p.z += (Math.random() - 0.5) * 0.025;
-
-       points.push(p);
-      }
-
-     const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-
-     const lineMaterial = new THREE.LineBasicMaterial({
-      color: 0xbffcff,
-      transparent: true,
-      opacity: 1,
-      depthTest: true,
-      depthWrite: false
-     });
-
-     const line = new THREE.Line(lineGeometry, lineMaterial);
-      line.userData.life = 1;
-
-      currentModel.add(line);
-      electricLines.push(line);
-    }
-     function triggerElectricFlash(now) {
-     const hero = mount.closest(".hero-3d");
-     hero?.classList.add("electric-flash");
-
-     for (let i = 0; i < 2; i++) {
-      createElectricLine();
-     }
-     playElectricSE();
-
-     setTimeout(() => {
-      hero?.classList.remove("electric-flash");
-     }, 850);
-
-     nextElectricFlash = now + 12000 + Math.random() * 12000;
-     }
 
      function normalizeModel(model) {
      const box = new THREE.Box3().setFromObject(model);
