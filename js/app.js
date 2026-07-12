@@ -669,6 +669,8 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             });
         }
 
+        setupWorkflowVideos();
+
         // WORKS 描画
         function renderWorks(works) {
             const container = document.getElementById("worksContainer");
@@ -1436,6 +1438,39 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
      restartAutoModelTimer();
      requestAnimationFrame(animate);
      } // setupCgcHero3D
+
+     function setupWorkflowVideos() {
+       document.querySelectorAll(".workflow-step").forEach((step) => {
+         const video = step.querySelector("video");
+         if (!video) return;
+
+         video.pause();
+         video.currentTime = 0;
+
+         const playVideo = () => {
+          video.play().catch(() => {});
+         };
+
+         const stopVideo = () => {
+          video.pause();
+          video.currentTime = 0;
+         };
+
+         step.addEventListener("mouseenter", playVideo);
+         step.addEventListener("mouseleave", stopVideo);
+
+         step.addEventListener("touchstart", () => {
+           document.querySelectorAll(".workflow-step video").forEach((v) => {
+             if (v !== video) {
+               v.pause();
+               v.currentTime = 0;
+             }
+           });
+
+           playVideo();
+          }, { passive: true });
+        });
+    }
 
     // 初期化
        (function init() {
