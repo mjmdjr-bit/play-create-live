@@ -360,11 +360,6 @@
             justify-content: flex-end;
             margin-top: 8px;
         }
-
-
-        /* CGC PROJECTS ADMIN */
-        .admin-mode-switch{display:flex;gap:8px;padding:14px 24px 0;max-width:1400px;margin:0 auto}.admin-mode-btn{border:1px solid rgba(255,255,255,.14);background:#111827;color:#cbd5e1;border-radius:999px;padding:10px 18px;cursor:pointer}.admin-mode-btn.active{background:#e5f6ff;color:#07111f}.admin-view.hidden{display:none}.projects-layout{max-width:1400px;margin:18px auto 60px;padding:0 24px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px}.project-admin-list{display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow:auto}.project-admin-item{padding:13px;border:1px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer}.project-admin-item.active{border-color:#7dd3fc;background:rgba(56,189,248,.08)}.project-admin-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#020617;margin-top:10px}.project-check{display:flex;align-items:center;gap:8px;margin-top:10px}.project-check input{width:auto}.project-preview{width:100%;aspect-ratio:16/9;border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;background:#020617}.project-preview img,.project-preview video,.project-preview iframe{width:100%;height:100%;object-fit:cover;border:0}@media(max-width:800px){.projects-layout{grid-template-columns:1fr;padding:0 12px}.admin-mode-switch{padding:12px}.project-admin-list{max-height:280px}}
-
     </style>
 </head>
 
@@ -377,9 +372,7 @@
         <button class="btn-top" onclick="location.href='index.html'">← TOPへ戻る</button>
     </header>
 
-    <div class="admin-mode-switch"><button id="showCreatorsAdmin" class="admin-mode-btn active" type="button">CREATORS</button><button id="showProjectsAdmin" class="admin-mode-btn" type="button">SELECTED WORKS</button></div>
-
-    <main id="creatorsAdminView" class="layout admin-view">
+    <main class="layout">
         <!-- 左：クリエイター一覧 + 検索 -->
         <section class="panel">
             <div class="panel-title">CREATORS</div>
@@ -522,32 +515,6 @@
             </form>
         </section>
     </main>
-
-
-
-    <main id="projectsAdminView" class="projects-layout admin-view hidden">
-      <section class="panel">
-        <div class="panel-title">SELECTED WORKS</div>
-        <div class="field-header"><span class="field-label">案件一覧</span><button id="newProjectBtn" class="btn btn-ghost" type="button">新規作成</button></div>
-        <div id="projectAdminList" class="project-admin-list"></div>
-      </section>
-      <section class="panel">
-        <div class="panel-title">PROJECT / EDIT</div>
-        <form class="form" onsubmit="return false;">
-          <div class="field-group">
-            <div class="row-2"><div><label class="field-label">案件名 *</label><input id="projectTitleInput" class="field-input" type="text" placeholder="FUJI ROCK WORLD"></div><div><label class="field-label">クライアント名</label><input id="projectClientInput" class="field-input" type="text" placeholder="CGC / ORIGINAL PROJECT"></div></div>
-            <div class="row-2" style="margin-top:10px"><div><label class="field-label">カテゴリ</label><input id="projectCategoryInput" class="field-input" type="text" placeholder="3D WEB APP / EXPERIENCE"></div><div><label class="field-label">表示順</label><input id="projectSortInput" class="field-input" type="number" value="1"></div></div>
-            <label class="field-label" style="margin-top:10px">概要</label><textarea id="projectSummaryInput" class="field-input" placeholder="案件の概要"></textarea>
-            <label class="field-label" style="margin-top:10px">プロジェクトURL</label><input id="projectUrlInput" class="field-input" type="url" placeholder="https://..."><label class="project-check"><input id="projectPublishedInput" type="checkbox" checked> 公開する</label>
-          </div>
-          <div class="field-group"><div class="field-header"><span class="field-label">TOP用ビジュアル</span></div><input id="projectThumbFile" class="field-input" type="file" accept="image/*,video/*"><input id="projectThumbUrl" class="field-input" type="url" placeholder="または画像・動画URL" style="margin-top:8px"><p class="field-note">未指定の場合はプロジェクトURLをプレビュー表示します。</p></div>
-          <div class="field-group"><div class="field-header"><span class="field-label">詳細用メディア</span></div><select id="projectMediaType" class="field-input"><option value="image">画像</option><option value="video">動画ファイル/MP4 URL</option><option value="youtube">YouTube</option><option value="vimeo">Vimeo</option><option value="url">Webサイト</option></select><input id="projectMediaFile" class="field-input" type="file" accept="image/*,video/*" style="margin-top:8px"><input id="projectMediaUrl" class="field-input" type="url" placeholder="またはメディアURL" style="margin-top:8px"></div>
-          <div id="projectAdminPreview" class="project-preview"></div>
-          <div class="btn-bar"><button id="deleteProjectBtn" class="btn btn-danger" type="button">削除</button><button id="previewProjectBtn" class="btn btn-ghost" type="button">URLを開く</button><button id="saveProjectBtn" class="btn btn-main" type="button">保存</button></div>
-        </form>
-      </section>
-    </main>
-
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1074,100 +1041,6 @@
             }
             window.open(`index.html?id=${encodeURIComponent(currentId)}`, "_blank");
         }
-
-
-
-        // --------------------------------------------------
-        // SELECTED WORKS ADMIN
-        // --------------------------------------------------
-        const showCreatorsAdmin = $("#showCreatorsAdmin");
-        const showProjectsAdmin = $("#showProjectsAdmin");
-        const creatorsAdminView = $("#creatorsAdminView");
-        const projectsAdminView = $("#projectsAdminView");
-        const projectAdminList = $("#projectAdminList");
-        const newProjectBtn = $("#newProjectBtn");
-        const saveProjectBtn = $("#saveProjectBtn");
-        const deleteProjectBtn = $("#deleteProjectBtn");
-        const previewProjectBtn = $("#previewProjectBtn");
-        const projectTitleInput = $("#projectTitleInput");
-        const projectClientInput = $("#projectClientInput");
-        const projectCategoryInput = $("#projectCategoryInput");
-        const projectSortInput = $("#projectSortInput");
-        const projectSummaryInput = $("#projectSummaryInput");
-        const projectUrlInput = $("#projectUrlInput");
-        const projectPublishedInput = $("#projectPublishedInput");
-        const projectThumbFile = $("#projectThumbFile");
-        const projectThumbUrl = $("#projectThumbUrl");
-        const projectMediaType = $("#projectMediaType");
-        const projectMediaFile = $("#projectMediaFile");
-        const projectMediaUrl = $("#projectMediaUrl");
-        const projectAdminPreview = $("#projectAdminPreview");
-        let projectDocs = [];
-        let currentProjectId = null;
-        let currentProjectDoc = null;
-
-        function setAdminMode(mode){
-          const projectsMode = mode === "projects";
-          creatorsAdminView.classList.toggle("hidden", projectsMode);
-          projectsAdminView.classList.toggle("hidden", !projectsMode);
-          showCreatorsAdmin.classList.toggle("active", !projectsMode);
-          showProjectsAdmin.classList.toggle("active", projectsMode);
-          if (projectsMode) loadProjectDocs();
-        }
-        showCreatorsAdmin.addEventListener("click",()=>setAdminMode("creators"));
-        showProjectsAdmin.addEventListener("click",()=>setAdminMode("projects"));
-
-        async function loadProjectDocs(){
-          const snap=await getDocs(collection(db,"projects"));
-          projectDocs=[]; snap.forEach(s=>projectDocs.push({id:s.id,data:s.data()}));
-          projectDocs.sort((a,b)=>(a.data.sortOrder??999)-(b.data.sortOrder??999));
-          renderProjectAdminList();
-          if (!projectDocs.length && !currentProjectId) fillFujiRockStarter();
-        }
-        function fillFujiRockStarter(){
-          currentProjectId=null;currentProjectDoc=null;
-          projectTitleInput.value="FUJI ROCK WORLD";
-          projectClientInput.value="CGC / ORIGINAL PROJECT";
-          projectCategoryInput.value="3D WEB APP / FESTIVAL EXPERIENCE";
-          projectSortInput.value=1;
-          projectSummaryInput.value="フジロックを世界ごと楽しむための3Dフェスティバル体験アプリ。仲間との現在地、ライブ予定、思い出をひとつのWORLDで共有するプロジェクトです。";
-          projectUrlInput.value="https://fujirock-26-app.web.app/";
-          projectPublishedInput.checked=true;
-          projectThumbUrl.value="";
-          projectMediaType.value="url";
-          projectMediaUrl.value="https://fujirock-26-app.web.app/";
-          renderProjectPreview();
-        }
-        function renderProjectAdminList(){
-          projectAdminList.innerHTML="";
-          projectDocs.forEach(p=>{const item=document.createElement("div");item.className="project-admin-item"+(p.id===currentProjectId?" active":"");item.innerHTML=`<b>${p.data.title||"UNTITLED"}</b><div class="field-note">${p.data.clientName||""}</div>`;item.addEventListener("click",()=>selectProjectDoc(p.id));projectAdminList.appendChild(item)});
-        }
-        function clearProjectForm(){
-          currentProjectId=null;currentProjectDoc=null;projectTitleInput.value="";projectClientInput.value="";projectCategoryInput.value="";projectSortInput.value=projectDocs.length+1;projectSummaryInput.value="";projectUrlInput.value="";projectPublishedInput.checked=true;projectThumbFile.value="";projectThumbUrl.value="";projectMediaType.value="image";projectMediaFile.value="";projectMediaUrl.value="";renderProjectPreview();renderProjectAdminList();
-        }
-        async function selectProjectDoc(id){
-          const snap=await getDoc(doc(db,"projects",id)); if(!snap.exists())return; currentProjectId=id;currentProjectDoc=snap.data();const d=currentProjectDoc;
-          projectTitleInput.value=d.title||"";projectClientInput.value=d.clientName||"";projectCategoryInput.value=d.category||"";projectSortInput.value=d.sortOrder??1;projectSummaryInput.value=d.summary||"";projectUrlInput.value=d.projectUrl||"";projectPublishedInput.checked=d.isPublished!==false;projectThumbUrl.value=d.thumbnailUrl||"";projectMediaType.value=d.mediaType||"image";projectMediaUrl.value=d.mediaUrl||"";projectThumbFile.value="";projectMediaFile.value="";renderProjectPreview();renderProjectAdminList();
-        }
-        async function uploadProjectFile(file, folder, projectId){
-          if(!file)return "";const ext=(file.name.split(".").pop()||"bin").toLowerCase();const fileRef=ref(storage,`projects/${projectId}/${folder}.${ext}`);await uploadBytes(fileRef,file);return await getDownloadURL(fileRef);
-        }
-        async function saveProject(){
-          const title=projectTitleInput.value.trim();if(!title){alert("案件名は必須です。");return}
-          try{
-            let id=currentProjectId;if(!id){const created=await addDoc(collection(db,"projects"),{title,createdAt:serverTimestamp()});id=created.id}
-            const thumbnailUrl=(await uploadProjectFile(projectThumbFile.files[0],"thumbnail",id))||projectThumbUrl.value.trim()||currentProjectDoc?.thumbnailUrl||"";
-            const mediaUrl=(await uploadProjectFile(projectMediaFile.files[0],"media",id))||projectMediaUrl.value.trim()||currentProjectDoc?.mediaUrl||projectUrlInput.value.trim();
-            const payload={title,clientName:projectClientInput.value.trim(),category:projectCategoryInput.value.trim(),summary:projectSummaryInput.value.trim(),projectUrl:projectUrlInput.value.trim(),thumbnailUrl,mediaType:projectMediaType.value,mediaUrl,sortOrder:Number(projectSortInput.value)||1,isPublished:projectPublishedInput.checked,updatedAt:serverTimestamp()};
-            await setDoc(doc(db,"projects",id),payload,{merge:true});currentProjectId=id;alert("WORKSを保存しました。");await loadProjectDocs();await selectProjectDoc(id);
-          }catch(err){console.error(err);alert("WORKSの保存に失敗しました: "+(err?.message||err))}
-        }
-        async function deleteProject(){if(!currentProjectId){alert("削除対象を選択してください。");return}if(!confirm("この案件を削除しますか？"))return;await deleteDoc(doc(db,"projects",currentProjectId));clearProjectForm();await loadProjectDocs()}
-        function renderProjectPreview(){
-          projectAdminPreview.innerHTML="";const url=projectMediaUrl.value.trim()||projectThumbUrl.value.trim()||projectUrlInput.value.trim();if(!url)return;let el;if(projectMediaType.value==="video"){el=document.createElement("video");el.src=url;el.controls=true}else if(projectMediaType.value==="url"){el=document.createElement("iframe");el.src=url}else{el=document.createElement("img");el.src=url}projectAdminPreview.appendChild(el)
-        }
-        newProjectBtn.addEventListener("click",clearProjectForm);saveProjectBtn.addEventListener("click",saveProject);deleteProjectBtn.addEventListener("click",deleteProject);previewProjectBtn.addEventListener("click",()=>{const u=projectUrlInput.value.trim();if(u)window.open(u,"_blank")});[projectMediaUrl,projectThumbUrl,projectUrlInput,projectMediaType].forEach(el=>el.addEventListener("input",renderProjectPreview));
-
 
         // --------------------------------------------------
         // イベント登録 & 初期ロード

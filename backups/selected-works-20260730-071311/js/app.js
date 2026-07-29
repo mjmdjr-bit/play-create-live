@@ -143,7 +143,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
         // 状態
         let creators = [];
-        let projects = [];
         let currentSort = "newest";
         let currentSearch = "";
         let currentCategory = "";
@@ -300,127 +299,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
          draw();
         })();
 
-
-
-        // ==============================
-        // SELECTED WORKS / PROJECTS
-        // ==============================
-        const DEFAULT_PROJECTS = [{
-          id: "fuji-rock-world",
-          title: "FUJI ROCK WORLD",
-          clientName: "CGC / ORIGINAL PROJECT",
-          category: "3D WEB APP / FESTIVAL EXPERIENCE",
-          summary: "フジロックを世界ごと楽しむための3Dフェスティバル体験アプリ。仲間との現在地、ライブ予定、思い出をひとつのWORLDで共有するプロジェクトです。",
-          thumbnailUrl: "",
-          mediaType: "url",
-          mediaUrl: "https://fujirock-26-app.web.app/",
-          projectUrl: "https://fujirock-26-app.web.app/",
-          sortOrder: 1,
-          isPublished: true
-        }];
-
-        function projectMediaElement(project, detail = false) {
-          const wrap = document.createElement("div");
-          const url = detail ? (project.mediaUrl || project.thumbnailUrl || project.projectUrl) : (project.thumbnailUrl || project.mediaUrl || project.projectUrl);
-          const type = (detail ? project.mediaType : project.thumbnailType) || project.mediaType || "image";
-          if (!url) return wrap;
-
-          if (type === "youtube") {
-            const iframe = document.createElement("iframe");
-            iframe.src = toYoutubeEmbed(url) + (detail ? "?autoplay=0" : "");
-            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-            iframe.allowFullscreen = true;
-            wrap.appendChild(iframe);
-          } else if (type === "vimeo") {
-            const iframe = document.createElement("iframe");
-            iframe.src = toVimeoEmbed(url);
-            iframe.allow = "autoplay; fullscreen; picture-in-picture";
-            iframe.allowFullscreen = true;
-            wrap.appendChild(iframe);
-          } else if (type === "video") {
-            const video = document.createElement("video");
-            video.src = url; video.muted = !detail; video.loop = !detail; video.playsInline = true; video.controls = detail; video.autoplay = !detail;
-            wrap.appendChild(video);
-          } else if (type === "url") {
-            const iframe = document.createElement("iframe"); iframe.src = url; iframe.loading = "lazy"; wrap.appendChild(iframe);
-          } else {
-            const img = document.createElement("img"); img.src = url; img.alt = project.title || "project"; wrap.appendChild(img);
-          }
-          return wrap;
-        }
-
-        async function loadProjects() {
-          try {
-            const snap = await getDocs(collection(db, "projects"));
-            projects = [];
-            snap.forEach((docSnap) => {
-              const d = docSnap.data();
-              if (d.isPublished === false) return;
-              projects.push({ id: docSnap.id, ...d });
-            });
-            if (!projects.length) projects = DEFAULT_PROJECTS.slice();
-            projects.sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
-            renderProjects();
-          } catch (err) {
-            console.warn("projects load failed; using default project", err);
-            projects = DEFAULT_PROJECTS.slice();
-            renderProjects();
-          }
-        }
-
-        function renderProjects() {
-          const grid = document.getElementById("projectGrid");
-          if (!grid) return;
-          grid.innerHTML = "";
-          projects.forEach((project, index) => {
-            const card = document.createElement("article");
-            card.className = "project-card";
-            card.tabIndex = 0;
-            const media = document.createElement("div"); media.className = "project-card-media";
-            const el = projectMediaElement(project, false); while (el.firstChild) media.appendChild(el.firstChild);
-            const content = document.createElement("div"); content.className = "project-card-content";
-            content.innerHTML = `<div class="project-card-index">${String(index+1).padStart(2,"0")}</div><h3>${escapeProjectHtml(project.title || "UNTITLED")}</h3><div class="project-card-category">${escapeProjectHtml(project.category || "PROJECT")}</div>`;
-            const arrow = document.createElement("div"); arrow.className = "project-card-arrow"; arrow.textContent = "↗";
-            card.append(media, content, arrow);
-            card.addEventListener("click", () => openProject(project));
-            card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProject(project); } });
-            grid.appendChild(card);
-          });
-        }
-
-        function escapeProjectHtml(value) {
-          return String(value || "").replace(/[&<>\"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"}[c]));
-        }
-
-        function openProject(project) {
-          const overlay = document.getElementById("projectOverlay");
-          const media = document.getElementById("projectModalMedia");
-          if (!overlay || !media) return;
-          media.innerHTML = "";
-          const el = projectMediaElement(project, true); while (el.firstChild) media.appendChild(el.firstChild);
-          document.getElementById("projectModalTitle").textContent = project.title || "";
-          document.getElementById("projectModalClient").textContent = project.clientName || "";
-          document.getElementById("projectModalCategory").textContent = project.category || "";
-          document.getElementById("projectModalSummary").textContent = project.summary || "";
-          const link = document.getElementById("projectModalLink");
-          link.href = project.projectUrl || project.mediaUrl || "#";
-          link.style.display = (project.projectUrl || project.mediaUrl) ? "inline-flex" : "none";
-          overlay.classList.add("show"); overlay.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
-        }
-
-        function closeProject() {
-          const overlay = document.getElementById("projectOverlay");
-          const media = document.getElementById("projectModalMedia");
-          overlay?.classList.remove("show"); overlay?.setAttribute("aria-hidden","true"); if (media) media.innerHTML = ""; document.body.style.overflow = "";
-        }
-
-        function setupProjectModal() {
-          document.getElementById("projectClose")?.addEventListener("click", closeProject);
-          document.getElementById("projectOverlay")?.addEventListener("click", e => { if (e.target.id === "projectOverlay") closeProject(); });
-          window.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("projectOverlay")?.classList.contains("show")) closeProject(); });
-        }
-
-
+        // Creators取得
         // Creators取得
         async function loadCreators() {
             try {
@@ -1679,7 +1558,6 @@ function setupBgmToggle() {
         setupBgmToggle();
 
        loadCreators();
-       loadProjects();
 
         document.addEventListener("pointerdown", () => {
        unlockAudio();
