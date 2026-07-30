@@ -1675,7 +1675,6 @@ function setupBgmToggle() {
         setupModalClose();
         setupMenu();
         setupWorksLightbox();
-        setupProjectModal();
         setupWorkflowVideos();
         setupBgmToggle();
 
