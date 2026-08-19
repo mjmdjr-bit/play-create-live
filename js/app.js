@@ -749,6 +749,9 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 video.playsInline = true;
                 video.autoplay = true;
                 body.appendChild(video);
+                video.play().catch(() => {
+                    // If autoplay is restricted, native controls remain available.
+                });
             }
             overlay.classList.add("show");
             overlay.setAttribute("aria-hidden", "false");
@@ -835,9 +838,28 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 } else {
                     const v = document.createElement("video");
                     v.src = url;
-                    v.controls = true;
+                    v.muted = true;
                     v.playsInline = true;
+                    v.preload = "metadata";
+                    v.controls = false;
+                    v.style.pointerEvents = "none";
+
+                    v.addEventListener("loadedmetadata", () => {
+                        try {
+                            if (Number.isFinite(v.duration) && v.duration > 0.2) {
+                                v.currentTime = Math.min(0.15, v.duration / 4);
+                            }
+                        } catch (err) {
+                            console.warn("WORK thumbnail seek failed:", err);
+                        }
+                    }, { once: true });
+
                     thumb.appendChild(v);
+
+                    const playMark = document.createElement("div");
+                    playMark.className = "work-play-mark";
+                    playMark.setAttribute("aria-hidden", "true");
+                    thumb.appendChild(playMark);
                 }
 
                 card.appendChild(thumb);

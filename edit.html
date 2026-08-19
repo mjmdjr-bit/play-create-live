@@ -997,8 +997,21 @@
                 const videoUrl = await buildMainVideoUrl(creatorId, previousVideoUrl);
 
                 const worksFromUI = readWorksFromEditor();
-                const newWorks = await buildNewWorksFromInputs(creatorId, worksFromUI);
-                const finalWorks = worksFromUI.concat(newWorks);
+                const storedWorks = Array.isArray(prev.works) ? prev.works : [];
+
+                // Existing WORKS must never disappear just because the editor UI was empty.
+                // Explicit deletions still work because a non-empty editor list is treated as authoritative.
+                const baseWorks = worksFromUI.length > 0 ? worksFromUI : storedWorks;
+                const newWorks = await buildNewWorksFromInputs(creatorId, baseWorks);
+
+                // Append new WORKS while preserving existing items and preventing duplicate URLs.
+                const workMap = new Map();
+                [...baseWorks, ...newWorks].forEach((work) => {
+                    const key = String(work?.url || "").trim();
+                    if (!key) return;
+                    workMap.set(key, work);
+                });
+                const finalWorks = Array.from(workMap.values());
 
                 const payload = {
                     name,

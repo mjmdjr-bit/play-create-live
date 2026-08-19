@@ -2676,6 +2676,57 @@
 .project-close { position:fixed; top:22px; right:24px; z-index:2401; width:48px; height:48px; border-radius:50%; border:1px solid rgba(255,255,255,.2); color:#fff; background:rgba(4,10,22,.68); font-size:28px; cursor:pointer; }
 @media (max-width:760px){ .selected-works{width:min(100% - 24px,1180px);margin:88px auto 80px}.project-grid{grid-template-columns:1fr}.project-card{min-height:360px}.project-modal-meta{grid-template-columns:1fr}.project-modal-body{padding:24px}.project-overlay{padding:12px}.project-close{top:12px;right:12px} }
 
+
+/* ==============================
+   WORK video thumbnail / direct play
+============================== */
+.work-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.work-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.work-play-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46px;
+  height: 46px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(210, 245, 255, .5);
+  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.035)), rgba(8,14,28,.34);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.3), 0 0 20px rgba(80,220,255,.28), 0 10px 30px rgba(0,0,0,.35);
+  pointer-events: none;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.work-play-mark::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 14px solid rgba(245,253,255,.95);
+  filter: drop-shadow(0 0 7px rgba(100,230,255,.7));
+}
+
+.work-card:hover .work-play-mark {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.4), 0 0 32px rgba(80,220,255,.52), 0 0 54px rgba(160,90,255,.18), 0 12px 34px rgba(0,0,0,.4);
+}
 </style>
 <script type="importmap">
 {
