@@ -1203,18 +1203,7 @@
           renderProjectAdminList();
         }
         async function uploadProjectFile(file, folder, projectId){
-          if(!file) return "";
-
-          const ext=(file.name.split(".").pop()||"bin").toLowerCase();
-          const version=`${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
-          const fileRef=ref(storage,`projects/${projectId}/${folder}-${version}.${ext}`);
-
-          await uploadBytes(fileRef,file,{
-            contentType:file.type||undefined,
-            cacheControl:"public,max-age=3600"
-          });
-
-          return await getDownloadURL(fileRef);
+          if(!file)return "";const ext=(file.name.split(".").pop()||"bin").toLowerCase();const fileRef=ref(storage,`projects/${projectId}/${folder}.${ext}`);await uploadBytes(fileRef,file);return await getDownloadURL(fileRef);
         }
         async function saveProject(){
           const title=projectTitleInput.value.trim();
