@@ -321,59 +321,30 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
         function projectMediaElement(project, detail = false) {
           const wrap = document.createElement("div");
-          const url = detail
-            ? (project.mediaUrl || project.thumbnailUrl || project.projectUrl)
-            : (project.thumbnailUrl || project.mediaUrl || project.projectUrl);
+          const url = detail ? (project.mediaUrl || project.thumbnailUrl || project.projectUrl) : (project.thumbnailUrl || project.mediaUrl || project.projectUrl);
           const type = (detail ? project.mediaType : project.thumbnailType) || project.mediaType || "image";
           if (!url) return wrap;
 
           if (type === "youtube") {
             const iframe = document.createElement("iframe");
-            iframe.src = toYoutubeEmbed(url) + (detail ? "?autoplay=1" : "");
+            iframe.src = toYoutubeEmbed(url) + (detail ? "?autoplay=0" : "");
             iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
             iframe.allowFullscreen = true;
             wrap.appendChild(iframe);
           } else if (type === "vimeo") {
             const iframe = document.createElement("iframe");
-            iframe.src = toVimeoEmbed(url) + (detail ? "?autoplay=1" : "");
+            iframe.src = toVimeoEmbed(url);
             iframe.allow = "autoplay; fullscreen; picture-in-picture";
             iframe.allowFullscreen = true;
             wrap.appendChild(iframe);
           } else if (type === "video") {
             const video = document.createElement("video");
-            video.src = url;
-            video.muted = !detail;
-            video.loop = false;
-            video.playsInline = true;
-            video.controls = detail;
-            video.autoplay = detail;
-            video.preload = "metadata";
+            video.src = url; video.muted = !detail; video.loop = !detail; video.playsInline = true; video.controls = detail; video.autoplay = !detail;
             wrap.appendChild(video);
-
-            if (!detail) {
-              const play = document.createElement("span");
-              play.className = "project-video-play";
-              wrap.appendChild(play);
-            } else {
-              video.play().catch(() => {});
-            }
           } else if (type === "url") {
-            if (detail) {
-              const iframe = document.createElement("iframe");
-              iframe.src = url;
-              iframe.loading = "lazy";
-              wrap.appendChild(iframe);
-            } else {
-              const fallback = document.createElement("div");
-              fallback.className = "project-url-preview";
-              fallback.textContent = project.title || "OPEN PROJECT";
-              wrap.appendChild(fallback);
-            }
+            const iframe = document.createElement("iframe"); iframe.src = url; iframe.loading = "lazy"; wrap.appendChild(iframe);
           } else {
-            const img = document.createElement("img");
-            img.src = url;
-            img.alt = project.title || "project";
-            wrap.appendChild(img);
+            const img = document.createElement("img"); img.src = url; img.alt = project.title || "project"; wrap.appendChild(img);
           }
           return wrap;
         }
@@ -432,9 +403,8 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
           document.getElementById("projectModalCategory").textContent = project.category || "";
           document.getElementById("projectModalSummary").textContent = project.summary || "";
           const link = document.getElementById("projectModalLink");
-          // アプリURLを公開しない案件は、動画自体を外部リンクとして公開しない。
-          link.href = project.projectUrl || "#";
-          link.style.display = project.projectUrl ? "inline-flex" : "none";
+          link.href = project.projectUrl || project.mediaUrl || "#";
+          link.style.display = (project.projectUrl || project.mediaUrl) ? "inline-flex" : "none";
           overlay.classList.add("show"); overlay.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
         }
 

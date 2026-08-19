@@ -1118,7 +1118,6 @@
         let projectDocs = [];
         let currentProjectId = null;
         let currentProjectDoc = null;
-        let isCreatingProject = false;
 
         function setAdminMode(mode){
           const projectsMode = mode === "projects";
@@ -1157,112 +1156,24 @@
           projectDocs.forEach(p=>{const item=document.createElement("div");item.className="project-admin-item"+(p.id===currentProjectId?" active":"");item.innerHTML=`<b>${p.data.title||"UNTITLED"}</b><div class="field-note">${p.data.clientName||""}</div>`;item.addEventListener("click",()=>selectProjectDoc(p.id));projectAdminList.appendChild(item)});
         }
         function clearProjectForm(){
-          isCreatingProject=true;
-          currentProjectId=null;
-          currentProjectDoc=null;
-          projectTitleInput.value="";
-          projectClientInput.value="";
-          projectCategoryInput.value="";
-          projectSortInput.value=projectDocs.length+1;
-          projectSummaryInput.value="";
-          projectUrlInput.value="";
-          projectPublishedInput.checked=true;
-          projectThumbFile.value="";
-          projectThumbUrl.value="";
-          projectMediaType.value="video";
-          projectMediaFile.value="";
-          projectMediaUrl.value="";
-          saveProjectBtn.textContent="新規案件を保存";
-          deleteProjectBtn.disabled=true;
-          renderProjectPreview();
-          renderProjectAdminList();
-          projectTitleInput.focus();
+          currentProjectId=null;currentProjectDoc=null;projectTitleInput.value="";projectClientInput.value="";projectCategoryInput.value="";projectSortInput.value=projectDocs.length+1;projectSummaryInput.value="";projectUrlInput.value="";projectPublishedInput.checked=true;projectThumbFile.value="";projectThumbUrl.value="";projectMediaType.value="image";projectMediaFile.value="";projectMediaUrl.value="";renderProjectPreview();renderProjectAdminList();
         }
         async function selectProjectDoc(id){
-          const snap=await getDoc(doc(db,"projects",id));
-          if(!snap.exists())return;
-          isCreatingProject=false;
-          currentProjectId=id;
-          currentProjectDoc=snap.data();
-          const d=currentProjectDoc;
-          projectTitleInput.value=d.title||"";
-          projectClientInput.value=d.clientName||"";
-          projectCategoryInput.value=d.category||"";
-          projectSortInput.value=d.sortOrder??1;
-          projectSummaryInput.value=d.summary||"";
-          projectUrlInput.value=d.projectUrl||"";
-          projectPublishedInput.checked=d.isPublished!==false;
-          projectThumbUrl.value=d.thumbnailUrl||"";
-          projectMediaType.value=d.mediaType||"image";
-          projectMediaUrl.value=d.mediaUrl||"";
-          projectThumbFile.value="";
-          projectMediaFile.value="";
-          saveProjectBtn.textContent="更新を保存";
-          deleteProjectBtn.disabled=false;
-          renderProjectPreview();
-          renderProjectAdminList();
+          const snap=await getDoc(doc(db,"projects",id)); if(!snap.exists())return; currentProjectId=id;currentProjectDoc=snap.data();const d=currentProjectDoc;
+          projectTitleInput.value=d.title||"";projectClientInput.value=d.clientName||"";projectCategoryInput.value=d.category||"";projectSortInput.value=d.sortOrder??1;projectSummaryInput.value=d.summary||"";projectUrlInput.value=d.projectUrl||"";projectPublishedInput.checked=d.isPublished!==false;projectThumbUrl.value=d.thumbnailUrl||"";projectMediaType.value=d.mediaType||"image";projectMediaUrl.value=d.mediaUrl||"";projectThumbFile.value="";projectMediaFile.value="";renderProjectPreview();renderProjectAdminList();
         }
         async function uploadProjectFile(file, folder, projectId){
           if(!file)return "";const ext=(file.name.split(".").pop()||"bin").toLowerCase();const fileRef=ref(storage,`projects/${projectId}/${folder}.${ext}`);await uploadBytes(fileRef,file);return await getDownloadURL(fileRef);
         }
         async function saveProject(){
-          const title=projectTitleInput.value.trim();
-          if(!title){alert("案件名は必須です。");return}
-
-          saveProjectBtn.disabled=true;
+          const title=projectTitleInput.value.trim();if(!title){alert("案件名は必須です。");return}
           try{
-            // 「新規作成」を押した後は、古いcurrentProjectIdが残っていても必ず新規documentを作る。
-            const creating = isCreatingProject || !currentProjectId;
-            let id = currentProjectId;
-
-            if(creating){
-              const created=await addDoc(collection(db,"projects"),{
-                title,
-                createdAt:serverTimestamp()
-              });
-              id=created.id;
-            }
-
-            const thumbFile=projectThumbFile.files[0];
-            const mediaFile=projectMediaFile.files[0];
-            const uploadedThumb=await uploadProjectFile(thumbFile,"thumbnail",id);
-            const uploadedMedia=await uploadProjectFile(mediaFile,"media",id);
-
-            const thumbnailUrl=uploadedThumb||projectThumbUrl.value.trim()||(!creating ? currentProjectDoc?.thumbnailUrl : "")||"";
-            const mediaUrl=uploadedMedia||projectMediaUrl.value.trim()||(!creating ? currentProjectDoc?.mediaUrl : "")||projectUrlInput.value.trim();
-
-            let thumbnailType=!creating ? (currentProjectDoc?.thumbnailType||"") : "";
-            if(thumbFile) thumbnailType=thumbFile.type.startsWith("video/") ? "video" : "image";
-            else if(projectThumbUrl.value.trim()) thumbnailType=/\.(mp4|webm|mov)(\?|#|$)/i.test(projectThumbUrl.value.trim()) ? "video" : "image";
-            if(!thumbnailType) thumbnailType=projectMediaType.value;
-
-            const payload={
-              title,
-              clientName:projectClientInput.value.trim(),
-              category:projectCategoryInput.value.trim(),
-              summary:projectSummaryInput.value.trim(),
-              projectUrl:projectUrlInput.value.trim(),
-              thumbnailUrl,
-              thumbnailType,
-              mediaType:projectMediaType.value,
-              mediaUrl,
-              sortOrder:Number(projectSortInput.value)||1,
-              isPublished:projectPublishedInput.checked,
-              updatedAt:serverTimestamp()
-            };
-
-            await setDoc(doc(db,"projects",id),payload,{merge:true});
-            isCreatingProject=false;
-            currentProjectId=id;
-            alert(creating ? "新しいWORKSを追加しました。" : "WORKSを更新しました。");
-            await loadProjectDocs();
-            await selectProjectDoc(id);
-          }catch(err){
-            console.error(err);
-            alert("WORKSの保存に失敗しました: "+(err?.message||err));
-          }finally{
-            saveProjectBtn.disabled=false;
-          }
+            let id=currentProjectId;if(!id){const created=await addDoc(collection(db,"projects"),{title,createdAt:serverTimestamp()});id=created.id}
+            const thumbnailUrl=(await uploadProjectFile(projectThumbFile.files[0],"thumbnail",id))||projectThumbUrl.value.trim()||currentProjectDoc?.thumbnailUrl||"";
+            const mediaUrl=(await uploadProjectFile(projectMediaFile.files[0],"media",id))||projectMediaUrl.value.trim()||currentProjectDoc?.mediaUrl||projectUrlInput.value.trim();
+            const payload={title,clientName:projectClientInput.value.trim(),category:projectCategoryInput.value.trim(),summary:projectSummaryInput.value.trim(),projectUrl:projectUrlInput.value.trim(),thumbnailUrl,mediaType:projectMediaType.value,mediaUrl,sortOrder:Number(projectSortInput.value)||1,isPublished:projectPublishedInput.checked,updatedAt:serverTimestamp()};
+            await setDoc(doc(db,"projects",id),payload,{merge:true});currentProjectId=id;alert("WORKSを保存しました。");await loadProjectDocs();await selectProjectDoc(id);
+          }catch(err){console.error(err);alert("WORKSの保存に失敗しました: "+(err?.message||err))}
         }
         async function deleteProject(){if(!currentProjectId){alert("削除対象を選択してください。");return}if(!confirm("この案件を削除しますか？"))return;await deleteDoc(doc(db,"projects",currentProjectId));clearProjectForm();await loadProjectDocs()}
         function renderProjectPreview(){
