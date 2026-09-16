@@ -3794,63 +3794,6 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
 }
 </style>
 
-<style id="cgc-v14-scroll-motion">
-/* CGC v14 — shared scroll motion language for copy, media and cards */
-.cgc-motion-item{
-  --cgc-motion-delay:0ms;
-  opacity:0;
-  transform:translate3d(0,22px,0);
-  filter:blur(3px);
-  transition:
-    opacity .72s cubic-bezier(.22,.61,.36,1) var(--cgc-motion-delay),
-    transform .82s cubic-bezier(.16,1,.3,1) var(--cgc-motion-delay),
-    filter .72s ease var(--cgc-motion-delay);
-  will-change:opacity,transform,filter;
-}
-.cgc-motion-item.is-cgc-motion-visible{
-  opacity:1;
-  transform:translate3d(0,0,0);
-  filter:blur(0);
-}
-.workflow-step.cgc-motion-item,
-.project-card.cgc-motion-item,
-#grid > .card.cgc-motion-item{
-  transform:translate3d(0,28px,0) scale(.992);
-}
-.workflow-step.cgc-motion-item.is-cgc-motion-visible,
-.project-card.cgc-motion-item.is-cgc-motion-visible,
-#grid > .card.cgc-motion-item.is-cgc-motion-visible{
-  transform:translate3d(0,0,0) scale(1);
-}
-/* Preserve the existing hover language after the reveal has settled. */
-.workflow-step.cgc-motion-item.is-cgc-motion-visible:hover,
-.project-card.cgc-motion-item.is-cgc-motion-visible:hover,
-#grid > .card.cgc-motion-item.is-cgc-motion-visible:hover{
-  transform:translate3d(0,-4px,0) scale(1);
-}
-@media(max-width:720px){
-  .cgc-motion-item{
-    transform:translate3d(0,16px,0);
-    transition-duration:.58s,.68s,.58s;
-  }
-  .workflow-step.cgc-motion-item,
-  .project-card.cgc-motion-item,
-  #grid > .card.cgc-motion-item{transform:translate3d(0,18px,0) scale(.996)}
-  .workflow-step.cgc-motion-item.is-cgc-motion-visible,
-  .project-card.cgc-motion-item.is-cgc-motion-visible,
-  #grid > .card.cgc-motion-item.is-cgc-motion-visible{transform:none}
-}
-@media(prefers-reduced-motion:reduce){
-  .cgc-motion-item,
-  .cgc-motion-item.is-cgc-motion-visible{
-    opacity:1!important;
-    transform:none!important;
-    filter:none!important;
-    transition:none!important;
-  }
-}
-</style>
-
 </head>
 
 <body>

@@ -1595,77 +1595,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       titles.forEach((title) => observer.observe(title));
     }
 
-    function setupCgcScrollMotion() {
-      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-      if (reduceMotion) return;
-
-      const selector = [
-        ".cgc-philosophy-index",
-        ".cgc-philosophy p",
-        ".cgc-form-lineage",
-        ".cgc-artifact-kicker",
-        ".cgc-artifact-copy p",
-        ".workflow-kicker",
-        ".workflow-head p",
-        ".workflow-step",
-        ".selected-works-kicker",
-        ".selected-works-copy",
-        ".project-card",
-        ".creators-kicker",
-        ".creators-copy",
-        ".toolbar",
-        "#grid > .card"
-      ].join(",");
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-cgc-motion-visible");
-          } else {
-            entry.target.classList.remove("is-cgc-motion-visible");
-          }
-        });
-      }, {
-        threshold: 0.12,
-        rootMargin: "0px 0px -7% 0px"
-      });
-
-      const prepare = (scope = document) => {
-        const nodes = [];
-        if (scope.nodeType === 1 && scope.matches?.(selector)) nodes.push(scope);
-        scope.querySelectorAll?.(selector).forEach((node) => nodes.push(node));
-
-        nodes.forEach((node) => {
-          if (node.dataset.cgcMotionReady) return;
-          node.dataset.cgcMotionReady = "1";
-          node.classList.add("cgc-motion-item");
-
-          const parent = node.parentElement;
-          if (node.matches(".workflow-step, .project-card, #grid > .card") && parent) {
-            const siblings = [...parent.children].filter((el) =>
-              el.matches?.(".workflow-step, .project-card, .card")
-            );
-            const index = Math.max(0, siblings.indexOf(node));
-            node.style.setProperty("--cgc-motion-delay", `${Math.min(index, 7) * 70}ms`);
-          }
-
-          observer.observe(node);
-        });
-      };
-
-      prepare(document);
-
-      const mutationObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === 1) prepare(node);
-          });
-        });
-      });
-
-      mutationObserver.observe(document.body, { childList: true, subtree: true });
-    }
-
     // 初期化
        (function init() {
         setupSearchAndSort();
@@ -1675,7 +1604,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         setupProjectModal();
         setupWorkflowVideos();
         setupSectionTitleReveals();
-        setupCgcScrollMotion();
 
        loadCreators();
        loadProjects();
