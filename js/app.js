@@ -1,52 +1,3 @@
-// ==============================
-// CGC UI Sound
-// ==============================
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-function playTone(freq, duration, volume, type = "sine") {
-
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.type = type;
-  osc.frequency.value = freq;
-
-  gain.gain.value = volume;
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.start();
-
-  gain.gain.exponentialRampToValueAtTime(
-    0.0001,
-    audioCtx.currentTime + duration
-  );
-
-  osc.stop(audioCtx.currentTime + duration);
-}
-function unlockAudio() {
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
-}
-
-function playHoverSE() {
-  unlockAudio();
-  playTone(1800, 0.07, 0.035, "triangle");
-
-  setTimeout(() => {
-    playTone(2400, 0.04, 0.022, "sine");
-  }, 18);
-}
-
-function playClickSE() {
-  unlockAudio();
-  playTone(760, 0.08, 0.045, "triangle");
-}
-
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
 import {
@@ -54,14 +5,6 @@ import {
   collection,
   getDocs,
   doc,
-  updateDoc,
-  increment,
-  addDoc,
-  serverTimestamp,
-  onSnapshot,
-  deleteDoc,
-  query,
-  orderBy
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 import {
@@ -92,53 +35,13 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         const $ = (s) => document.querySelector(s);
 
         function bindCardTap(card, onOpen) {
-            const TAP_MOVE_PX = 14;   // 12〜16で調整（大きいほど誤爆しにくい）
-            const TAP_TIME_MS = 450;
-
-            let sx = 0, sy = 0, st = 0;
-            let moved = false;
-            let pointerId = null;
-
-            // 縦スクロールを優先（これが効く）
             card.style.touchAction = "pan-y";
-
-            card.addEventListener("pointerdown", (e) => {
-                if (e.button != null && e.button !== 0) return;
-                pointerId = e.pointerId;
-                sx = e.clientX;
-                sy = e.clientY;
-                st = performance.now();
-                moved = false;
-                try { card.setPointerCapture(pointerId); } catch { }
-            }, { passive: true });
-
-            card.addEventListener("pointermove", (e) => {
-                if (pointerId == null || e.pointerId !== pointerId) return;
-                const dx = Math.abs(e.clientX - sx);
-                const dy = Math.abs(e.clientY - sy);
-                if (dx > TAP_MOVE_PX || dy > TAP_MOVE_PX) moved = true;
-            }, { passive: true });
-
-            card.addEventListener("pointerup", (e) => {
-                if (pointerId == null || e.pointerId !== pointerId) return;
-
-                const dt = performance.now() - st;
-                const dx = Math.abs(e.clientX - sx);
-                const dy = Math.abs(e.clientY - sy);
-
-                const isTap = !moved && dx <= TAP_MOVE_PX && dy <= TAP_MOVE_PX && dt <= TAP_TIME_MS;
-                pointerId = null;
-
-                if (!isTap) return;
-
-                // いいねボタン等を押した時に開かない
-                const t = e.target;
-                if (t && t.closest && t.closest("button, a, input, textarea, select, [data-no-open]")) return;
-
+            card.addEventListener("click", (e) => {
+                if (e.target?.closest?.("button, a, input, textarea, select, [data-no-open]")) return;
+                e.preventDefault();
+                e.stopPropagation();
                 onOpen();
-            }, { passive: true });
-
-            card.addEventListener("pointercancel", () => { pointerId = null; }, { passive: true });
+            });
         }
 
         // 状態
@@ -147,160 +50,104 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         let currentSort = "newest";
         let currentSearch = "";
         let currentCategory = "";
-        let messagesUnsub = null;
         let currentCreatorName = "";
         let currentCreatorId = "";
         let currentCreatorUrl = "";
 
-        // クライアントID（投稿者識別）
-        let clientId = localStorage.getItem("pcl_client_id");
-        if (!clientId) {
-            clientId = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now());
-            localStorage.setItem("pcl_client_id", clientId);
-        }
         const ADMIN_SECRET = "pcl-admin-2024";
         let isAdmin = false;
 
-        // 背景パーティクル：hover reactive
+        // CGC MICRO DUST — visible cinematic silver particles
         (function () {
           const canvas = document.getElementById("particles");
-           if (!canvas) return;
+          if (!canvas) return;
+          const ctx = canvas.getContext("2d", { alpha: true });
+          let W = 0, H = 0, dpr = 1;
+          const mouse = { x: 0, y: 0, active: false };
+          let parts = [];
 
-          const ctx = canvas.getContext("2d");
-           let W, H, dpr;
-           let mouse = { x: 0, y: 0, active: false };
-           let mode = "float";
-           let modeTimer = 0;
+          function resetParticle(p, randomPosition = true) {
+            p.x = randomPosition ? Math.random() * W : (Math.random() < .5 ? -16 : W + 16);
+            p.y = Math.random() * H;
+            p.z = Math.random();
+            p.r = (0.28 + Math.pow(p.z, 1.7) * 0.95) * dpr;
+            p.vx = (Math.random() - 0.5) * (0.035 + p.z * 0.05) * dpr;
+            p.vy = (Math.random() - 0.5) * 0.028 * dpr;
+            p.alpha = 0.16 + p.z * 0.34;
+            p.twinkle = Math.random() * Math.PI * 2;
+            p.phase = Math.random() * Math.PI * 2;
+          }
 
-          const colors = [
-           "rgba(80,220,255,",
-           "rgba(180,90,255,",
-           "rgba(255,180,87,",
-           "rgba(120,255,220,"
-         ];
-
-         function resize() {
-          dpr = Math.min(window.devicePixelRatio || 1, 2);
-          W = canvas.width = innerWidth * dpr;
-          H = canvas.height = innerHeight * dpr;
+          function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            W = canvas.width = Math.max(innerWidth * dpr, 1);
+            H = canvas.height = Math.max(innerHeight * dpr, 1);
             canvas.style.width = innerWidth + "px";
             canvas.style.height = innerHeight + "px";
+            const count = Math.min(720, Math.max(420, Math.round(innerWidth * innerHeight / 3800)));
+            parts = Array.from({ length: count }, () => { const p = {}; resetParticle(p, true); return p; });
           }
 
           resize();
-          window.addEventListener("resize", resize);
-
-         const parts = Array.from({ length: 120 }, () => ({
-           x: Math.random() * W,
-           y: Math.random() * H,
-           ox: Math.random() * W,
-           oy: Math.random() * H,
-           vx: 0,
-           vy: 0,
-           r: (Math.random() * 2.6 + 0.8) * dpr,
-           a: Math.random() * Math.PI * 2,
-           color: colors[Math.floor(Math.random() * colors.length)]
-         }));
-
-         function changeMode() {
-         const modes = ["gather", "burst", "orbit", "glow", "collapse"];
-          mode = modes[Math.floor(Math.random() * modes.length)];
-          modeTimer = 90 + Math.random() * 90;
-         }
-
-          window.addEventListener("pointermove", (e) => {
-           mouse.x = e.clientX * dpr;
-           mouse.y = e.clientY * dpr;
-           mouse.active = true;
-
-           if (Math.random() < 0.025) changeMode();
+          addEventListener("resize", resize, { passive: true });
+          addEventListener("pointermove", (e) => {
+            mouse.x = e.clientX * dpr;
+            mouse.y = e.clientY * dpr;
+            mouse.active = true;
           }, { passive: true });
+          addEventListener("pointerleave", () => { mouse.active = false; }, { passive: true });
 
-         window.addEventListener("pointerleave", () => {
-           mouse.active = false;
-           mode = "float";
-          });
+          function draw(t) {
+            ctx.clearRect(0, 0, W, H);
+            const time = t * 0.00035;
 
-         function draw() {
-          ctx.clearRect(0, 0, W, H);
+            for (const p of parts) {
+              if (mouse.active) {
+                const dx = mouse.x - p.x;
+                const dy = mouse.y - p.y;
+                const d2 = dx * dx + dy * dy;
+                const range = 190 * dpr;
+                if (d2 < range * range && d2 > 25) {
+                  const d = Math.sqrt(d2);
+                  const f = (1 - d / range) * 0.00012;
+                  p.vx += dx * f;
+                  p.vy += dy * f;
+                }
+              }
 
-           if (mouse.active) {
-            modeTimer--;
-           if (modeTimer <= 0) changeMode();
+              p.vx += Math.sin(time + p.phase) * 0.000015 * dpr;
+              p.vy += Math.cos(time * 0.7 + p.phase) * 0.000012 * dpr;
+              p.vx *= 0.997;
+              p.vy *= 0.997;
+              p.x += p.vx;
+              p.y += p.vy;
+              p.twinkle += 0.004 + p.z * 0.009;
+
+              if (p.x < -20 || p.x > W + 20 || p.y < -20 || p.y > H + 20) resetParticle(p, false);
+
+              const pulse = 0.78 + Math.sin(p.twinkle) * 0.22;
+              const a = Math.min(0.92, p.alpha * pulse);
+              const radius = p.r * (0.7 + p.z * 0.55);
+
+              ctx.beginPath();
+              ctx.fillStyle = `rgba(226,238,244,${a})`;
+              ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+              ctx.fill();
+
+              if (p.z > 0.88) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(220,240,250,${a * 0.26})`;
+                ctx.lineWidth = Math.max(0.35, dpr * 0.42);
+                ctx.moveTo(p.x - radius * 2.4, p.y);
+                ctx.lineTo(p.x + radius * 2.4, p.y);
+                ctx.stroke();
+              }
+            }
+            requestAnimationFrame(draw);
           }
 
-          for (const p of parts) {
-          const dx = mouse.x - p.x;
-          const dy = mouse.y - p.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const range = 260 * dpr;
-          const force = Math.max(0, 1 - dist / range);
-
-          if (mouse.active) {
-          if (mode === "gather") {
-           p.vx += dx * 0.0009 * force;
-           p.vy += dy * 0.0009 * force;
-          }
-
-          if (mode === "burst") {
-           p.vx -= dx * 0.0018 * force;
-           p.vy -= dy * 0.0018 * force;
-          }
-
-          if (mode === "orbit") {
-           p.vx += -dy * 0.0011 * force;
-           p.vy += dx * 0.0011 * force;
-          }
-
-          if (mode === "collapse") {
-           p.vx += dx * 0.0022 * force;
-           p.vy += dy * 0.0022 * force;
-          if (dist < 34 * dpr) {
-            p.x = Math.random() * W;
-            p.y = Math.random() * H;
-          }
-         }
-
-          if (mode === "glow") {
-           p.vx += dx * 0.00045 * force;
-           p.vy += dy * 0.00045 * force;
-          }
-         }
-
-          p.a += 0.015;
-          p.vx += Math.cos(p.a) * 0.025 * dpr;
-          p.vy += Math.sin(p.a) * 0.025 * dpr;
-
-          p.vx *= 0.94;
-          p.vy *= 0.94;
-
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.x < -20) p.x = W + 20;
-          if (p.x > W + 20) p.x = -20;
-          if (p.y < -20) p.y = H + 20;
-          if (p.y > H + 20) p.y = -20;
-
-         const glow = mouse.active ? 0.25 + force * 0.75 : 0.22;
-         const size = p.r * (mouse.active ? 2.2 + force * 5.5 : 2.4);
-
-          ctx.beginPath();
-          ctx.fillStyle = `${p.color}${glow})`;
-          ctx.shadowBlur = 18 * glow;
-          ctx.shadowColor = `${p.color}0.9)`;
-          ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
-          ctx.fill();
-          }
-
-          ctx.shadowBlur = 0;
-           requestAnimationFrame(draw);
-          }
-
-         draw();
+          requestAnimationFrame(draw);
         })();
-
-
 
         // ==============================
         // SELECTED WORKS / PROJECTS
@@ -470,7 +317,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                         profileImageUrl: d.profileImageUrl || d.profileImage || "",
                         videoUrl: d.videoUrl || "",
                         categories: Array.isArray(d.categories) ? d.categories : [],
-                        likes: typeof d.likes === "number" ? d.likes : 0,
                         works: Array.isArray(d.works) ? d.works : [],
                         createdAt: d.createdAt || null
                     });
@@ -619,33 +465,8 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 compEl.className = "creator-company";
                 compEl.textContent = c.company || "";
 
-                const footer = document.createElement("div");
-                footer.className = "card-footer";
-
-                const likesLabel = document.createElement("span");
-                likesLabel.textContent = `${c.likes} ♥`;
-
-                const likeBtn = document.createElement("button");
-                likeBtn.className = "like-btn";
-                likeBtn.innerHTML = '<span class="heart">👍</span> いいね';
-                likeBtn.addEventListener("click", async (e) => {
-                    e.stopPropagation();
-                    try {
-                        await updateDoc(doc(db, "creators", c.id), { likes: increment(1) });
-                        c.likes += 1;
-                        likesLabel.textContent = `${c.likes} ♥`;
-                    } catch (err) {
-                        console.error(err);
-                        alert("いいねの送信に失敗しました");
-                    }
-                });
-
-                footer.appendChild(likesLabel);
-                footer.appendChild(likeBtn);
-
                 body.appendChild(nameEl);
                 body.appendChild(compEl);
-                body.appendChild(footer);
 
                 card.appendChild(tw);
                 card.appendChild(body);
@@ -916,134 +737,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             container.appendChild(grid);
         }
 
-        // CHAT（Firestoreサブコレクション）
-        function listenComments(creatorId) {
-            const list = document.getElementById("commentList");
-            if (!list) return;
-            list.innerHTML = "";
-
-            if (messagesUnsub) {
-                messagesUnsub();
-                messagesUnsub = null;
-            }
-
-            const colRef = collection(db, "creators", creatorId, "messages");
-            const q = query(colRef, orderBy("createdAt", "asc"));
-
-            messagesUnsub = onSnapshot(q, snapshot => {
-                list.innerHTML = "";
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const isMine = data.clientId === clientId;
-
-                    const row = document.createElement("div");
-                    row.className = "comment-row " + (isMine ? "mine" : "theirs");
-
-                    const bubble = document.createElement("div");
-                    bubble.className = "comment-bubble";
-                    bubble.textContent = data.text || "";
-
-                    const meta = document.createElement("div");
-                    meta.className = "comment-meta";
-
-                    let dateStr = "";
-                    if (data.createdAt?.toDate) {
-                        const d = data.createdAt.toDate();
-                        dateStr = d.toLocaleString("ja-JP", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        });
-                    }
-                    meta.textContent = (data.nickname || "匿名") + (dateStr ? ` · ${dateStr}` : "");
-                    bubble.appendChild(meta);
-
-                    row.appendChild(bubble);
-
-                    const canDelete = isMine || isAdmin;
-                    if (canDelete) {
-                        const del = document.createElement("button");
-                        del.className = "comment-delete";
-                        del.textContent = "削除";
-                        del.onclick = async (e) => {
-                            e.stopPropagation();
-                            if (!confirm("このメッセージを削除しますか？")) return;
-                            try {
-                                await deleteDoc(doc(db, "creators", creatorId, "messages", docSnap.id));
-                            } catch (err) {
-                                console.error(err);
-                                alert("削除に失敗しました");
-                            }
-                        };
-                        row.appendChild(del);
-                    }
-
-                    list.appendChild(row);
-                });
-
-                list.scrollTop = list.scrollHeight;
-            });
-        }
-
-        function setupCommentInput(creatorId) {
-            const input = $("#commentInput");
-            const send = $("#commentSend");
-            const nickIn = $("#nicknameInput");
-            if (!input || !send || !nickIn) return;
-
-            const storedNick = localStorage.getItem("pcl_nickname");
-            if (storedNick && !nickIn.value) {
-                nickIn.value = storedNick;
-            }
-
-            async function doSend() {
-                const text = input.value.trim();
-                const nick = nickIn.value.trim();
-                if (!nick) {
-                    alert("ニックネームを入力してください。");
-                    nickIn.focus();
-                    return;
-                }
-                if (!text) return;
-
-                if (text.startsWith("/admin ")) {
-                    const code = text.replace("/admin ", "").trim();
-                    if (code === ADMIN_SECRET) {
-                        isAdmin = true;
-                        alert("管理者モードになりました（このブラウザのみ）");
-                    } else {
-                        alert("管理者コードが違います");
-                    }
-                    input.value = "";
-                    return;
-                }
-
-                localStorage.setItem("pcl_nickname", nick);
-
-                try {
-                    await addDoc(collection(db, "creators", creatorId, "messages"), {
-                        text,
-                        nickname: nick,
-                        clientId,
-                        createdAt: serverTimestamp()
-                    });
-                    input.value = "";
-                } catch (err) {
-                    console.error(err);
-                    alert("メッセージ送信に失敗しました");
-                }
-            }
-
-            send.onclick = () => { doSend(); };
-            input.onkeydown = (e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    doSend();
-                }
-            };
-        }
-
         function openDetailById(id) {
             try {
                 const c = creators.find(x => x.id === id);
@@ -1090,8 +783,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
             renderMainVideo(c.videoUrl);
             renderWorks(c.works);
-            listenComments(c.id);
-            setupCommentInput(c.id);
 
 
             const ov = document.getElementById("detailOverlay");
@@ -1114,16 +805,9 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             const overlay = $("#detailOverlay");
             const videoWrap = $("#detailVideoContainer");
             const worksWrap = $("#worksContainer");
-            const list = $("#commentList");
-
             overlay.classList.remove("show");
-            if (messagesUnsub) {
-                messagesUnsub();
-                messagesUnsub = null;
-            }
             if (videoWrap) videoWrap.innerHTML = "";
             if (worksWrap) worksWrap.innerHTML = "";
-            if (list) list.innerHTML = "";
             const contactOpen = document.getElementById("contactOverlay")?.classList.contains("show");
             if (!contactOpen) document.body.style.overflow = "";
 
@@ -1179,111 +863,43 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             const ov = $("#menuOverlay");
             if (!btn || !ov) return;
 
-            function toggle() {
+            const closeMenu = () => {
+                btn.classList.remove("active");
+                ov.classList.remove("show");
+            };
+
+            const toggle = () => {
                 btn.classList.toggle("active");
                 ov.classList.toggle("show");
-            }
+            };
 
             btn.addEventListener("click", toggle);
             ov.addEventListener("click", e => {
-                if (e.target.id === "menuOverlay") toggle();
+                if (e.target.id === "menuOverlay") closeMenu();
             });
 
-            $("#linkMarket")?.addEventListener("click", e => {
-                e.preventDefault();
-                toggle();
-                alert("Creator’s Market（ECモール構想）の仮画面です。");
+            ov.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener("click", e => {
+                    const targetId = link.getAttribute("href");
+                    if (!targetId || targetId === "#") return;
+                    e.preventDefault();
+                    closeMenu();
+                    document.querySelector(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
             });
-            $("#linkAI")?.addEventListener("click", e => {
+
+            $("#menuContact")?.addEventListener("click", e => {
                 e.preventDefault();
-                toggle();
-                alert("Creator’s AI Consulting（AIクローン相談）の仮画面です。");
+                closeMenu();
+                $("#contactBtn")?.click();
             });
-            $("#linkGuild")?.addEventListener("click", e => {
-                e.preventDefault();
-                toggle();
-                alert("Creator’s Guild Produce（課題相談→クリエイターアサイン）の仮画面です。");
+
+            window.addEventListener("keydown", e => {
+                if (e.key === "Escape" && ov.classList.contains("show")) closeMenu();
             });
+
             document.body.style.overflow = "";
         }
-      // ==============================
-      // CGC BGM
-      // ==============================
-      const BGM_TRACKS = [
-  "audio/bgm-01.mp3",
-  "audio/bgm-02.mp3",
-  "audio/bgm-03.mp3",
-  "audio/bgm-04.mp3"
-];
-
-let bgmTrackIndex = -1;
-let bgmEnabled = false;
-
-const bgmAudio = new Audio();
-bgmAudio.loop = true;
-bgmAudio.volume = 0.42;
-bgmAudio.preload = "auto";
-
-function setupBgmToggle() {
-  const btn = document.getElementById("soundToggleBtn");
-  const text = document.getElementById("soundToggleText");
-
-  if (!btn || !text) return;
-
-  function updateUI() {
-    btn.classList.toggle("is-on", bgmEnabled);
-    text.textContent = bgmEnabled
-      ? `SOUND ON ${bgmTrackIndex + 1}/4`
-      : "SOUND OFF";
-  }
-
-  async function playTrack(index) {
-    bgmTrackIndex = index;
-    bgmEnabled = true;
-
-    bgmAudio.pause();
-    bgmAudio.src = BGM_TRACKS[bgmTrackIndex];
-    bgmAudio.currentTime = 0;
-
-    updateUI();
-    unlockAudio();
-
-    try {
-      await bgmAudio.play();
-    } catch (err) {
-      console.warn("BGM play blocked:", err);
-    }
-  }
-
-  function stopBgm() {
-    bgmAudio.pause();
-    bgmAudio.currentTime = 0;
-    bgmTrackIndex = -1;
-    bgmEnabled = false;
-    updateUI();
-  }
-
-  btn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    playClickSE();
-
-    const nextIndex = bgmTrackIndex + 1;
-
-    if (nextIndex >= BGM_TRACKS.length) {
-      stopBgm();
-      return;
-    }
-
-    await playTrack(nextIndex);
-  });
-
-  updateUI();
- }
-
-
-
         // ==============================
         // CGC 3D HERO / Three.js GLB Viewer
         // ==============================
@@ -1568,7 +1184,6 @@ function setupBgmToggle() {
       e.stopPropagation();
 
       unlockAudio();
-      playClickSE();
 
       nextModel();
       restartAutoModelTimer();
@@ -1579,7 +1194,6 @@ function setupBgmToggle() {
       e.stopPropagation();
 
       unlockAudio();
-      playClickSE();
 
       prevModel();
       restartAutoModelTimer();
@@ -1688,6 +1302,169 @@ function setupBgmToggle() {
      requestAnimationFrame(animate);
      } // setupCgcHero3D
 
+
+    // ==============================
+    // CGC ARTIFACT / 3D LOGO
+    // ==============================
+    function setupCgcArtifact3D() {
+      const mount = document.getElementById("cgcArtifactCanvas");
+      if (!mount) return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        34,
+        Math.max(mount.clientWidth, 1) / Math.max(mount.clientHeight, 1),
+        0.1,
+        100
+      );
+      camera.position.set(0, 0.08, 4.1);
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance"
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+      renderer.setSize(mount.clientWidth, mount.clientHeight);
+      renderer.setClearColor(0x000000, 0);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      renderer.domElement.setAttribute("aria-hidden", "true");
+      mount.appendChild(renderer.domElement);
+
+      scene.add(new THREE.AmbientLight(0xf4f9fc, 0.58));
+
+      const key = new THREE.DirectionalLight(0xf5fbff, 4.6);
+      key.position.set(3.4, 4.2, 5.0);
+      key.intensity = 3.15;
+      scene.add(key);
+
+      const rim = new THREE.PointLight(0xe8f8ff, 4.8, 12);
+      rim.position.set(-2.6, 1.8, 3.0);
+      scene.add(rim);
+
+      const scanLight = new THREE.PointLight(0xffffff, 0, 7.0);
+      scanLight.position.set(-3.2, 0.2, 2.5);
+      scene.add(scanLight);
+
+      const loader = new GLTFLoader();
+      let model = null;
+      let modelReady = false;
+      let targetY = 0;
+      let currentY = 0;
+      let pointerX = 0;
+      let pointerY = 0;
+      let active = false;
+      let hovering = false;
+      let lastTime = performance.now();
+
+      loader.load(
+        "models/cgc-logo.glb",
+        (gltf) => {
+          model = gltf.scene;
+
+          const box = new THREE.Box3().setFromObject(model);
+          const size = new THREE.Vector3();
+          const center = new THREE.Vector3();
+          box.getSize(size);
+          box.getCenter(center);
+
+          const maxAxis = Math.max(size.x, size.y, size.z) || 1;
+          const scale = 2.15 / maxAxis;
+          model.scale.setScalar(scale);
+          model.position.sub(center.multiplyScalar(scale));
+          model.rotation.set(0.08, -0.12, 0.02);
+
+          model.traverse((obj) => {
+            if (!obj.isMesh) return;
+            if (obj.material) {
+              const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+              materials.forEach((material) => {
+                if (material.color) material.color.setRGB(0.34, 0.39, 0.42);
+                if ("roughness" in material) material.roughness = 0.11;
+                if ("metalness" in material) material.metalness = 0.98;
+                if ("emissive" in material) { material.emissive.setRGB(0.028, 0.038, 0.045); material.emissiveIntensity = 0.34; }
+                material.needsUpdate = true;
+              });
+            }
+          });
+
+          scene.add(model);
+          modelReady = true;
+        },
+        undefined,
+        (err) => {
+          console.warn("CGC Artifact GLB load failed:", err);
+        }
+      );
+
+      const observer = new IntersectionObserver((entries) => {
+        active = entries.some((entry) => entry.isIntersecting);
+      }, { threshold: 0.08 });
+      observer.observe(mount);
+
+      const onPointerMove = (event) => {
+        const rect = mount.getBoundingClientRect();
+        pointerX = ((event.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1;
+        pointerY = ((event.clientY - rect.top) / Math.max(rect.height, 1)) * 2 - 1;
+        hovering = true;
+      };
+
+      mount.addEventListener("pointermove", onPointerMove, { passive: true });
+      mount.addEventListener("pointerenter", () => { hovering = true; }, { passive: true });
+      mount.addEventListener("pointerleave", () => {
+        hovering = false;
+        pointerX = 0;
+        pointerY = 0;
+      }, { passive: true });
+
+      function resize() {
+        const width = mount.clientWidth;
+        const height = mount.clientHeight;
+        if (!width || !height) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }
+      window.addEventListener("resize", resize, { passive: true });
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+        if (!active && !modelReady) return;
+
+        const dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+
+        if (model && active) {
+          const time = now * 0.001;
+          targetY = Math.sin(time * 0.16) * 0.055 + pointerX * 0.075;
+          currentY += (targetY - currentY) * 0.035;
+
+          model.rotation.y = currentY;
+          model.rotation.x = 0.055 + pointerY * -0.045 + Math.sin(time * 0.20) * 0.018;
+          model.position.y = Math.sin(time * 0.42) * 0.04;
+          model.position.z = Math.sin(time * 0.21) * 0.025;
+
+          const scan = (Math.sin(time * 0.72) + 1) * 0.5;
+          scanLight.position.x = -3.0 + scan * 6.0;
+          scanLight.position.y = 0.15 + Math.sin(time * 0.43) * 0.5;
+          scanLight.intensity = 0.55 + Math.pow(Math.max(0, Math.sin(time * 0.72)), 10) * 8.0;
+          if (hovering) {
+            rim.intensity += (6.8 - rim.intensity) * Math.min(dt * 3.0, 1);
+            scanLight.intensity *= 1.35;
+          } else {
+            rim.intensity += (4.8 - rim.intensity) * Math.min(dt * 2.0, 1);
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      resize();
+      requestAnimationFrame(animate);
+    }
+
      function setupWorkflowVideos() {
        document.querySelectorAll(".workflow-step").forEach((step) => {
          const video = step.querySelector("video");
@@ -1729,29 +1506,36 @@ function setupBgmToggle() {
         setupWorksLightbox();
         setupProjectModal();
         setupWorkflowVideos();
-        setupBgmToggle();
 
        loadCreators();
        loadProjects();
 
-        document.addEventListener("pointerdown", () => {
-       unlockAudio();
-       }, { once: true });
+       const heroVideo = document.querySelector(".cgc-cinematic-video");
+       if (heroVideo) {
+         const heroSources = [
+           "media/cgc-hero.mp4",
+           "media/cgc-hero-2.mp4"
+         ];
+         let heroIndex = Number(localStorage.getItem("cgcHeroVideoIndex") || "0");
+         heroIndex = heroIndex === 1 ? 1 : 0;
+         heroVideo.src = heroSources[heroIndex];
+         heroVideo.load();
+         heroVideo.play().catch(() => {});
+         localStorage.setItem("cgcHeroVideoIndex", String(heroIndex === 0 ? 1 : 0));
+         heroVideo.addEventListener("error", () => {
+           if (heroIndex === 1) {
+             heroVideo.src = heroSources[0];
+             heroVideo.load();
+             heroVideo.play().catch(() => {});
+           }
+         }, { once: true });
+       }
 
-       document.addEventListener("pointerover", (e) => {
-       const target = e.target.closest(
-       ".model-arrow, .contact-btn, .workflow-step, .card, #toTopBtn, #toBottomBtn, .menu-button"
-       );
-
-      if (!target) return;
-      playHoverSE();
-      });
-
-      try {
-      setupCgcHero3D();
+       try {
+        // v8: Artifact uses the official PNG identity; no GLB initialization.
       } catch (err) {
-      console.error("3D init error:", err);
-     }
+        console.error("Artifact 3D init error:", err);
+      }
     })();
 
         const toBottomBtn = document.getElementById("toBottomBtn");

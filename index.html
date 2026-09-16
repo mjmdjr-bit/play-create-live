@@ -665,23 +665,6 @@
             color: #9ca3af;
         }
 
-        .like-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.35);
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .like-btn .heart {
-            color: #fb7185;
-            font-size: 12px;
-        }
-
         .category-chip {
             display: inline-flex;
             align-items: center;
@@ -909,104 +892,6 @@
             color: #9ca3af;
             text-transform: uppercase;
             letter-spacing: .08em;
-        }
-
-        /* CHAT��LINE鬚ｨ�� */
-        .comment-section {
-            margin-top: 4px;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid #1f2937;
-            background: rgba(15, 23, 42, 0.9);
-            max-height: 260px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .comment-list {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .comment-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .comment-row.mine {
-            justify-content: flex-end;
-        }
-
-        .comment-row.theirs {
-            justify-content: flex-start;
-        }
-
-        .comment-bubble {
-            max-width: 80%;
-            padding: 6px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-
-        .comment-row.theirs .comment-bubble {
-            background: #0f172a;
-            border: 1px solid #1f2937;
-            color: #e5e7eb;
-        }
-
-        .comment-row.mine .comment-bubble {
-            background: #1d4ed8;
-            border: 1px solid #60a5fa;
-            color: #e5f0ff;
-        }
-
-        .comment-meta {
-            font-size: 10px;
-            color: #9ca3af;
-            margin-top: 2px;
-        }
-
-        .comment-delete {
-            border: none;
-            background: transparent;
-            color: #fca5a5;
-            font-size: 10px;
-            cursor: pointer;
-            padding: 2px 4px;
-            align-self: center;
-        }
-
-        .comment-input-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .comment-input-row input {
-            flex: 1;
-            font-size: 12px;
-            border-radius: 999px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            padding: 6px 10px;
-        }
-
-        .comment-input-row button {
-            border-radius: 999px;
-            border: none;
-            padding: 6px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #ffb457, #ff8c37);
-            color: #111827;
         }
 
         /* EDIT繝懊ち繝ｳ繝ｻ繝輔ャ繧ｿ繝ｼ */
@@ -2737,6 +2622,473 @@
 .project-video-play::before { content:""; position:absolute; left:23px; top:18px; border-top:11px solid transparent; border-bottom:11px solid transparent; border-left:16px solid rgba(245,253,255,.96); filter:drop-shadow(0 0 8px rgba(100,230,255,.75)); }
 .project-url-preview { width:100%; height:100%; display:grid; place-items:center; padding:24px; color:#dbeafe; letter-spacing:.16em; text-align:center; background:radial-gradient(circle at 50% 45%,rgba(56,189,248,.18),transparent 45%),linear-gradient(145deg,#111827,#020617); }
 
+
+/* =========================================================
+   CGC REDESIGN V2 — CINEMATIC BLACK WORLD
+========================================================= */
+:root {
+  --cgc-black: #020202;
+  --cgc-white: #f7f8fa;
+  --cgc-muted: rgba(232,236,242,.64);
+  --cgc-line: rgba(255,255,255,.13);
+  --cgc-silver: rgba(222,232,240,.72);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: #000 !important;
+  color: var(--cgc-white);
+}
+
+#particles {
+  background: #000 !important;
+  opacity: .42;
+}
+
+/* ---------- HERO ---------- */
+.cgc-cinematic-hero {
+  position: relative;
+  min-height: 100svh;
+  height: 100svh;
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+}
+
+.cgc-cinematic-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+  filter: contrast(1.02) brightness(.98);
+}
+
+.cgc-hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.26), transparent 18%, transparent 76%, rgba(0,0,0,.36)),
+    radial-gradient(circle at center, transparent 48%, rgba(0,0,0,.34) 100%);
+}
+
+.cgc-hero-meta {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,.66);
+  font-size: 9px;
+  line-height: 1.2;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.cgc-hero-meta-left { left: 5vw; }
+.cgc-hero-meta-right { right: 5vw; text-align: right; }
+
+.cgc-hero-scroll {
+  position: absolute;
+  z-index: 3;
+  left: 5vw;
+  bottom: 42px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: rgba(255,255,255,.78);
+  font-size: 9px;
+  letter-spacing: .34em;
+}
+
+.cgc-scroll-line {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.9), transparent);
+  box-shadow: 0 0 10px rgba(190,235,255,.42);
+}
+
+.cgc-hero-index {
+  position: absolute;
+  z-index: 3;
+  right: 5vw;
+  bottom: 42px;
+  color: rgba(255,255,255,.62);
+  font-size: 9px;
+  letter-spacing: .28em;
+}
+
+/* ---------- PHILOSOPHY ---------- */
+.cgc-philosophy {
+  position: relative;
+  padding: 16vh 20px 18vh;
+  background:
+    linear-gradient(to bottom, #000, #040404),
+    #000;
+}
+
+.cgc-philosophy-inner {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cgc-section-kicker {
+  margin-bottom: 20px;
+  color: rgba(205,226,235,.58);
+  font-size: 10px;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+}
+
+.cgc-philosophy h2,
+.cgc-artifact h2 {
+  margin: 0;
+  font-size: clamp(44px, 7vw, 96px);
+  line-height: .96;
+  letter-spacing: -.055em;
+  font-weight: 700;
+}
+
+.cgc-philosophy p,
+.cgc-artifact-copy p {
+  max-width: 700px;
+  margin: 34px auto 0;
+  color: var(--cgc-muted);
+  font-size: clamp(14px, 1.5vw, 17px);
+  line-height: 2.05;
+}
+
+/* ---------- ARTIFACT ---------- */
+.cgc-artifact {
+  position: relative;
+  min-height: 86vh;
+  display: grid;
+  grid-template-columns: minmax(280px,.72fr) minmax(420px,1.28fr);
+  align-items: center;
+  gap: 40px;
+  width: min(1260px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 8vh 0 12vh;
+}
+
+.cgc-artifact-copy {
+  position: relative;
+  z-index: 2;
+}
+
+.cgc-artifact-copy p {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.cgc-artifact-stage {
+  position: relative;
+  min-height: 560px;
+  overflow: visible;
+}
+
+.cgc-artifact-canvas {
+  position: absolute;
+  inset: 0;
+  min-height: 560px;
+  z-index: 2;
+}
+
+.cgc-artifact-glow {
+  position: absolute;
+  inset: 18% 5%;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(210,236,255,.16), rgba(130,190,220,.05) 35%, transparent 72%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+/* ---------- WORKFLOW / WORKS / CREATORS ---------- */
+.workflow-section {
+  width: min(1260px, calc(100% - 64px)) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 12vh 0 10vh !important;
+}
+
+.workflow-head {
+  width: min(920px, 100%);
+  margin: 0 auto 54px !important;
+  text-align: center;
+}
+
+.workflow-kicker,
+.selected-works-kicker,
+.creators-kicker {
+  color: rgba(205,226,235,.58) !important;
+  letter-spacing: .34em !important;
+}
+
+.workflow-head h2,
+.selected-works-title,
+.creators-title {
+  color: #f4f7fa !important;
+  letter-spacing: -.04em !important;
+}
+
+.workflow-head p,
+.selected-works-copy,
+.creators-copy {
+  color: rgba(232,236,242,.60) !important;
+}
+
+.workflow-timeline {
+  gap: 20px !important;
+}
+
+.workflow-step {
+  border-color: rgba(255,255,255,.14) !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.018)) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,.42) !important;
+}
+
+.workflow-step:hover {
+  border-color: rgba(215,240,250,.44) !important;
+  box-shadow: 0 30px 100px rgba(0,0,0,.54), 0 0 28px rgba(160,220,255,.09) !important;
+}
+
+.workflow-content p { color: rgba(232,236,242,.64) !important; }
+
+.selected-works {
+  width: min(1260px, calc(100% - 64px)) !important;
+  margin: 0 auto !important;
+  padding: 12vh 0 14vh !important;
+}
+
+.project-grid { gap: 1px !important; background: rgba(255,255,255,.11); }
+.project-card {
+  min-height: 540px !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: #050505 !important;
+}
+.project-card-media::after {
+  background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,.16) 45%, rgba(0,0,0,.92) 100%) !important;
+}
+.project-card-category { color: rgba(220,238,245,.70) !important; }
+
+main.container {
+  width: min(1260px, calc(100% - 64px)) !important;
+  max-width: none !important;
+  padding: 12vh 0 12vh !important;
+}
+
+.creators-head {
+  max-width: 900px !important;
+  margin: 0 auto 58px !important;
+  text-align: center !important;
+}
+
+.creators-copy { margin-left: auto !important; margin-right: auto !important; }
+
+.grid { gap: 1px !important; background: rgba(255,255,255,.11); }
+.card {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #050505 !important;
+  box-shadow: none !important;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 22px 70px rgba(0,0,0,.44) !important; }
+
+.toolbar {
+  margin-top: 32px !important;
+  margin-bottom: 18px !important;
+}
+
+/* Existing top GLB / controls are no longer part of the hero. */
+.hero-3d-section,
+.hero-3d-wrap,
+.hero-3d,
+#hero3dCanvas,
+#hero3dPlaceholder,
+.model-arrow,
+.hero-3d-hint {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .cgc-hero-meta { display: none; }
+  .cgc-cinematic-hero { min-height: 100svh; height: 100svh; }
+  .cgc-artifact {
+    grid-template-columns: 1fr;
+    width: min(100% - 28px, 760px);
+    padding: 7vh 0 10vh;
+  }
+  .cgc-artifact-copy { text-align: center; }
+  .cgc-artifact-copy p { margin-left: auto; margin-right: auto; }
+  .cgc-artifact-stage { min-height: 460px; }
+  .cgc-artifact-canvas { min-height: 460px; }
+  .workflow-section,
+  .selected-works,
+  main.container {
+    width: min(100% - 28px, 760px) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .cgc-hero-scroll { left: 20px; bottom: 30px; }
+  .cgc-hero-index { right: 20px; bottom: 30px; }
+  .cgc-philosophy { padding: 12vh 18px 14vh; }
+  .cgc-philosophy h2,
+  .cgc-artifact h2 { font-size: clamp(40px, 12vw, 64px); }
+  .cgc-artifact-stage,
+  .cgc-artifact-canvas { min-height: 380px; }
+  .project-card { min-height: 390px !important; }
+}
+
+/* Use the monochrome world for background particles. */
+
+
+/* ==========================================================
+   CGC REDESIGN v3 — MONOCHROME SYSTEM
+   One visual language: black / white / silver / hairline light.
+========================================================== */
+:root{
+  --cgc-black:#000;
+  --cgc-ink:#050505;
+  --cgc-white:#f5f7f8;
+  --cgc-muted:rgba(235,240,244,.58);
+  --cgc-dim:rgba(235,240,244,.34);
+  --cgc-line:rgba(225,240,248,.16);
+  --cgc-line-hi:rgba(225,245,252,.42);
+  --cgc-glow:rgba(180,230,250,.14);
+  --accent:#eef7fb;
+  --accent2:#dcebf2;
+  --card:rgba(255,255,255,.018);
+  --border:var(--cgc-line);
+  --text:var(--cgc-white);
+  --muted:var(--cgc-muted);
+}
+html{scroll-behavior:smooth;scroll-padding-top:36px}
+body{background:#000;color:var(--cgc-white);font-family:Inter,-apple-system,BlinkMacSystemFont,"Helvetica Neue","Noto Sans JP",sans-serif;letter-spacing:-.015em}
+.grain{opacity:.035!important}
+
+/* Global typography */
+.cgc-philosophy h2,.cgc-artifact h2,.workflow-head h2,.selected-works-title,.creators-title{
+  font-weight:560!important;letter-spacing:-.055em!important;line-height:.94!important;text-shadow:none!important;
+}
+.cgc-philosophy p,.cgc-artifact-copy p,.workflow-head p,.selected-works-copy,.creators-copy,
+.workflow-content p,.detail-about,.meta-text{font-weight:350!important;letter-spacing:.01em!important}
+.workflow-kicker,.selected-works-kicker,.creators-kicker,.cgc-artifact-kicker,.cgc-philosophy-index{
+  color:var(--cgc-dim)!important;font-size:10px!important;font-weight:500!important;letter-spacing:.34em!important;
+}
+
+/* Navigation: no floating navy card, just a spatial index */
+.menu-overlay{align-items:stretch!important;justify-content:flex-end!important;background:rgba(0,0,0,.72)!important;backdrop-filter:blur(26px) saturate(110%)!important;-webkit-backdrop-filter:blur(26px) saturate(110%)!important}
+.menu-panel{width:min(520px,100vw)!important;height:100%!important;border:0!important;border-left:1px solid var(--cgc-line)!important;border-radius:0!important;background:rgba(0,0,0,.88)!important;padding:clamp(90px,12vh,150px) clamp(30px,5vw,72px)!important;box-shadow:-30px 0 100px rgba(0,0,0,.55)!important}
+.menu-eyebrow{margin-bottom:44px;color:var(--cgc-dim);font-size:9px;letter-spacing:.38em}
+.menu-list{gap:0!important}
+.menu-list a{display:grid!important;grid-template-columns:42px 1fr;align-items:center;padding:17px 0!important;border:0!important;border-bottom:1px solid var(--cgc-line)!important;border-radius:0!important;background:transparent!important;color:rgba(245,248,250,.76)!important;font-size:clamp(18px,2vw,27px)!important;font-weight:420!important;letter-spacing:.06em!important;box-shadow:none!important;text-decoration:none}
+.menu-list a span{font-size:9px;color:var(--cgc-dim);letter-spacing:.16em}
+.menu-list a:hover{color:#fff!important;background:transparent!important;transform:translateX(7px)!important;box-shadow:none!important;text-shadow:0 0 22px rgba(205,240,255,.24)}
+.menu-button,.sound-toggle,#toTopBtn,#toBottomBtn{border-color:var(--cgc-line-hi)!important;background:rgba(0,0,0,.22)!important;box-shadow:0 0 22px rgba(170,225,245,.08),inset 0 0 18px rgba(255,255,255,.025)!important}
+.menu-button:hover,.sound-toggle:hover,#toTopBtn:hover,#toBottomBtn:hover{box-shadow:0 0 30px rgba(190,235,250,.18),inset 0 0 18px rgba(255,255,255,.05)!important}
+
+/* Remove old orange/yellow visual language */
+.contact-btn,.detail-contact-btn,.contact-send,.comment-input-row button,.edit-bottom-btn{
+  color:#f6f8f9!important;background:rgba(0,0,0,.56)!important;border:1px solid var(--cgc-line-hi)!important;box-shadow:0 0 24px rgba(190,235,250,.08)!important;font-weight:500!important;letter-spacing:.24em!important
+}
+.contact-btn:hover,.detail-contact-btn:hover,.contact-send:hover{filter:none!important;border-color:rgba(235,250,255,.75)!important;box-shadow:0 0 34px rgba(190,235,250,.18)!important}
+.detail-url a,.category-chip{color:rgba(235,245,250,.76)!important;border-color:var(--cgc-line-hi)!important;background:transparent!important;box-shadow:none!important;text-shadow:none!important}
+.workflow-content span{color:rgba(235,245,250,.52)!important}
+
+/* Sections: use space and hairlines, not cards */
+.cgc-philosophy{border-top:1px solid var(--cgc-line);border-bottom:1px solid var(--cgc-line)}
+.cgc-artifact{border-bottom:1px solid var(--cgc-line)}
+.workflow-section,.selected-works,main.container{border-bottom:1px solid var(--cgc-line)}
+
+/* Workflow — lighter, flatter, more editorial */
+.workflow-timeline{gap:1px!important;background:var(--cgc-line)!important}
+.workflow-step{border:0!important;border-radius:0!important;background:#030303!important;box-shadow:none!important;backdrop-filter:none!important}
+.workflow-step:hover{transform:none!important;background:#070707!important;box-shadow:inset 0 0 50px rgba(190,235,250,.025)!important}
+.workflow-image{filter:saturate(.15) contrast(1.08);opacity:.76;transition:filter .45s ease,opacity .45s ease}
+.workflow-step:hover .workflow-image{filter:saturate(.35) contrast(1.05);opacity:1}
+.workflow-content h3{font-weight:520!important;letter-spacing:.13em!important}
+
+/* Selected works */
+.project-grid{background:var(--cgc-line)!important}
+.project-card{background:#020202!important;box-shadow:none!important}
+.project-card-content{padding:30px!important}
+.project-card h3{font-weight:480!important;letter-spacing:-.035em!important}
+
+/* Creator directory — remove blue pills / old game-card feel */
+.grid{background:var(--cgc-line)!important;gap:1px!important}
+.card{background:#020202!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.card:hover{transform:none!important;background:#060606!important;box-shadow:inset 0 0 50px rgba(190,235,250,.025)!important}
+.thumb{filter:saturate(.22) contrast(1.06);opacity:.72!important;transition:filter .4s ease,opacity .4s ease,transform .5s ease!important}
+.card:hover .thumb{filter:saturate(.65) contrast(1.03);opacity:1!important;transform:scale(1.035)!important}
+.thumb-title{color:rgba(245,248,250,.74)!important;background:linear-gradient(to top,rgba(0,0,0,.82),transparent)!important;text-shadow:none!important;font-size:9px!important;letter-spacing:.18em!important}
+.creator-name{font-weight:520!important;letter-spacing:-.01em!important}
+.category-chip{border:0!important;border-top:1px solid var(--cgc-line)!important;border-bottom:1px solid var(--cgc-line)!important;border-radius:0!important;padding:5px 0!important;font-size:9px!important;letter-spacing:.14em!important}
+
+/* Filters */
+.toolbar input[type="search"],.toolbar select{border:0!important;border-bottom:1px solid var(--cgc-line-hi)!important;border-radius:0!important;background:transparent!important;padding:9px 2px!important;color:rgba(245,248,250,.78)!important}
+
+/* Creator modal: black editorial sheet instead of navy app dialog */
+.modal-overlay{background:rgba(0,0,0,.82)!important;backdrop-filter:blur(24px)!important}
+.modal{width:min(1180px,94vw)!important;background:rgba(3,3,3,.96)!important;border:1px solid var(--cgc-line)!important;border-radius:0!important;box-shadow:0 40px 140px rgba(0,0,0,.78)!important}
+.modal-head{border-bottom:1px solid var(--cgc-line);padding:22px 26px!important}
+.modal-body{gap:1px!important;padding:0!important;background:var(--cgc-line)!important}
+.modal-left,.modal-right{background:#030303;padding:26px!important}
+.work-card{background:#050505!important;border:1px solid var(--cgc-line)!important;border-radius:0!important}
+.work-thumb,.work-thumb img,.work-thumb video,.work-thumb iframe{border-radius:0!important}
+.comment-section{border:1px solid var(--cgc-line)!important;border-radius:0!important;background:#030303!important}
+
+/* Contact modal */
+.contact-overlay{background:rgba(0,0,0,.84)!important;backdrop-filter:blur(24px)!important}
+.contact-modal{border:1px solid var(--cgc-line)!important;border-radius:0!important;background:#030303!important;box-shadow:0 40px 140px rgba(0,0,0,.8)!important}
+.contact-head{border-bottom:1px solid var(--cgc-line)!important}
+.contact-form input,.contact-form textarea{border:0!important;border-bottom:1px solid var(--cgc-line-hi)!important;border-radius:0!important;background:transparent!important}
+
+@media(max-width:720px){
+  .menu-panel{width:100%!important;padding:100px 26px 36px!important;border-left:0!important}
+  .menu-list a{font-size:21px!important;padding:16px 0!important}
+  .modal{width:100%!important;max-height:100dvh!important;border-left:0!important;border-right:0!important}
+  .modal-body{display:block!important;background:#030303!important}
+  .modal-left,.modal-right{border-bottom:1px solid var(--cgc-line)}
+}
+
+
+/* ==============================
+   CGC REDESIGN V4 — LIVING SILVER
+============================== */
+.cgc-hero-brand{
+  position:absolute;left:50%;bottom:5.2vh;z-index:5;transform:translateX(-50%);
+  color:rgba(248,250,252,.92);font-size:clamp(9px,.72vw,12px);font-weight:500;
+  letter-spacing:.42em;white-space:nowrap;text-shadow:0 0 18px rgba(210,235,255,.16);
+}
+.cgc-philosophy-brand{margin:0 auto 26px;color:rgba(245,248,250,.72);font-size:10px;font-weight:500;letter-spacing:.38em;text-transform:uppercase}
+.cgc-philosophy h2,.cgc-artifact h2{font-weight:520!important;letter-spacing:-.045em!important}
+.cgc-philosophy p,.cgc-artifact-copy p{font-weight:350;letter-spacing:.015em}
+.cgc-form-lineage{margin-top:34px;color:rgba(224,235,240,.52);font-size:9px;letter-spacing:.26em;white-space:nowrap}
+.cgc-form-lineage span{display:inline-block;margin:0 12px;color:rgba(255,255,255,.24)}
+.cgc-artifact-stage::after{
+  content:"";position:absolute;left:8%;right:8%;top:50%;height:1px;z-index:3;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(240,250,255,0),rgba(240,250,255,.78),rgba(240,250,255,0),transparent);
+  opacity:.18;filter:blur(.2px) drop-shadow(0 0 8px rgba(200,235,255,.7));
+  transform:translateY(-50%) translateX(-80%);animation:cgcArtifactScan 9s cubic-bezier(.42,0,.22,1) infinite;
+}
+.cgc-artifact-stage:hover::after{opacity:.55;animation-duration:3.8s}
+.cgc-artifact-glow{opacity:.28!important;filter:blur(90px)!important;background:radial-gradient(ellipse,rgba(225,242,250,.10),rgba(155,200,220,.025) 38%,transparent 72%)!important;transition:opacity .6s ease}
+.cgc-artifact-stage:hover .cgc-artifact-glow{opacity:.48!important}
+@keyframes cgcArtifactScan{0%,15%{transform:translateY(-50%) translateX(-95%);opacity:0}24%{opacity:.12}45%{opacity:.42}65%{opacity:.10}78%,100%{transform:translateY(-50%) translateX(95%);opacity:0}}
+#particles{opacity:.68!important;filter:none!important}
+@media(max-width:720px){.cgc-hero-brand{bottom:7vh;font-size:8px;letter-spacing:.28em}.cgc-form-lineage{white-space:normal;line-height:2}.cgc-artifact h2{font-size:clamp(40px,11vw,62px)!important}}
+
 </style>
 <script type="importmap">
 {
@@ -2745,6 +3097,557 @@
   }
 }
 </script>
+
+<style id="cgc-v6-finish">
+/* ==============================
+   CGC v6 FINISH
+   Visible silver dust + stronger Artifact
+============================== */
+#particles{
+  z-index:0!important;
+  opacity:1!important;
+  pointer-events:none!important;
+  background:#000!important;
+}
+body > *:not(#particles):not(.grain){position:relative;z-index:1}
+.grain{z-index:2!important}
+.cgc-cinematic-hero{background:#000!important}
+.cgc-cinematic-video{z-index:1!important}
+.cgc-hero-vignette{z-index:2!important}
+.cgc-hero-meta,.cgc-hero-scroll,.cgc-hero-brand,.cgc-hero-index{z-index:3!important}
+.cgc-hero-brand{bottom:11.5vh!important}
+.contact-btn{bottom:28px!important}
+.cgc-artifact-stage{isolation:isolate!important}
+.cgc-artifact-canvas{z-index:4!important}
+.cgc-artifact-glow{z-index:2!important;opacity:.42!important;background:radial-gradient(ellipse,rgba(225,242,250,.18),rgba(155,200,220,.055) 36%,transparent 72%)!important;filter:blur(74px)!important}
+.cgc-artifact-stage::after{z-index:5!important;opacity:.3!important}
+.cgc-artifact-stage:hover::after{opacity:.9!important}
+
+/* No empty grey creator cells: let the page breathe. */
+.grid{background:transparent!important;gap:28px!important}
+.card{background:#020202!important}
+
+/* Dust should remain visible in the black negative space. */
+.cgc-philosophy,.cgc-artifact,.workflow-section,.selected-works,main.container{background:transparent!important}
+
+@media (max-width:900px){
+  .cgc-hero-brand{bottom:12vh!important;letter-spacing:.24em!important}
+  .contact-btn{bottom:20px!important}
+  .grid{gap:18px!important}
+}
+</style>
+
+
+<style id="cgc-v7-stability">
+/* CGC v7 — restore layout/interaction stability without changing composition */
+#particles{
+  position:fixed!important; inset:0!important; width:100vw!important; height:100vh!important;
+  z-index:0!important; pointer-events:none!important; background:transparent!important;
+  opacity:.82!important; mix-blend-mode:screen;
+}
+/* Undo v6 broad body-child positioning rule that changed fixed UI/layout behavior. */
+body > *:not(#particles):not(.grain){position:initial;z-index:auto}
+.grain{position:fixed!important;z-index:1!important;pointer-events:none!important}
+.cgc-cinematic-hero,.cgc-philosophy,.cgc-artifact,.workflow-section,.selected-works,main.container,footer{position:relative!important;z-index:2!important}
+.menu-button,.sound-toggle,.contact-btn,#toTopBtn,#toBottomBtn{position:fixed!important;z-index:120!important}
+.menu-overlay,.detail-overlay,.works-lightbox-overlay,.project-overlay,.contact-overlay{position:fixed!important;z-index:200!important}
+/* Keep creator and project hit areas completely separate. */
+.grid{position:relative!important;z-index:3!important;background:transparent!important}
+.card{position:relative!important;z-index:1!important;cursor:pointer!important;isolation:isolate}
+.selected-works{isolation:isolate}
+.project-grid{position:relative!important;z-index:2!important}
+.project-card{position:relative!important;z-index:1!important}
+/* Dust remains elegant but actually visible in negative space. */
+.cgc-philosophy,.cgc-artifact,.workflow-section,.selected-works,main.container{background-color:rgba(0,0,0,.08)!important}
+</style>
+
+
+<style id="cgc-v10-polish">
+/* ==========================================================
+   CGC v10 — LIGHT / NO FRAME / EDITORIAL INTERACTION
+   - No artifact frame or scan line
+   - PNG mark is the hero of the Artifact section
+   - Soft backlight originates behind the mark
+   - Selected Works are monochrome at rest
+   - Hover uses restrained white light accents, not color blocks
+========================================================== */
+
+/* ---------- Artifact: remove frame + scan ---------- */
+.cgc-artifact-stage,
+.cgc-artifact-logo,
+.cgc-artifact-logo img{
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none;
+}
+
+.cgc-artifact-stage{
+  min-height:560px !important;
+  display:grid !important;
+  place-items:center !important;
+  overflow:visible !important;
+  background:transparent !important;
+}
+
+.cgc-artifact-logo{
+  position:relative !important;
+  width:min(72%,560px) !important;
+  max-width:560px !important;
+  aspect-ratio:1.42 / 1;
+  display:grid !important;
+  place-items:center !important;
+  isolation:isolate;
+  cursor:default;
+  overflow:visible !important;
+}
+
+/* soft luminous field behind the logo */
+.cgc-artifact-logo::before{
+  content:"";
+  position:absolute;
+  inset:14% 8%;
+  z-index:0;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 50% 50%,
+      rgba(248,252,255,.34) 0%,
+      rgba(220,238,248,.18) 24%,
+      rgba(190,218,232,.07) 42%,
+      transparent 72%);
+  filter:blur(34px);
+  opacity:.74;
+  transform:scale(.96);
+  transition:opacity .8s ease,transform 1s cubic-bezier(.2,.7,.2,1),filter .8s ease;
+  pointer-events:none;
+}
+
+/* atmospheric smoke, kept extremely subtle */
+.cgc-artifact-smoke{
+  z-index:1 !important;
+  inset:6% 0 !important;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 48% 50%,
+      rgba(235,247,253,.16),
+      rgba(180,216,232,.06) 30%,
+      transparent 70%);
+  filter:blur(42px) !important;
+  opacity:.58 !important;
+  animation:cgcArtifactBreath 9s ease-in-out infinite alternate !important;
+}
+
+/* use the supplied PNG as the single identity source */
+.cgc-artifact-logo img{
+  position:relative !important;
+  z-index:3 !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  mix-blend-mode:screen !important;
+  filter:
+    brightness(.94)
+    contrast(1.06)
+    drop-shadow(0 0 12px rgba(235,247,255,.12))
+    drop-shadow(0 0 34px rgba(205,233,246,.10)) !important;
+  transition:
+    filter .6s cubic-bezier(.2,.7,.2,1),
+    transform .7s cubic-bezier(.2,.7,.2,1);
+}
+
+/* remove the previous traveling line completely */
+.cgc-artifact-scan,
+.cgc-artifact-stage::after{
+  display:none !important;
+  animation:none !important;
+}
+
+.cgc-artifact-logo:hover::before,
+.cgc-artifact-logo:focus-visible::before{
+  opacity:1 !important;
+  transform:scale(1.10) !important;
+  filter:blur(42px) !important;
+}
+
+.cgc-artifact-logo:hover .cgc-artifact-smoke,
+.cgc-artifact-logo:focus-visible .cgc-artifact-smoke{
+  opacity:.82 !important;
+  transform:scale(1.06) !important;
+}
+
+.cgc-artifact-logo:hover img,
+.cgc-artifact-logo:focus-visible img{
+  filter:
+    brightness(1.20)
+    contrast(1.04)
+    drop-shadow(0 0 10px rgba(255,255,255,.56))
+    drop-shadow(0 0 28px rgba(230,245,252,.24)) !important;
+  transform:scale(1.012) !important;
+}
+
+@keyframes cgcArtifactBreath{
+  0%{opacity:.44;transform:scale(.98) translate3d(-.6%,.4%,0)}
+  100%{opacity:.64;transform:scale(1.06) translate3d(.6%,-.4%,0)}
+}
+
+/* ---------- Selected Works: editorial monochrome ---------- */
+.project-grid{
+  gap:1px !important;
+  background:rgba(240,248,252,.13) !important;
+}
+
+.project-card{
+  min-height:520px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:#020202 !important;
+  box-shadow:none !important;
+  transition:background .45s ease,transform .65s cubic-bezier(.2,.7,.2,1);
+}
+
+.project-card-media{
+  inset:0 !important;
+  background:#010101 !important;
+}
+
+.project-card-media img,
+.project-card-media video,
+.project-card-media iframe{
+  filter:grayscale(1) saturate(0) contrast(1.06) brightness(.78) !important;
+  transition:
+    filter .75s cubic-bezier(.2,.7,.2,1),
+    transform .9s cubic-bezier(.2,.7,.2,1) !important;
+}
+
+.project-card-media::after{
+  background:
+    linear-gradient(180deg,
+      rgba(0,0,0,.02) 18%,
+      rgba(0,0,0,.22) 48%,
+      rgba(0,0,0,.92) 100%) !important;
+}
+
+.project-card-content{
+  padding:30px !important;
+}
+
+.project-card-index{
+  color:rgba(240,247,250,.54) !important;
+}
+
+.project-card-category{
+  color:rgba(231,239,244,.58) !important;
+}
+
+/* subtle white light point on hover */
+.project-card::before,
+.workflow-step::before,
+.card::before{
+  content:"";
+  position:absolute;
+  width:88px;
+  height:88px;
+  left:14%;
+  top:13%;
+  border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(255,255,255,.18) 0%,
+    rgba(240,250,255,.08) 22%,
+    transparent 68%);
+  filter:blur(2px);
+  opacity:0;
+  transform:scale(.72);
+  transition:opacity .6s ease,transform .8s cubic-bezier(.2,.7,.2,1);
+  pointer-events:none;
+  z-index:4;
+}
+
+.project-card:hover::before,
+.project-card:focus-visible::before,
+.workflow-step:hover::before,
+.card:hover::before{
+  opacity:.9;
+  transform:scale(1.08);
+}
+
+.project-card:hover .project-card-media img,
+.project-card:hover .project-card-media video,
+.project-card:focus-visible .project-card-media img,
+.project-card:focus-visible .project-card-media video{
+  filter:grayscale(.78) saturate(.18) contrast(1.08) brightness(.92) !important;
+  transform:scale(1.022) !important;
+}
+
+.project-card:hover .project-card-arrow,
+.project-card:focus-visible .project-card-arrow{
+  border-color:rgba(245,252,255,.62) !important;
+  background:rgba(255,255,255,.035) !important;
+  box-shadow:0 0 24px rgba(220,242,252,.16) !important;
+}
+
+/* ---------- WORKS detail / lightbox: remove old rounded-app feel ---------- */
+.project-overlay{
+  padding:0 !important;
+  background:rgba(0,0,0,.90) !important;
+  backdrop-filter:blur(22px) !important;
+  -webkit-backdrop-filter:blur(22px) !important;
+}
+
+.project-modal{
+  width:min(1180px,100vw) !important;
+  max-height:100dvh !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:#020202 !important;
+  box-shadow:none !important;
+}
+
+.project-modal-media{
+  border-radius:0 !important;
+  background:#000 !important;
+  border-bottom:1px solid rgba(240,248,252,.14) !important;
+}
+
+.project-modal-body{
+  padding:42px !important;
+  background:#020202 !important;
+}
+
+.project-modal-title{
+  font-weight:520 !important;
+}
+
+.project-modal-summary{
+  color:rgba(235,241,245,.68) !important;
+}
+
+.project-modal-link{
+  border:0 !important;
+  border-bottom:1px solid rgba(235,245,250,.52) !important;
+  border-radius:0 !important;
+  padding:10px 0 8px !important;
+  background:transparent !important;
+  letter-spacing:.18em;
+  transition:color .3s ease,border-color .3s ease,text-shadow .3s ease;
+}
+
+.project-modal-link:hover{
+  color:#fff !important;
+  border-color:#fff !important;
+  text-shadow:0 0 18px rgba(225,245,255,.24);
+}
+
+.project-close{
+  width:44px !important;
+  height:44px !important;
+  border:0 !important;
+  border-bottom:1px solid rgba(235,245,250,.48) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  color:#fff !important;
+  box-shadow:none !important;
+  transition:text-shadow .25s ease,border-color .25s ease;
+}
+.project-close:hover{
+  border-color:#fff !important;
+  text-shadow:0 0 18px rgba(225,245,255,.42);
+}
+
+.works-lightbox{
+  padding:0 !important;
+  background:rgba(0,0,0,.94) !important;
+}
+.works-lightbox-body img,
+.works-lightbox-body video,
+.works-lightbox-body iframe{
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+.works-lightbox-close{
+  border:0 !important;
+  border-bottom:1px solid rgba(235,245,250,.48) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+/* ---------- global hover language: white light, not color ---------- */
+.contact-btn,
+.detail-contact-btn,
+.menu-button,
+.sound-toggle,
+#toTopBtn,
+#toBottomBtn,
+.model-arrow,
+.project-card-arrow,
+.project-modal-link{
+  transition:
+    color .32s ease,
+    border-color .32s ease,
+    box-shadow .45s ease,
+    text-shadow .32s ease,
+    transform .45s cubic-bezier(.2,.7,.2,1) !important;
+}
+
+.contact-btn:hover,
+.detail-contact-btn:hover,
+.menu-button:hover,
+.sound-toggle:hover,
+#toTopBtn:hover,
+#toBottomBtn:hover,
+.model-arrow:hover{
+  color:#fff !important;
+  border-color:rgba(250,253,255,.78) !important;
+  box-shadow:
+    0 0 10px rgba(245,251,255,.10),
+    0 0 26px rgba(220,245,255,.12),
+    inset 0 0 12px rgba(255,255,255,.035) !important;
+  text-shadow:0 0 16px rgba(235,248,255,.28);
+}
+
+.workflow-step{
+  position:relative !important;
+  overflow:hidden !important;
+}
+.workflow-step:hover{
+  border-color:transparent !important;
+  background:#050505 !important;
+  box-shadow:inset 0 0 50px rgba(235,248,255,.035) !important;
+}
+
+.menu-list a{
+  position:relative !important;
+  transition:color .28s ease,text-shadow .35s ease,padding-left .45s cubic-bezier(.2,.7,.2,1) !important;
+}
+.menu-list a:hover{
+  color:#fff !important;
+  text-shadow:0 0 18px rgba(235,248,255,.25) !important;
+  padding-left:8px !important;
+}
+
+/* Creator cards: same restrained light language */
+.card{overflow:hidden !important}
+.card:hover{
+  background:#040404 !important;
+  box-shadow:inset 0 0 44px rgba(235,248,255,.035) !important;
+}
+
+/* no legacy roundness in Creator detail */
+.modal,
+.modal-head,
+.modal-left,
+.modal-right,
+.work-card,
+.work-thumb,
+.work-thumb img,
+.work-thumb video,
+.detail-contact-btn,
+.close{
+  border-radius:0 !important;
+}
+
+@media(max-width:900px){
+  .cgc-artifact-logo{width:min(82vw,430px)!important}
+  .project-modal-body{padding:28px 22px !important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .cgc-artifact-logo::before,
+  .cgc-artifact-smoke,
+  .project-card::before,
+  .workflow-step::before,
+  .card::before{animation:none!important;transition:none!important}
+}
+</style>
+
+
+<style id="cgc-v11-refine">
+/* CGC v11 — quiet color + light as the common interaction language */
+.sound-toggle{display:none!important}
+
+/* Selected Works retain a restrained amount of their original color. */
+.project-card{position:relative;isolation:isolate;overflow:hidden!important}
+.project-card-media img,
+.project-card-media video{
+  filter:grayscale(.62) saturate(.42) brightness(.74) contrast(1.08)!important;
+  transition:filter .65s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)!important;
+}
+.project-card:hover .project-card-media img,
+.project-card:hover .project-card-media video,
+.project-card:focus-visible .project-card-media img,
+.project-card:focus-visible .project-card-media video{
+  filter:grayscale(.28) saturate(.72) brightness(.90) contrast(1.06)!important;
+  transform:scale(1.018)!important;
+}
+
+/* One refined white backlight language for Works / Creators / Workflow. */
+.project-card::after,
+.card::after,
+.workflow-step::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border:1px solid rgba(238,248,252,0);
+  box-shadow:0 0 0 rgba(220,242,250,0),inset 0 0 0 rgba(255,255,255,0);
+  opacity:0;
+  pointer-events:none;
+  z-index:8;
+  transition:opacity .45s ease,border-color .45s ease,box-shadow .55s ease;
+}
+.project-card:hover::after,
+.project-card:focus-visible::after,
+.card:hover::after,
+.card:focus-visible::after,
+.workflow-step:hover::after,
+.workflow-step:focus-within::after{
+  opacity:1;
+  border-color:rgba(235,247,252,.42);
+  box-shadow:0 0 26px rgba(215,240,250,.10),inset 0 0 22px rgba(255,255,255,.025);
+}
+.card{position:relative;isolation:isolate}
+.card .thumb img{filter:grayscale(.55) saturate(.48) brightness(.82);transition:filter .6s ease,transform .7s ease}
+.card:hover .thumb img{filter:grayscale(.22) saturate(.72) brightness(.96);transform:scale(1.012)}
+
+/* Artifact: no frame, no travelling scan. Light comes from behind the mark. */
+.cgc-artifact-stage,.cgc-artifact-logo{border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important}
+.cgc-artifact-scan{display:none!important;animation:none!important}
+.cgc-artifact-logo::before{
+  content:""!important;
+  position:absolute!important;
+  inset:8% -5%!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:radial-gradient(ellipse at 50% 50%,rgba(255,255,255,.32) 0%,rgba(220,240,248,.16) 23%,rgba(175,210,226,.055) 44%,transparent 72%)!important;
+  filter:blur(44px)!important;
+  opacity:.78!important;
+  transform:scale(1)!important;
+  animation:cgcBacklightBreath 7s ease-in-out infinite alternate!important;
+  pointer-events:none!important;
+}
+.cgc-artifact-smoke{
+  background:radial-gradient(ellipse at 50% 50%,rgba(238,249,253,.13),rgba(190,220,233,.045) 35%,transparent 72%)!important;
+  filter:blur(54px)!important;
+  opacity:.62!important;
+}
+.cgc-artifact-logo img{
+  filter:brightness(1.02) contrast(1.04) drop-shadow(0 0 14px rgba(240,250,255,.18)) drop-shadow(0 0 42px rgba(205,235,246,.13))!important;
+}
+.cgc-artifact-logo:hover img,
+.cgc-artifact-logo:focus-visible img{
+  filter:brightness(1.24) contrast(1.02) drop-shadow(0 0 12px rgba(255,255,255,.62)) drop-shadow(0 0 44px rgba(220,244,252,.30))!important;
+}
+@keyframes cgcBacklightBreath{from{opacity:.58;transform:scale(.96)}to{opacity:.9;transform:scale(1.07)}}
+
+/* Creator detail must always be an independent fixed overlay. */
+#detailOverlay.modal-overlay{
+  position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;
+  z-index:5000!important;overflow:auto!important;overscroll-behavior:contain!important;
+}
+#detailOverlay.modal-overlay.show{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+#detailOverlay .modal{position:relative!important;z-index:1!important}
+
+@media(prefers-reduced-motion:reduce){.cgc-artifact-logo::before{animation:none!important}}
+</style>
+
 </head>
 
 <body>
@@ -2757,23 +3660,18 @@
         <div class="bar"></div>
         <div class="bar"></div>
     </div>
-
-    <button id="soundToggleBtn" class="sound-toggle" type="button" aria-label="Sound toggle" title="SOUND">
-     <span class="sound-record">
-       <span class="sound-record-core"></span>
-     </span>
-     <span id="soundToggleText" class="sound-toggle-text">SOUND OFF</span>
-    </button>
-
-    <!-- メニューオーバーレイ -->
+<!-- メニューオーバーレイ -->
     <div id="menuOverlay" class="menu-overlay">
         <div class="menu-panel">
-            <h2>CREATOR'S MENU</h2>
-            <ul class="menu-list">
-                <li><a href="#" id="linkMarket">Creator’s Market</a></li>
-                <li><a href="#" id="linkAI">Creator’s AI Consulting</a></li>
-                <li><a href="#" id="linkGuild">Creator’s Guild Produce</a></li>
-            </ul>
+            <div class="menu-eyebrow">CGC / INDEX</div>
+            <nav class="menu-list" aria-label="Site navigation">
+                <a href="#philosophy"><span>01</span>PHILOSOPHY</a>
+                <a href="#artifact"><span>02</span>CGC ARTIFACT</a>
+                <a href="#workflow"><span>03</span>WORK FLOW</a>
+                <a href="#selectedWorks"><span>04</span>SELECTED WORKS</a>
+                <a href="#creators"><span>05</span>CREATORS</a>
+                <a href="#" id="menuContact"><span>06</span>CONTACT</a>
+            </nav>
         </div>
     </div>
 
@@ -2802,7 +3700,7 @@
 
 
             <div class="modal-body">
-                <!-- 左：Main Video + WORKS + CHAT -->
+                <!-- 左：Main Video + WORKS -->
                 <div class="modal-left">
                     <div id="detailVideoContainer"></div>
 
@@ -2812,17 +3710,6 @@
                     <div class="meta-label" style="margin-top:12px;">WORKS</div>
                     <div id="worksContainer" class="works-section"></div>
 
-                    <div class="meta-label" style="margin-top:12px;">CHAT</div>
-                    <div class="comment-section">
-                        <input id="nicknameInput" type="text" placeholder="ニックネーム（必須）" style="width:100%;padding:8px 10px;margin-bottom:6px;
-                     border-radius:10px;border:1px solid #1f2937;
-                     background:#020617;color:#e5e7eb;" />
-                        <div id="commentList" class="comment-list"></div>
-                        <div class="comment-input-row">
-                            <input id="commentInput" type="text" placeholder="メッセージを入力…" />
-                            <button id="commentSend">送信</button>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- 右：ABOUT -->
@@ -2834,42 +3721,79 @@
         </div>
     </div>
 
-    <!-- HEADER / 3D HERO -->
-    <header class="hero-3d-section">
-      <div class="hero-copy">
-       <div class="hero-kicker">TOKYO</div>
-       <h1 class="hero-title">CREATORS’ GUILD COLLECTIVE</h1>
-       <p class="hero-lead">
-        共に、未来をつくる。<br>
-        CGCは、クリエイターとテクノロジーをつなぎ、<br>
-        革新的な価値を共創するクリエイティブ・ギルドです。
-      </p>
-     </div>
+    <!-- CGC CINEMATIC HERO -->
+    <header class="cgc-cinematic-hero" id="top">
+      <video
+        class="cgc-cinematic-video"
+        src="media/cgc-hero.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        aria-hidden="true"></video>
 
-     <div class="hero-3d-wrap">
-      <button id="modelPrevBtn" class="model-arrow model-arrow-left" type="button">‹</button>
-      <div class="hero-3d">
-        <div id="hero3dCanvas"></div>
+      <div class="cgc-hero-vignette" aria-hidden="true"></div>
 
-        <div id="hero3dPlaceholder" class="hero-placeholder">
-          <div class="hero-placeholder-logo">
-             CGC
-          </div>
+      <div class="cgc-hero-meta cgc-hero-meta-left">
+        <span>IDEAS</span>
+        <span>PEOPLE</span>
+        <span>TECHNOLOGY</span>
+        <span>CULTURE</span>
+      </div>
 
-          <div class="hero-placeholder-text">
-             3D LOGO LOADING
-          </div>
+      <div class="cgc-hero-meta cgc-hero-meta-right">
+        <span>A</span>
+        <span>MORE</span>
+        <span>CREATIVE</span>
+        <span>TOMORROW</span>
+      </div>
 
-          <div class="hero-placeholder-sub">
-             assets/models にGLBを配置すると
-             自動で3D表示へ切り替わります
-          </div>
-       </div>
-     </div>
-      <button id="modelNextBtn" class="model-arrow model-arrow-right" type="button">›</button>
-      <div class="hero-3d-hint">DRAG TO ROTATE / SWIPE TO CHANGE</div>
-     </div>
+      <div class="cgc-hero-scroll">
+        <span class="cgc-scroll-line"></span>
+        <span>SCROLL</span>
+      </div>
+
+      <div class="cgc-hero-brand" aria-label="Creators Guild Collective">CREATORS' GUILD COLLECTIVE</div>
+      <div class="cgc-hero-index">01 / 04</div>
     </header>
+
+    <!-- PHILOSOPHY -->
+    <section class="cgc-philosophy" id="philosophy">
+      <div class="cgc-philosophy-inner">
+        <div class="cgc-section-kicker">01 / PHILOSOPHY</div>
+        <div class="cgc-philosophy-brand">CREATORS' GUILD COLLECTIVE</div>
+        <h2>Form evolves.<br>Creativity endures.</h2>
+        <p>
+          受け継がれるもの。変わり続けるもの。<br>
+          時代を超えて継承されてきた創造の美学を尊び、変化の兆しを捉え、<br>
+          その本質をまだ見ぬ体験と新しい価値へ進化させ続けます。
+        </p>
+      </div>
+    </section>
+
+    <!-- CGC ARTIFACT / 3D LOGO -->
+    <section class="cgc-artifact" id="artifact">
+      <div class="cgc-artifact-copy">
+        <div class="cgc-section-kicker">CGC / EVOLUTION OF FORM</div>
+        <h2>Evolving form.<br>Enduring creativity.</h2>
+        <p>
+          CGCのシンボルは、古代ギリシャからエトルリア、そして現代のラテン文字へと
+          受け継がれ、磨かれてきた文字の系譜に着想を得ています。<br>
+          形は変わる。本質は受け継がれる。<br>
+          時代を読み、新しい価値へと進化し続けるCGCの姿勢を表現しています。
+        </p>
+        <div class="cgc-form-lineage" aria-label="Form lineage">GAMMA <span>→</span> OLD ITALIC <span>→</span> MODERN FORM</div>
+      </div>
+      <div class="cgc-artifact-stage">
+        <div class="cgc-artifact-logo" id="cgcArtifactLogo" tabindex="0" aria-label="CGC symbol">
+          <div class="cgc-artifact-smoke" aria-hidden="true"></div>
+          <img src="assets/brand/cgc-symbol.png" alt="CGC symbol">
+          <div class="cgc-artifact-scan" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="workflow-section workflow-flow" id="workflow">
       <div class="workflow-head">
       <div class="workflow-kicker">WORK FLOW</div>
@@ -2899,7 +3823,7 @@
 
      <article class="workflow-step">
       <div class="workflow-image">
-        <video autoplay muted loop playsinline>
+        <video muted loop playsinline preload="metadata">
           <source src="images/workflow/imagine.mp4" type="video/mp4">
         </video>
       </div>
@@ -2914,7 +3838,7 @@
 
      <article class="workflow-step">
       <div class="workflow-image">
-        <video autoplay muted loop playsinline>
+        <video muted loop playsinline preload="metadata">
           <source src="images/workflow/curate.mp4" type="video/mp4">
         </video>
       </div>
@@ -2929,7 +3853,7 @@
  
      <article class="workflow-step">
       <div class="workflow-image">
-        <video autoplay muted loop playsinline>
+        <video muted loop playsinline preload="metadata">
           <source src="images/workflow/create.mp4" type="video/mp4">
         </video>
       </div>
@@ -2944,7 +3868,7 @@
 
      <article class="workflow-step">
       <div class="workflow-image">
-        <video autoplay muted loop playsinline>
+        <video muted loop playsinline preload="metadata">
           <source src="images/workflow/build.mp4" type="video/mp4">
         </video>
       </div>
@@ -2959,7 +3883,7 @@
 
      <article class="workflow-step">
       <div class="workflow-image">
-        <video autoplay muted loop playsinline>
+        <video muted loop playsinline preload="metadata">
           <source src="images/workflow/deliver.mp4" type="video/mp4">
         </video>
       </div>
@@ -2986,7 +3910,7 @@
     </section>
 
     <!-- MAIN -->
-    <main class="container">
+    <main class="container" id="creators">
         <section class="creators-head">
 
         <div class="creators-kicker">
