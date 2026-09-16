@@ -3747,53 +3747,6 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
 }
 </style>
 
-
-<style id="cgc-v13-reveal-fix">
-/* CGC v13 — preserve typography + reset reveal when the heading leaves the viewport */
-.cgc-reveal-title .cgc-reveal-char{
-  display:inline;
-  opacity:0;
-  transform:none;
-  filter:blur(6px);
-  text-shadow:none;
-  transition:
-    opacity .56s cubic-bezier(.22,.61,.36,1),
-    filter .62s ease,
-    text-shadow .7s ease;
-  transition-delay:calc(var(--char-i) * 22ms);
-  will-change:opacity,filter;
-}
-
-.cgc-reveal-title.is-revealed .cgc-reveal-char{
-  opacity:1;
-  filter:blur(0);
-  text-shadow:0 0 22px rgba(235,248,255,.045);
-}
-
-.cgc-reveal-title.is-resetting .cgc-reveal-char{
-  opacity:0;
-  filter:blur(6px);
-  transition-delay:0ms;
-}
-
-@media (max-width:720px){
-  .cgc-reveal-title .cgc-reveal-char{
-    transition-delay:calc(var(--char-i) * 16ms);
-  }
-}
-
-@media (prefers-reduced-motion:reduce){
-  .cgc-reveal-title .cgc-reveal-char,
-  .cgc-reveal-title.is-resetting .cgc-reveal-char,
-  .cgc-reveal-title.is-revealed .cgc-reveal-char{
-    opacity:1!important;
-    filter:none!important;
-    transition:none!important;
-    text-shadow:none!important;
-  }
-}
-</style>
-
 </head>
 
 <body>

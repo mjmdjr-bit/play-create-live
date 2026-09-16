@@ -1533,66 +1533,48 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         ".selected-works-title",
         ".creators-title"
       ];
-
       const titles = document.querySelectorAll(selectors.join(","));
-      if (!titles.length) return;
 
       const wrapTextNodes = (root) => {
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         const nodes = [];
         while (walker.nextNode()) nodes.push(walker.currentNode);
-
         let charIndex = 0;
-        nodes.forEach((node) => {
-          const text = node.nodeValue || "";
-          if (!text) return;
-
+        nodes.forEach(node => {
+          const text = node.nodeValue;
+          if (!text || !text.trim()) return;
           const frag = document.createDocumentFragment();
-          for (const char of [...text]) {
-            // Keep whitespace as real text so browser line-wrapping, word spacing,
-            // kerning and the original line breaks remain untouched.
-            if (/\s/.test(char)) {
+          [...text].forEach(char => {
+            if (/\\s/.test(char)) {
               frag.appendChild(document.createTextNode(char));
-              continue;
+              return;
             }
-
             const span = document.createElement("span");
             span.className = "cgc-reveal-char";
             span.textContent = char;
             span.style.setProperty("--char-i", charIndex++);
             frag.appendChild(span);
-          }
+          });
           node.parentNode.replaceChild(frag, node);
         });
       };
 
-      titles.forEach((title) => {
+      titles.forEach(title => {
         if (title.dataset.cgcRevealReady) return;
         title.dataset.cgcRevealReady = "1";
         title.classList.add("cgc-reveal-title");
         wrapTextNodes(title);
       });
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          // Re-run the reveal every time the heading leaves and re-enters
-          // the viewport. No one-shot unobserve here.
-          if (entry.isIntersecting) {
-            entry.target.classList.remove("is-resetting");
-            // Force a clean transition cycle even when scrolling rapidly.
-            void entry.target.offsetWidth;
-            entry.target.classList.add("is-revealed");
-          } else {
-            entry.target.classList.remove("is-revealed");
-            entry.target.classList.add("is-resetting");
-          }
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
         });
-      }, {
-        threshold: 0.18,
-        rootMargin: "-6% 0px -10% 0px"
-      });
+      }, { threshold: 0.28, rootMargin: "0px 0px -8% 0px" });
 
-      titles.forEach((title) => observer.observe(title));
+      titles.forEach(title => observer.observe(title));
     }
 
     // 初期化
