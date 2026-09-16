@@ -3849,41 +3849,6 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
     transition:none!important;
   }
 }
-
-/* CGC symbol design credit */
-.cgc-symbol-credit{
-  margin-top:22px;
-  display:flex;
-  align-items:center;
-  gap:18px;
-  color:rgba(224,235,240,.42);
-  font-size:9px;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-}
-.cgc-symbol-credit>span{white-space:nowrap;color:rgba(224,235,240,.32)}
-.cgc-symbol-credit a{
-  position:relative;
-  color:rgba(238,246,249,.62);
-  text-decoration:none;
-  letter-spacing:.18em;
-  transition:color .35s ease,text-shadow .35s ease;
-}
-.cgc-symbol-credit a::after{
-  content:"";
-  position:absolute;
-  left:0;right:0;bottom:-7px;
-  height:1px;
-  background:linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,255,255,.08));
-  transform:scaleX(0);
-  transform-origin:left;
-  transition:transform .42s cubic-bezier(.2,.8,.2,1);
-  box-shadow:0 0 12px rgba(225,244,255,.28);
-}
-.cgc-symbol-credit a:hover,.cgc-symbol-credit a:focus-visible{color:#fff;text-shadow:0 0 16px rgba(230,247,255,.24)}
-.cgc-symbol-credit a:hover::after,.cgc-symbol-credit a:focus-visible::after{transform:scaleX(1)}
-.cgc-symbol-credit b{font-weight:400;margin-left:4px}
-@media(max-width:720px){.cgc-symbol-credit{align-items:flex-start;flex-direction:column;gap:8px;line-height:1.7}}
 </style>
 
 </head>
@@ -4022,10 +3987,6 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
           時代を読み、新しい価値へと進化し続けるCGCの姿勢を表現しています。
         </p>
         <div class="cgc-form-lineage" aria-label="Form lineage">GAMMA <span>→</span> OLD ITALIC <span>→</span> MODERN FORM</div>
-        <div class="cgc-symbol-credit">
-          <span>SYMBOL DESIGN</span>
-          <a href="https://studyllc.tokyo/" target="_blank" rel="noopener noreferrer">Designed by STUDY LLC. <b aria-hidden="true">↗</b></a>
-        </div>
       </div>
       <div class="cgc-artifact-stage">
         <div class="cgc-artifact-logo" id="cgcArtifactLogo" tabindex="0" aria-label="CGC symbol">
