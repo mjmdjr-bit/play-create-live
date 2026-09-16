@@ -3648,105 +3648,6 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
 @media(prefers-reduced-motion:reduce){.cgc-artifact-logo::before{animation:none!important}}
 </style>
 
-
-<style id="cgc-v12-motion-gallery">
-/* CGC v12 — unified editorial titles + creator works gallery */
-.cgc-philosophy h2,
-.cgc-artifact h2,
-.workflow-head h2,
-.selected-works-title,
-.creators-title{
-  font-size:clamp(54px,5.4vw,92px)!important;
-  line-height:.94!important;
-  letter-spacing:-.058em!important;
-  font-weight:560!important;
-}
-.workflow-head,.selected-works-head,.creators-head{max-width:1120px!important}
-
-.cgc-reveal-title .cgc-reveal-char{
-  display:inline-block;
-  opacity:0;
-  transform:translate3d(0,22px,0);
-  filter:blur(7px);
-  transition:
-    opacity .72s cubic-bezier(.2,.75,.2,1),
-    transform .82s cubic-bezier(.16,1,.3,1),
-    filter .78s ease,
-    text-shadow .9s ease;
-  transition-delay:calc(var(--char-i) * 34ms);
-  will-change:opacity,transform,filter;
-}
-.cgc-reveal-title.is-revealed .cgc-reveal-char{
-  opacity:1;
-  transform:translate3d(0,0,0);
-  filter:blur(0);
-  text-shadow:0 0 24px rgba(225,245,255,.055);
-}
-
-.work-card{
-  appearance:none!important;
-  -webkit-appearance:none!important;
-  width:100%;
-  padding:0!important;
-  color:inherit;
-  text-align:left;
-  font:inherit;
-  cursor:pointer!important;
-}
-.work-card:focus-visible{outline:1px solid rgba(235,248,255,.72)!important;outline-offset:3px}
-.work-card:hover{
-  border-color:rgba(238,250,255,.58)!important;
-  box-shadow:0 0 0 1px rgba(235,248,255,.06),0 0 34px rgba(190,230,245,.11),inset 0 0 30px rgba(220,245,255,.025)!important;
-}
-.work-thumb iframe{pointer-events:none!important}
-
-.works-lightbox{
-  position:fixed!important;
-  inset:0!important;
-  z-index:5000!important;
-  display:none;
-  align-items:center!important;
-  justify-content:center!important;
-  background:rgba(0,0,0,.965)!important;
-  backdrop-filter:blur(18px)!important;
-  -webkit-backdrop-filter:blur(18px)!important;
-  padding:clamp(28px,5vw,72px)!important;
-}
-.works-lightbox.show{display:flex!important}
-.works-lightbox-body{width:min(1180px,82vw)!important;max-height:80vh!important}
-.works-lightbox-body img,.works-lightbox-body video,.works-lightbox-body iframe{
-  max-width:100%!important;max-height:78vh!important;border:0!important;border-radius:0!important;background:#000!important;box-shadow:0 0 70px rgba(205,238,250,.07)!important;
-}
-.works-lightbox-body iframe{width:min(1180px,82vw)!important;aspect-ratio:16/9}
-.works-lightbox-close{top:28px!important;right:34px!important;z-index:5010!important}
-.works-lightbox-nav{
-  position:fixed;top:50%;z-index:5010;width:58px;height:58px;transform:translateY(-50%);
-  border:1px solid rgba(225,242,250,.32);border-radius:50%;background:rgba(0,0,0,.34);color:#fff;
-  font-size:38px;font-weight:200;line-height:1;cursor:pointer;backdrop-filter:blur(12px);
-  transition:border-color .28s ease,box-shadow .28s ease,background .28s ease,transform .28s ease;
-}
-.works-lightbox-nav:hover{border-color:rgba(245,252,255,.8);box-shadow:0 0 28px rgba(205,238,250,.2);background:rgba(255,255,255,.035)}
-.works-lightbox-prev{left:32px}.works-lightbox-next{right:32px}
-.works-lightbox-meta{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);text-align:center;pointer-events:none}
-.works-lightbox-counter{margin-bottom:8px;color:rgba(230,242,248,.48);font-size:9px;letter-spacing:.3em}
-.works-lightbox-caption{position:static!important;color:rgba(248,250,252,.88)!important;font-size:11px!important;letter-spacing:.14em!important}
-
-@media(max-width:720px){
-  .cgc-philosophy h2,.cgc-artifact h2,.workflow-head h2,.selected-works-title,.creators-title{
-    font-size:clamp(42px,12vw,64px)!important;
-  }
-  .cgc-reveal-title .cgc-reveal-char{transform:translate3d(0,14px,0);transition-delay:calc(var(--char-i) * 24ms)}
-  .works-lightbox{padding:64px 12px 82px!important}
-  .works-lightbox-body{width:100%!important}
-  .works-lightbox-nav{width:46px;height:46px;font-size:30px;top:auto;bottom:20px;transform:none}
-  .works-lightbox-prev{left:18px}.works-lightbox-next{right:18px}
-  .works-lightbox-meta{bottom:28px;max-width:58vw}
-}
-@media(prefers-reduced-motion:reduce){
-  .cgc-reveal-title .cgc-reveal-char{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}
-}
-</style>
-
 </head>
 
 <body>
@@ -4057,15 +3958,10 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
     </button>
     <!-- WORKS Lightbox -->
      <div id="worksLightbox" class="works-lightbox" aria-hidden="true">
-      <button id="worksLightboxClose" class="works-lightbox-close" type="button" aria-label="閉じる">×</button>
-      <button id="worksLightboxPrev" class="works-lightbox-nav works-lightbox-prev" type="button" aria-label="前の作品">‹</button>
-      <button id="worksLightboxNext" class="works-lightbox-nav works-lightbox-next" type="button" aria-label="次の作品">›</button>
-      <div id="worksLightboxBody" class="works-lightbox-body"></div>
-      <div class="works-lightbox-meta">
-       <div id="worksLightboxCounter" class="works-lightbox-counter"></div>
-       <div id="worksLightboxCaption" class="works-lightbox-caption"></div>
-      </div>
-     </div>
+     <button id="worksLightboxClose" class="works-lightbox-close" type="button" aria-label="閉じる">×</button>
+     <div id="worksLightboxBody" class="works-lightbox-body"></div>
+     <div id="worksLightboxCaption" class="works-lightbox-caption"></div>
+    </div>
 
     <!-- PROJECT DETAIL modal -->
     <div id="projectOverlay" class="project-overlay" aria-hidden="true">

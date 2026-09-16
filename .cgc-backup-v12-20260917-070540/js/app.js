@@ -563,32 +563,17 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         }
 
 
-        // WORKS Lightbox / Creator gallery
-        let worksLightboxItems = [];
-        let worksLightboxIndex = 0;
-
-        function renderWorksLightboxItem() {
+        // WORKS Lightbox
+        function openWorksLightbox(work) {
             const overlay = document.getElementById("worksLightbox");
             const body = document.getElementById("worksLightboxBody");
             const caption = document.getElementById("worksLightboxCaption");
-            const counter = document.getElementById("worksLightboxCounter");
-            const prevBtn = document.getElementById("worksLightboxPrev");
-            const nextBtn = document.getElementById("worksLightboxNext");
-            if (!overlay || !body || !worksLightboxItems.length) return;
-
-            const work = worksLightboxItems[worksLightboxIndex];
+            if (!overlay || !body) return;
             body.innerHTML = "";
             if (caption) caption.textContent = work.title || "";
-            if (counter) counter.textContent = `${String(worksLightboxIndex + 1).padStart(2, "0")} / ${String(worksLightboxItems.length).padStart(2, "0")}`;
-
-            const hasMultiple = worksLightboxItems.length > 1;
-            if (prevBtn) prevBtn.hidden = !hasMultiple;
-            if (nextBtn) nextBtn.hidden = !hasMultiple;
-
             const type = (work.type || "").toLowerCase();
             const url = work.url || "";
             if (!url) return;
-
             if (type === "image") {
                 const img = document.createElement("img");
                 img.src = url;
@@ -615,43 +600,23 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 video.playsInline = true;
                 video.autoplay = true;
                 body.appendChild(video);
-                video.play().catch(() => {});
+                video.play().catch(() => {
+                    // If autoplay is restricted, native controls remain available.
+                });
             }
-        }
-
-        function openWorksLightbox(work, works = null, index = -1) {
-            const overlay = document.getElementById("worksLightbox");
-            if (!overlay) return;
-
-            const source = Array.isArray(works) && works.length ? works : [work];
-            worksLightboxItems = source.filter(item => item && item.url);
-            worksLightboxIndex = index >= 0 ? index : Math.max(0, worksLightboxItems.indexOf(work));
-            if (!worksLightboxItems.length) return;
-
-            renderWorksLightboxItem();
             overlay.classList.add("show");
             overlay.setAttribute("aria-hidden", "false");
             document.body.style.overflow = "hidden";
-        }
-
-        function stepWorksLightbox(direction) {
-            if (worksLightboxItems.length < 2) return;
-            worksLightboxIndex = (worksLightboxIndex + direction + worksLightboxItems.length) % worksLightboxItems.length;
-            renderWorksLightboxItem();
         }
 
         function closeWorksLightbox() {
             const overlay = document.getElementById("worksLightbox");
             const body = document.getElementById("worksLightboxBody");
             const caption = document.getElementById("worksLightboxCaption");
-            const counter = document.getElementById("worksLightboxCounter");
             overlay?.classList.remove("show");
             overlay?.setAttribute("aria-hidden", "true");
             if (body) body.innerHTML = "";
             if (caption) caption.textContent = "";
-            if (counter) counter.textContent = "";
-            worksLightboxItems = [];
-            worksLightboxIndex = 0;
             const detailOpen = document.getElementById("detailOverlay")?.classList.contains("show");
             const contactOpen = document.getElementById("contactOverlay")?.classList.contains("show");
             document.body.style.overflow = detailOpen || contactOpen ? "hidden" : "";
@@ -659,17 +624,15 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
 
         function setupWorksLightbox() {
             const overlay = document.getElementById("worksLightbox");
-            document.getElementById("worksLightboxClose")?.addEventListener("click", closeWorksLightbox);
-            document.getElementById("worksLightboxPrev")?.addEventListener("click", (e) => { e.stopPropagation(); stepWorksLightbox(-1); });
-            document.getElementById("worksLightboxNext")?.addEventListener("click", (e) => { e.stopPropagation(); stepWorksLightbox(1); });
+            const closeBtn = document.getElementById("worksLightboxClose");
+            closeBtn?.addEventListener("click", closeWorksLightbox);
             overlay?.addEventListener("click", (e) => {
                 if (e.target === overlay) closeWorksLightbox();
             });
             window.addEventListener("keydown", (e) => {
-                if (!document.getElementById("worksLightbox")?.classList.contains("show")) return;
-                if (e.key === "Escape") closeWorksLightbox();
-                if (e.key === "ArrowLeft") stepWorksLightbox(-1);
-                if (e.key === "ArrowRight") stepWorksLightbox(1);
+                if (e.key === "Escape" && document.getElementById("worksLightbox")?.classList.contains("show")) {
+                    closeWorksLightbox();
+                }
             });
         }
 
@@ -679,7 +642,8 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             if (!container) return;
 
             container.innerHTML = "";
-            const list = Array.isArray(works) ? works.filter(w => w && w.url) : [];
+
+            const list = Array.isArray(works) ? works : [];
             if (!list.length) {
                 const msg = document.createElement("div");
                 msg.className = "meta-text";
@@ -693,14 +657,13 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
             const grid = document.createElement("div");
             grid.className = "works-grid";
 
-            list.forEach((w, index) => {
-                const card = document.createElement("button");
-                card.type = "button";
+            list.forEach(w => {
+                const card = document.createElement("div");
                 card.className = "work-card";
-                card.setAttribute("aria-label", `${w.title || `Works ${index + 1}`} を表示`);
 
                 const thumb = document.createElement("div");
                 thumb.className = "work-thumb";
+
                 const type = (w.type || "").toLowerCase();
                 const url = w.url;
 
@@ -712,15 +675,15 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 } else if (type === "youtube") {
                     const iframe = document.createElement("iframe");
                     iframe.src = toYoutubeEmbed(url);
-                    iframe.tabIndex = -1;
-                    iframe.style.pointerEvents = "none";
+                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                    iframe.allowFullscreen = true;
                     iframe.frameBorder = "0";
                     thumb.appendChild(iframe);
                 } else if (type === "vimeo") {
                     const iframe = document.createElement("iframe");
                     iframe.src = toVimeoEmbed(url);
-                    iframe.tabIndex = -1;
-                    iframe.style.pointerEvents = "none";
+                    iframe.allow = "autoplay; fullscreen; picture-in-picture";
+                    iframe.allowFullscreen = true;
                     iframe.frameBorder = "0";
                     thumb.appendChild(iframe);
                 } else {
@@ -731,10 +694,19 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                     v.preload = "metadata";
                     v.controls = false;
                     v.style.pointerEvents = "none";
+
                     v.addEventListener("loadedmetadata", () => {
-                        try { if (Number.isFinite(v.duration) && v.duration > 0.2) v.currentTime = Math.min(0.15, v.duration / 4); } catch (_) {}
+                        try {
+                            if (Number.isFinite(v.duration) && v.duration > 0.2) {
+                                v.currentTime = Math.min(0.15, v.duration / 4);
+                            }
+                        } catch (err) {
+                            console.warn("WORK thumbnail seek failed:", err);
+                        }
                     }, { once: true });
+
                     thumb.appendChild(v);
+
                     const playMark = document.createElement("div");
                     playMark.className = "work-play-mark";
                     playMark.setAttribute("aria-hidden", "true");
@@ -742,6 +714,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                 }
 
                 card.appendChild(thumb);
+
                 if (w.title) {
                     const titleEl = document.createElement("div");
                     titleEl.className = "work-title";
@@ -754,13 +727,13 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
                     typeEl.textContent = w.type;
                     card.appendChild(typeEl);
                 }
-                card.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openWorksLightbox(w, list, index);
+                  card.addEventListener("click", () => {
+                    openWorksLightbox(w);
                 });
+
                 grid.appendChild(card);
             });
+
             container.appendChild(grid);
         }
 
@@ -1525,58 +1498,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         });
     }
 
-    function setupSectionTitleReveals() {
-      const selectors = [
-        ".cgc-philosophy h2",
-        ".cgc-artifact h2",
-        ".workflow-head h2",
-        ".selected-works-title",
-        ".creators-title"
-      ];
-      const titles = document.querySelectorAll(selectors.join(","));
-
-      const wrapTextNodes = (root) => {
-        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-        const nodes = [];
-        while (walker.nextNode()) nodes.push(walker.currentNode);
-        let charIndex = 0;
-        nodes.forEach(node => {
-          const text = node.nodeValue;
-          if (!text || !text.trim()) return;
-          const frag = document.createDocumentFragment();
-          [...text].forEach(char => {
-            if (/\\s/.test(char)) {
-              frag.appendChild(document.createTextNode(char));
-              return;
-            }
-            const span = document.createElement("span");
-            span.className = "cgc-reveal-char";
-            span.textContent = char;
-            span.style.setProperty("--char-i", charIndex++);
-            frag.appendChild(span);
-          });
-          node.parentNode.replaceChild(frag, node);
-        });
-      };
-
-      titles.forEach(title => {
-        if (title.dataset.cgcRevealReady) return;
-        title.dataset.cgcRevealReady = "1";
-        title.classList.add("cgc-reveal-title");
-        wrapTextNodes(title);
-      });
-
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-revealed");
-          observer.unobserve(entry.target);
-        });
-      }, { threshold: 0.28, rootMargin: "0px 0px -8% 0px" });
-
-      titles.forEach(title => observer.observe(title));
-    }
-
     // 初期化
        (function init() {
         setupSearchAndSort();
@@ -1585,7 +1506,6 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         setupWorksLightbox();
         setupProjectModal();
         setupWorkflowVideos();
-        setupSectionTitleReveals();
 
        loadCreators();
        loadProjects();
