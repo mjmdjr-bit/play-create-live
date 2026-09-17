@@ -1686,60 +1686,17 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
            "media/cgc-hero.mp4",
            "media/cgc-hero-2.mp4"
          ];
-
-         // Mobile Safari / iOS autoplay: the video files may contain audio,
-         // but the hero is always explicitly muted before loading/playing.
-         heroVideo.autoplay = true;
-         heroVideo.loop = true;
-         heroVideo.muted = true;
-         heroVideo.defaultMuted = true;
-         heroVideo.playsInline = true;
-         heroVideo.setAttribute("autoplay", "");
-         heroVideo.setAttribute("muted", "");
-         heroVideo.setAttribute("playsinline", "");
-         heroVideo.setAttribute("webkit-playsinline", "");
-         heroVideo.setAttribute("preload", "auto");
-
-         const forceHeroPlay = () => {
-           heroVideo.muted = true;
-           heroVideo.defaultMuted = true;
-           heroVideo.volume = 0;
-           const promise = heroVideo.play();
-           if (promise && typeof promise.catch === "function") {
-             promise.catch(() => {});
-           }
-         };
-
          let heroIndex = Number(localStorage.getItem("cgcHeroVideoIndex") || "0");
          heroIndex = heroIndex === 1 ? 1 : 0;
-
-         const loadHero = (index) => {
-           heroVideo.muted = true;
-           heroVideo.defaultMuted = true;
-           heroVideo.volume = 0;
-           heroVideo.src = heroSources[index];
-           heroVideo.load();
-           forceHeroPlay();
-         };
-
-         loadHero(heroIndex);
+         heroVideo.src = heroSources[heroIndex];
+         heroVideo.load();
+         heroVideo.play().catch(() => {});
          localStorage.setItem("cgcHeroVideoIndex", String(heroIndex === 0 ? 1 : 0));
-
-         heroVideo.addEventListener("loadedmetadata", forceHeroPlay);
-         heroVideo.addEventListener("canplay", forceHeroPlay);
-         heroVideo.addEventListener("loadeddata", forceHeroPlay);
-
-         document.addEventListener("visibilitychange", () => {
-           if (!document.hidden) forceHeroPlay();
-         });
-
-         window.addEventListener("pageshow", forceHeroPlay, { passive: true });
-
          heroVideo.addEventListener("error", () => {
            if (heroIndex === 1) {
-             heroIndex = 0;
-             localStorage.setItem("cgcHeroVideoIndex", "1");
-             loadHero(0);
+             heroVideo.src = heroSources[0];
+             heroVideo.load();
+             heroVideo.play().catch(() => {});
            }
          }, { once: true });
        }
