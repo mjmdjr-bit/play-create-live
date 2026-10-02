@@ -1595,6 +1595,77 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
       titles.forEach((title) => observer.observe(title));
     }
 
+    function setupCgcScrollMotion() {
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      if (reduceMotion) return;
+
+      const selector = [
+        ".cgc-philosophy-index",
+        ".cgc-philosophy p",
+        ".cgc-form-lineage",
+        ".cgc-artifact-kicker",
+        ".cgc-artifact-copy p",
+        ".workflow-kicker",
+        ".workflow-head p",
+        ".workflow-step",
+        ".selected-works-kicker",
+        ".selected-works-copy",
+        ".project-card",
+        ".creators-kicker",
+        ".creators-copy",
+        ".toolbar",
+        "#grid > .card"
+      ].join(",");
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-cgc-motion-visible");
+          } else {
+            entry.target.classList.remove("is-cgc-motion-visible");
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: "0px 0px -7% 0px"
+      });
+
+      const prepare = (scope = document) => {
+        const nodes = [];
+        if (scope.nodeType === 1 && scope.matches?.(selector)) nodes.push(scope);
+        scope.querySelectorAll?.(selector).forEach((node) => nodes.push(node));
+
+        nodes.forEach((node) => {
+          if (node.dataset.cgcMotionReady) return;
+          node.dataset.cgcMotionReady = "1";
+          node.classList.add("cgc-motion-item");
+
+          const parent = node.parentElement;
+          if (node.matches(".workflow-step, .project-card, #grid > .card") && parent) {
+            const siblings = [...parent.children].filter((el) =>
+              el.matches?.(".workflow-step, .project-card, .card")
+            );
+            const index = Math.max(0, siblings.indexOf(node));
+            node.style.setProperty("--cgc-motion-delay", `${Math.min(index, 7) * 70}ms`);
+          }
+
+          observer.observe(node);
+        });
+      };
+
+      prepare(document);
+
+      const mutationObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) prepare(node);
+          });
+        });
+      });
+
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
     // 初期化
        (function init() {
         setupSearchAndSort();
@@ -1604,6 +1675,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         setupProjectModal();
         setupWorkflowVideos();
         setupSectionTitleReveals();
+        setupCgcScrollMotion();
 
        loadCreators();
        loadProjects();
@@ -1614,17 +1686,60 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
            "media/cgc-hero.mp4",
            "media/cgc-hero-2.mp4"
          ];
+
+         // Mobile Safari / iOS autoplay: the video files may contain audio,
+         // but the hero is always explicitly muted before loading/playing.
+         heroVideo.autoplay = true;
+         heroVideo.loop = true;
+         heroVideo.muted = true;
+         heroVideo.defaultMuted = true;
+         heroVideo.playsInline = true;
+         heroVideo.setAttribute("autoplay", "");
+         heroVideo.setAttribute("muted", "");
+         heroVideo.setAttribute("playsinline", "");
+         heroVideo.setAttribute("webkit-playsinline", "");
+         heroVideo.setAttribute("preload", "auto");
+
+         const forceHeroPlay = () => {
+           heroVideo.muted = true;
+           heroVideo.defaultMuted = true;
+           heroVideo.volume = 0;
+           const promise = heroVideo.play();
+           if (promise && typeof promise.catch === "function") {
+             promise.catch(() => {});
+           }
+         };
+
          let heroIndex = Number(localStorage.getItem("cgcHeroVideoIndex") || "0");
          heroIndex = heroIndex === 1 ? 1 : 0;
-         heroVideo.src = heroSources[heroIndex];
-         heroVideo.load();
-         heroVideo.play().catch(() => {});
+
+         const loadHero = (index) => {
+           heroVideo.muted = true;
+           heroVideo.defaultMuted = true;
+           heroVideo.volume = 0;
+           heroVideo.src = heroSources[index];
+           heroVideo.load();
+           forceHeroPlay();
+         };
+
+         loadHero(heroIndex);
          localStorage.setItem("cgcHeroVideoIndex", String(heroIndex === 0 ? 1 : 0));
+
+         heroVideo.addEventListener("loadedmetadata", forceHeroPlay);
+         heroVideo.addEventListener("canplay", forceHeroPlay);
+         heroVideo.addEventListener("loadeddata", forceHeroPlay);
+
+         document.addEventListener("visibilitychange", () => {
+           if (!document.hidden) forceHeroPlay();
+         });
+
+         window.addEventListener("pageshow", forceHeroPlay, { passive: true });
+
          heroVideo.addEventListener("error", () => {
            if (heroIndex === 1) {
-             heroVideo.src = heroSources[0];
-             heroVideo.load();
-             heroVideo.play().catch(() => {});
+             heroIndex = 0;
+             localStorage.setItem("cgcHeroVideoIndex", "1");
+             loadHero(0);
            }
          }, { once: true });
        }
