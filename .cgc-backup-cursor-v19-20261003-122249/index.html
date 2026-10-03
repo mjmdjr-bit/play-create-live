@@ -3795,80 +3795,75 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
 </style>
 
 
-<style id="cgc-cursor-style-v19">
+<style id="cgc-cursor-style">
 @media (hover: hover) and (pointer: fine) {
-  html.cgc-cursor-enabled,
-  html.cgc-cursor-enabled *,
-  html.cgc-cursor-enabled *::before,
-  html.cgc-cursor-enabled *::after {
-    cursor: none !important;
-  }
-
-  #cgcCursor, #cgcCursorHalo {
-    position: fixed !important;
-    display: block !important;
-    pointer-events: none !important;
-    opacity: 1 !important;
-    will-change: transform, left, top, opacity;
-  }
+  html.cgc-custom-cursor,
+  html.cgc-custom-cursor *,
+  html.cgc-custom-cursor *::before,
+  html.cgc-custom-cursor *::after { cursor: none !important; }
 
   #cgcCursor {
-    left: 0 !important;
-    top: 0 !important;
-    width: 8px !important;
-    height: 8px !important;
-    margin: -4px 0 0 -4px !important;
-    border-radius: 50% !important;
-    background: #ffffff !important;
-    border: 1px solid rgba(0,0,0,.72) !important;
+    position: fixed;
+    left: 0; top: 0;
+    width: 8px; height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,.24);
     box-shadow:
-      0 0 0 1px rgba(255,255,255,.18),
-      0 0 10px rgba(255,255,255,.95),
-      0 0 22px rgba(220,240,255,.55) !important;
-    z-index: 2147483647 !important;
-    transform: translate3d(-100px,-100px,0) scale(1);
+      0 0 0 1px rgba(255,255,255,.42),
+      0 0 8px rgba(255,255,255,1),
+      0 0 20px rgba(205,235,255,.72),
+      0 0 34px rgba(175,220,255,.28);
+    pointer-events: none;
+    z-index: 2147483647;
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity .12s ease, transform .2s cubic-bezier(.22,.61,.36,1), box-shadow .22s ease;
+    will-change: left, top, transform;
   }
 
   #cgcCursorHalo {
-    left: 0 !important;
-    top: 0 !important;
-    width: 30px !important;
-    height: 30px !important;
-    margin: -15px 0 0 -15px !important;
-    border-radius: 50% !important;
-    border: 1px solid rgba(255,255,255,.42) !important;
-    background: rgba(255,255,255,.025) !important;
+    position: fixed;
+    left: 0; top: 0;
+    width: 32px; height: 32px;
+    margin: -16px 0 0 -16px;
+    border: 1px solid rgba(235,250,255,.52);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(220,242,255,.10) 0%, rgba(220,242,255,.035) 45%, transparent 70%);
     box-shadow:
-      inset 0 0 12px rgba(255,255,255,.08),
-      0 0 14px rgba(220,240,255,.2) !important;
-    z-index: 2147483646 !important;
-    transform: translate3d(-100px,-100px,0) scale(.78);
-    transition:
-      transform .18s cubic-bezier(.22,.61,.36,1),
-      border-color .18s ease,
-      box-shadow .18s ease !important;
+      0 0 12px rgba(225,245,255,.18),
+      0 0 28px rgba(180,225,255,.12);
+    pointer-events: none;
+    z-index: 2147483646;
+    opacity: 0;
+    transform: scale(.78);
+    transition: opacity .14s ease, transform .26s cubic-bezier(.22,.61,.36,1), border-color .22s ease, box-shadow .22s ease;
+    will-change: left, top, transform;
   }
 
-  html.cgc-cursor-target #cgcCursor {
-    transform: translate3d(var(--cgc-x),var(--cgc-y),0) scale(1.4) !important;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.2),
-      0 0 12px rgba(255,255,255,1),
-      0 0 28px rgba(220,240,255,.72) !important;
-  }
+  html.cgc-custom-cursor.cgc-cursor-active #cgcCursor { opacity: 1; }
+  html.cgc-custom-cursor.cgc-cursor-active #cgcCursorHalo { opacity: .88; }
 
-  html.cgc-cursor-target #cgcCursorHalo {
-    transform: translate3d(var(--cgc-hx),var(--cgc-hy),0) scale(1.05) !important;
-    border-color: rgba(255,255,255,.72) !important;
+  html.cgc-custom-cursor.cgc-cursor-target #cgcCursor {
+    transform: scale(1.32);
+    background: #fff;
     box-shadow:
-      inset 0 0 16px rgba(255,255,255,.08),
-      0 0 22px rgba(220,240,255,.26) !important;
+      0 0 0 1px rgba(255,255,255,.58),
+      0 0 10px rgba(255,255,255,1),
+      0 0 26px rgba(205,238,255,.92),
+      0 0 46px rgba(165,215,255,.42);
   }
-
-  html.cgc-cursor-down #cgcCursor {
-    transform: translate3d(var(--cgc-x),var(--cgc-y),0) scale(.72) !important;
+  html.cgc-custom-cursor.cgc-cursor-target #cgcCursorHalo {
+    transform: scale(1.12);
+    opacity: 1;
+    border-color: rgba(250,254,255,.82);
+    box-shadow: 0 0 18px rgba(235,250,255,.28), 0 0 38px rgba(185,228,255,.20);
   }
+  html.cgc-custom-cursor.cgc-cursor-down #cgcCursor { transform: scale(.72); }
+  html.cgc-custom-cursor.cgc-cursor-down #cgcCursorHalo { transform: scale(.9); }
 }
+@media (pointer: coarse) { #cgcCursor, #cgcCursorHalo { display:none !important; } }
 </style>
 </head>
 
@@ -4258,52 +4253,7 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
         </div>
     </div>
 
-    <script>
-(function(){
-  var mq = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)");
-  if (!mq || !mq.matches) return;
-  var root = document.documentElement;
-  var dot = document.getElementById("cgcCursor");
-  var halo = document.getElementById("cgcCursorHalo");
-  if (!dot || !halo) return;
-
-  root.classList.add("cgc-cursor-enabled");
-
-  var x = window.innerWidth / 2;
-  var y = window.innerHeight / 2;
-  var hx = x;
-  var hy = y;
-  var raf = 0;
-
-  function render(){
-    hx += (x - hx) * 0.18;
-    hy += (y - hy) * 0.18;
-    root.style.setProperty("--cgc-x", x + "px");
-    root.style.setProperty("--cgc-y", y + "px");
-    root.style.setProperty("--cgc-hx", hx + "px");
-    root.style.setProperty("--cgc-hy", hy + "px");
-    dot.style.transform = "translate3d(" + x + "px," + y + "px,0)";
-    halo.style.transform = "translate3d(" + hx + "px," + hy + "px,0)";
-    raf = requestAnimationFrame(render);
-  }
-
-  function move(e){
-    x = e.clientX;
-    y = e.clientY;
-    root.classList.add("cgc-cursor-visible");
-    var target = e.target && e.target.closest ? e.target.closest("a,button,.card,.work-card,.workflow-step,.menu-button,.model-arrow,.contact-btn,input,select,textarea") : null;
-    root.classList.toggle("cgc-cursor-target", !!target);
-  }
-
-  window.addEventListener("mousemove", move, {passive:true});
-  window.addEventListener("mousedown", function(){root.classList.add("cgc-cursor-down")}, {passive:true});
-  window.addEventListener("mouseup", function(){root.classList.remove("cgc-cursor-down")}, {passive:true});
-  window.addEventListener("blur", function(){root.classList.remove("cgc-cursor-visible","cgc-cursor-target")});
-  document.addEventListener("mouseleave", function(){root.classList.remove("cgc-cursor-visible","cgc-cursor-target")});
-  render();
-})();
-</script>
-<script type="module" src="js/app.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>
