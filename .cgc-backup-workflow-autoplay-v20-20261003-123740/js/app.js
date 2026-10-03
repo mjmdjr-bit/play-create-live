@@ -1493,49 +1493,37 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     }
 
      function setupWorkflowVideos() {
-       const videos = document.querySelectorAll(".workflow-step video");
+       document.querySelectorAll(".workflow-step").forEach((step) => {
+         const video = step.querySelector("video");
+         if (!video) return;
 
-       videos.forEach((video) => {
-         video.autoplay = true;
-         video.muted = true;
-         video.defaultMuted = true;
-         video.loop = true;
-         video.playsInline = true;
-         video.setAttribute("autoplay", "");
-         video.setAttribute("muted", "");
-         video.setAttribute("loop", "");
-         video.setAttribute("playsinline", "");
-         video.setAttribute("webkit-playsinline", "");
+         video.pause();
+         video.currentTime = 0;
 
-         const ensurePlayback = () => {
-           video.muted = true;
-           video.play().catch(() => {});
+         const playVideo = () => {
+          video.play().catch(() => {});
          };
 
-         if (video.readyState >= 2) {
-           ensurePlayback();
-         } else {
-           video.addEventListener("canplay", ensurePlayback, { once: true });
-         }
-       });
+         const stopVideo = () => {
+          video.pause();
+          video.currentTime = 0;
+         };
 
-       // Browsers can suspend media when a tab is backgrounded.
-       // Resume every workflow film when the page becomes active again.
-       document.addEventListener("visibilitychange", () => {
-         if (document.hidden) return;
-         videos.forEach((video) => {
-           video.muted = true;
-           video.play().catch(() => {});
-         });
-       });
+         step.addEventListener("mouseenter", playVideo);
+         step.addEventListener("mouseleave", stopVideo);
 
-       window.addEventListener("pageshow", () => {
-         videos.forEach((video) => {
-           video.muted = true;
-           video.play().catch(() => {});
-         });
-       });
-     }
+         step.addEventListener("touchstart", () => {
+           document.querySelectorAll(".workflow-step video").forEach((v) => {
+             if (v !== video) {
+               v.pause();
+               v.currentTime = 0;
+             }
+           });
+
+           playVideo();
+          }, { passive: true });
+        });
+    }
 
     function setupSectionTitleReveals() {
       const selectors = [
