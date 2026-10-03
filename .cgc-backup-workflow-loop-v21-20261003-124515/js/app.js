@@ -1493,64 +1493,47 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
     }
 
      function setupWorkflowVideos() {
-       const videos = Array.from(document.querySelectorAll(".workflow-step video"));
-       if (!videos.length) return;
+       const videos = document.querySelectorAll(".workflow-step video");
 
-       const forcePlay = (video) => {
-         try {
-           video.autoplay = true;
+       videos.forEach((video) => {
+         video.autoplay = true;
+         video.muted = true;
+         video.defaultMuted = true;
+         video.loop = true;
+         video.playsInline = true;
+         video.setAttribute("autoplay", "");
+         video.setAttribute("muted", "");
+         video.setAttribute("loop", "");
+         video.setAttribute("playsinline", "");
+         video.setAttribute("webkit-playsinline", "");
+
+         const ensurePlayback = () => {
            video.muted = true;
-           video.defaultMuted = true;
-           video.loop = true;
-           video.playsInline = true;
-           video.setAttribute("autoplay", "");
-           video.setAttribute("muted", "");
-           video.setAttribute("loop", "");
-           video.setAttribute("playsinline", "");
-           video.setAttribute("webkit-playsinline", "");
+           video.play().catch(() => {});
+         };
 
-           const promise = video.play();
-           if (promise && typeof promise.catch === "function") {
-             promise.catch(() => {});
-           }
-         } catch (_) {
-           // Ignore media-policy errors; retry below.
+         if (video.readyState >= 2) {
+           ensurePlayback();
+         } else {
+           video.addEventListener("canplay", ensurePlayback, { once: true });
          }
-       };
-
-       videos.forEach((video, index) => {
-         // Do not wait for hover or canplay. Start immediately and retry
-         // during the first few seconds so browsers that defer media startup
-         // can begin playback without a pointer gesture.
-         forcePlay(video);
-
-         [0, 120, 400, 900, 1800, 3000].forEach((delay) => {
-           window.setTimeout(() => forcePlay(video), delay + index * 40);
-         });
-
-         video.addEventListener("loadedmetadata", () => forcePlay(video), { passive: true });
-         video.addEventListener("loadeddata", () => forcePlay(video), { passive: true });
-         video.addEventListener("canplay", () => forcePlay(video), { passive: true });
-         video.addEventListener("play", () => {
-           // If another script or browser heuristic pauses it, put it back in
-           // autoplay mode immediately.
-           if (video.paused) forcePlay(video);
-         }, { passive: true });
        });
 
-       const resumeAll = () => {
+       // Browsers can suspend media when a tab is backgrounded.
+       // Resume every workflow film when the page becomes active again.
+       document.addEventListener("visibilitychange", () => {
          if (document.hidden) return;
-         videos.forEach(forcePlay);
-       };
+         videos.forEach((video) => {
+           video.muted = true;
+           video.play().catch(() => {});
+         });
+       });
 
-       document.addEventListener("visibilitychange", resumeAll, { passive: true });
-       window.addEventListener("pageshow", resumeAll, { passive: true });
-
-       // Keep every workflow film independent from pointer/hover state.
-       // Hover is visual styling only; it must never be required for playback.
-       document.querySelectorAll(".workflow-step").forEach((step) => {
-         step.addEventListener("mouseenter", () => {}, { passive: true });
-         step.addEventListener("mouseleave", () => {}, { passive: true });
+       window.addEventListener("pageshow", () => {
+         videos.forEach((video) => {
+           video.muted = true;
+           video.play().catch(() => {});
+         });
        });
      }
 
