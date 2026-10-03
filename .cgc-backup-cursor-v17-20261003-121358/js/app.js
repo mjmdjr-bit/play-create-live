@@ -1801,53 +1801,83 @@ import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/cont
         });
 
 // ==============================
-// CGC Living Silver Dot Cursor
+// CGC / Living Silver Dot Cursor v16
+// Desktop fine-pointer only. No effect on touch devices.
 // ==============================
-(function setupCgcCursor() {
-  const media = window.matchMedia ? window.matchMedia("(hover: hover) and (pointer: fine)") : null;
-  if (!media || !media.matches) return;
+(function setupCgcLivingCursor() {
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  if (!finePointer.matches) return;
+  if (document.querySelector('.cgc-cursor-dot')) return;
 
   const root = document.documentElement;
-  const dot = document.getElementById("cgcCursor");
-  const halo = document.getElementById("cgcCursorHalo");
-  if (!dot || !halo) return;
+  const dot = document.createElement('div');
+  const halo = document.createElement('div');
+  dot.className = 'cgc-cursor-dot';
+  halo.className = 'cgc-cursor-halo';
+  dot.setAttribute('aria-hidden', 'true');
+  halo.setAttribute('aria-hidden', 'true');
+  document.body.append(dot, halo);
+  root.classList.add('cgc-custom-cursor');
 
-  root.classList.add("cgc-custom-cursor");
+  let targetX = window.innerWidth * 0.5;
+  let targetY = window.innerHeight * 0.5;
+  let haloX = targetX;
+  let haloY = targetY;
+  let visible = false;
 
-  let tx = window.innerWidth / 2;
-  let ty = window.innerHeight / 2;
-  let dx = tx, dy = ty, hx = tx, hy = ty;
-  let rafId = 0;
+  const interactiveSelector = [
+    'a', 'button', '[role="button"]',
+    '.card', '.work-card', '.project-card', '.workflow-step',
+    '.model-arrow', '.menu-button', '.contact-btn',
+    '.works-lightbox-close', '.works-lightbox-prev', '.works-lightbox-next',
+    'input', 'select', 'textarea', 'label'
+  ].join(',');
 
-  function isTarget(node) {
-    return !!(node && node.closest && node.closest(
-      "a,button,[role=\"button\"],.card,.work-card,.workflow-step,.menu-button,.model-arrow,.contact-btn,input,select,textarea"
-    ));
+  function setVisible(next) {
+    if (visible === next) return;
+    visible = next;
+    root.classList.toggle('cgc-cursor-visible', next);
   }
 
-  function frame() {
-    dx += (tx - dx) * 0.36;
-    dy += (ty - dy) * 0.36;
-    hx += (tx - hx) * 0.14;
-    hy += (ty - hy) * 0.14;
-    dot.style.left = dx + "px";
-    dot.style.top = dy + "px";
-    halo.style.left = hx + "px";
-    halo.style.top = hy + "px";
-    rafId = requestAnimationFrame(frame);
-  }
-
-  window.addEventListener("mousemove", (e) => {
-    tx = e.clientX;
-    ty = e.clientY;
-    root.classList.add("cgc-cursor-active");
-    root.classList.toggle("cgc-cursor-target", isTarget(e.target));
+  document.addEventListener('pointermove', (event) => {
+    if (event.pointerType && event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+    targetX = event.clientX;
+    targetY = event.clientY;
+    dot.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+    setVisible(true);
   }, { passive: true });
 
-  window.addEventListener("mousedown", () => root.classList.add("cgc-cursor-down"), { passive: true });
-  window.addEventListener("mouseup", () => root.classList.remove("cgc-cursor-down"), { passive: true });
-  document.addEventListener("mouseleave", () => root.classList.remove("cgc-cursor-active", "cgc-cursor-target"), { passive: true });
+  document.addEventListener('pointerover', (event) => {
+    const target = event.target instanceof Element ? event.target.closest(interactiveSelector) : null;
+    root.classList.toggle('cgc-cursor-active', Boolean(target));
+  }, { passive: true });
 
-  frame();
-  window.addEventListener("beforeunload", () => cancelAnimationFrame(rafId), { once: true });
+  document.addEventListener('pointerout', (event) => {
+    if (!event.relatedTarget) {
+      root.classList.remove('cgc-cursor-active');
+      setVisible(false);
+    }
+  }, { passive: true });
+
+  document.addEventListener('pointerdown', () => {
+    root.classList.add('cgc-cursor-down');
+  }, { passive: true });
+
+  document.addEventListener('pointerup', () => {
+    root.classList.remove('cgc-cursor-down');
+  }, { passive: true });
+
+  window.addEventListener('blur', () => {
+    root.classList.remove('cgc-cursor-active', 'cgc-cursor-down');
+    setVisible(false);
+  });
+
+  function animateCursor() {
+    // Slight inertia gives the halo a refined, fluid response without feeling sluggish.
+    haloX += (targetX - haloX) * 0.16;
+    haloY += (targetY - haloY) * 0.16;
+    halo.style.transform = `translate3d(${haloX}px, ${haloY}px, 0)`;
+    requestAnimationFrame(animateCursor);
+  }
+  requestAnimationFrame(animateCursor);
 })();

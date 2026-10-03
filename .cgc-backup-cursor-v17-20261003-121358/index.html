@@ -3795,28 +3795,123 @@ body > *:not(#particles):not(.grain){position:initial;z-index:auto}
 </style>
 
 
-<style id="cgc-cursor-style">
+<style id="cgc-cursor-v16-style">
+/* ==============================
+   CGC / Living Silver Dot Cursor
+   Desktop fine-pointer only
+============================== */
 @media (hover: hover) and (pointer: fine) {
   html.cgc-custom-cursor,
-  html.cgc-custom-cursor *,
-  html.cgc-custom-cursor *::before,
-  html.cgc-custom-cursor *::after {
+  html.cgc-custom-cursor body,
+  html.cgc-custom-cursor a,
+  html.cgc-custom-cursor button,
+  html.cgc-custom-cursor [role="button"],
+  html.cgc-custom-cursor .card,
+  html.cgc-custom-cursor .work-card,
+  html.cgc-custom-cursor .project-card,
+  html.cgc-custom-cursor .workflow-step,
+  html.cgc-custom-cursor input,
+  html.cgc-custom-cursor select,
+  html.cgc-custom-cursor textarea {
     cursor: none !important;
   }
-  #cgcCursor { position:fixed; left:0; top:0; width:5px; height:5px; margin:-2.5px 0 0 -2.5px; border-radius:50%; background:#fff; box-shadow:0 0 6px rgba(255,255,255,.95),0 0 14px rgba(220,240,255,.45); pointer-events:none; z-index:2147483647; opacity:0; transform:translate3d(0,0,0) scale(1); transition:opacity .18s ease,transform .2s ease,box-shadow .25s ease; }
-  #cgcCursorHalo { position:fixed; left:0; top:0; width:24px; height:24px; margin:-12px 0 0 -12px; border:1px solid rgba(220,245,255,.28); border-radius:50%; pointer-events:none; z-index:2147483646; opacity:0; transform:translate3d(0,0,0) scale(.72); transition:opacity .2s ease,transform .28s cubic-bezier(.22,.61,.36,1),border-color .25s ease,box-shadow .25s ease; }
-  html.cgc-custom-cursor.cgc-cursor-active #cgcCursor, html.cgc-custom-cursor.cgc-cursor-active #cgcCursorHalo { opacity:1; }
-  html.cgc-custom-cursor.cgc-cursor-target #cgcCursor { transform:translate3d(0,0,0) scale(1.45); box-shadow:0 0 8px rgba(255,255,255,1),0 0 18px rgba(220,240,255,.65); }
-  html.cgc-custom-cursor.cgc-cursor-target #cgcCursorHalo { transform:translate3d(0,0,0) scale(1); border-color:rgba(245,252,255,.58); box-shadow:0 0 18px rgba(220,245,255,.15); }
-  html.cgc-custom-cursor.cgc-cursor-down #cgcCursor { transform:translate3d(0,0,0) scale(.7); }
+
+  .cgc-cursor-dot,
+  .cgc-cursor-halo {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 2147483647;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .cgc-cursor-dot {
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    margin-top: -2px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.98);
+    box-shadow:
+      0 0 5px rgba(255,255,255,.85),
+      0 0 12px rgba(210,238,255,.42);
+    transition: width .22s ease, height .22s ease, margin .22s ease,
+                box-shadow .22s ease, opacity .18s ease;
+  }
+
+  .cgc-cursor-halo {
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+    border-radius: 50%;
+    border: 1px solid rgba(225,242,255,.16);
+    background: radial-gradient(circle, rgba(255,255,255,.045) 0%, rgba(205,232,255,.018) 42%, transparent 72%);
+    box-shadow:
+      0 0 14px rgba(210,238,255,.08),
+      inset 0 0 10px rgba(255,255,255,.025);
+    transition: width .28s cubic-bezier(.2,.75,.25,1),
+                height .28s cubic-bezier(.2,.75,.25,1),
+                margin .28s cubic-bezier(.2,.75,.25,1),
+                border-color .25s ease,
+                background .25s ease,
+                box-shadow .25s ease,
+                opacity .18s ease;
+  }
+
+  html.cgc-cursor-visible .cgc-cursor-dot { opacity: 1; }
+  html.cgc-cursor-visible .cgc-cursor-halo { opacity: .9; }
+
+  html.cgc-cursor-active .cgc-cursor-dot {
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    margin-top: -2.5px;
+    box-shadow:
+      0 0 7px rgba(255,255,255,1),
+      0 0 18px rgba(215,240,255,.58);
+  }
+
+  html.cgc-cursor-active .cgc-cursor-halo {
+    width: 38px;
+    height: 38px;
+    margin-left: -19px;
+    margin-top: -19px;
+    border-color: rgba(235,248,255,.34);
+    background: radial-gradient(circle, rgba(255,255,255,.085) 0%, rgba(205,232,255,.025) 48%, transparent 74%);
+    box-shadow:
+      0 0 22px rgba(220,242,255,.14),
+      0 0 42px rgba(200,225,255,.055),
+      inset 0 0 14px rgba(255,255,255,.04);
+  }
+
+  html.cgc-cursor-down .cgc-cursor-dot {
+    width: 3px;
+    height: 3px;
+    margin-left: -1.5px;
+    margin-top: -1.5px;
+  }
+
+  html.cgc-cursor-down .cgc-cursor-halo {
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    margin-top: -9px;
+    border-color: rgba(255,255,255,.5);
+  }
 }
-@media (pointer: coarse) { #cgcCursor, #cgcCursorHalo { display:none !important; } }
+
+@media (hover: none), (pointer: coarse) {
+  .cgc-cursor-dot,
+  .cgc-cursor-halo { display: none !important; }
+}
 </style>
+
 </head>
 
 <body>
-<div id="cgcCursor" aria-hidden="true"></div>
-<div id="cgcCursorHalo" aria-hidden="true"></div>
     <canvas id="particles"></canvas>
     <div class="grain"></div>
 
